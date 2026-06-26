@@ -45,6 +45,7 @@ export default function AdminDashboard({
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [editingConfig, setEditingConfig] = useState<HomepageConfig>({ ...homepageConfig });
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [contentSubTab, setContentSubTab] = useState<"hero" | "intro" | "why" | "pain">("hero");
 
   // Member companies list
   const [companies, setCompanies] = useState<any[]>(() => {
@@ -689,122 +690,547 @@ export default function AdminDashboard({
               </motion.div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Left Form: Headline & Subtitle */}
-              <div className="space-y-5">
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
-                    헤드라인 서브 배지 텍스트
-                  </label>
-                  <input
-                    type="text"
-                    value={editingConfig.heroBadge}
-                    onChange={(e) => setEditingConfig({ ...editingConfig, heroBadge: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition"
-                  />
-                  <span className="text-[10px] text-gray-400 block mt-1">메인 배너 최상단에 뜨는 홍보용 원형 배지구</span>
-                </div>
+            {/* Sub-Tabs for different sections */}
+            <div className="flex border-b border-gray-100 overflow-x-auto pb-px gap-2">
+              <button
+                onClick={() => setContentSubTab("hero")}
+                className={`pb-3 text-xs font-bold whitespace-nowrap px-3 transition border-b-2 ${
+                  contentSubTab === "hero"
+                    ? "border-[#073B31] text-[#073B31]"
+                    : "border-transparent text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                메인 히어로 & 지표
+              </button>
+              <button
+                onClick={() => setContentSubTab("intro")}
+                className={`pb-3 text-xs font-bold whitespace-nowrap px-3 transition border-b-2 ${
+                  contentSubTab === "intro"
+                    ? "border-[#073B31] text-[#073B31]"
+                    : "border-transparent text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                소개 영역 (Intro)
+              </button>
+              <button
+                onClick={() => setContentSubTab("why")}
+                className={`pb-3 text-xs font-bold whitespace-nowrap px-3 transition border-b-2 ${
+                  contentSubTab === "why"
+                    ? "border-[#073B31] text-[#073B31]"
+                    : "border-transparent text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                고용 필요성 (Why)
+              </button>
+              <button
+                onClick={() => setContentSubTab("pain")}
+                className={`pb-3 text-xs font-bold whitespace-nowrap px-3 transition border-b-2 ${
+                  contentSubTab === "pain"
+                    ? "border-[#073B31] text-[#073B31]"
+                    : "border-transparent text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                현실적 고민 (Pain Points)
+              </button>
+            </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
-                    메인 헤드라인 텍스트 (줄바꿈 가능)
-                  </label>
-                  <textarea
-                    rows={4}
-                    value={editingConfig.heroTitle}
-                    onChange={(e) => setEditingConfig({ ...editingConfig, heroTitle: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition font-mono leading-relaxed"
-                  />
-                  <span className="text-[10px] text-gray-400 block mt-1">줄바꿈을 적용하면 웹 브라우저에서도 그대로 단락이 맞춰집니다.</span>
-                </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Left Column: Form Fields (Takes 7 cols) */}
+              <div className="lg:col-span-7 space-y-6">
+                {contentSubTab === "hero" && (
+                  <div className="space-y-5">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                        히어로 배지 텍스트
+                      </label>
+                      <input
+                        type="text"
+                        value={editingConfig.heroBadge}
+                        onChange={(e) => setEditingConfig({ ...editingConfig, heroBadge: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
-                    메인 서브 요약 설명글
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={editingConfig.heroSubtitle}
-                    onChange={(e) => setEditingConfig({ ...editingConfig, heroSubtitle: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition font-sans leading-relaxed"
-                  />
-                </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                        메인 헤드라인 텍스트 (줄바꿈 가능)
+                      </label>
+                      <textarea
+                        rows={4}
+                        value={editingConfig.heroTitle}
+                        onChange={(e) => setEditingConfig({ ...editingConfig, heroTitle: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition font-mono leading-relaxed"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                        메인 서브 요약 설명글
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={editingConfig.heroSubtitle}
+                        onChange={(e) => setEditingConfig({ ...editingConfig, heroSubtitle: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition font-sans leading-relaxed"
+                      />
+                    </div>
+
+                    <div className="pt-4 border-t border-gray-100">
+                      <h3 className="font-extrabold text-xs text-[#073B31] uppercase tracking-wider mb-3">수치 지표 관리 (Metrics)</h3>
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[10px] font-bold text-gray-500 mb-1">지표 1 수치</label>
+                            <input
+                              type="text"
+                              value={editingConfig.metric1Val}
+                              onChange={(e) => setEditingConfig({ ...editingConfig, metric1Val: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs font-bold"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold text-gray-500 mb-1">지표 1 설명문구</label>
+                            <input
+                              type="text"
+                              value={editingConfig.metric1Lab}
+                              onChange={(e) => setEditingConfig({ ...editingConfig, metric1Lab: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs font-medium"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[10px] font-bold text-gray-500 mb-1">지표 2 수치</label>
+                            <input
+                              type="text"
+                              value={editingConfig.metric2Val}
+                              onChange={(e) => setEditingConfig({ ...editingConfig, metric2Val: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs font-bold"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold text-gray-500 mb-1">지표 2 설명문구</label>
+                            <input
+                              type="text"
+                              value={editingConfig.metric2Lab}
+                              onChange={(e) => setEditingConfig({ ...editingConfig, metric2Lab: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs font-medium"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[10px] font-bold text-gray-500 mb-1">지표 3 수치</label>
+                            <input
+                              type="text"
+                              value={editingConfig.metric3Val}
+                              onChange={(e) => setEditingConfig({ ...editingConfig, metric3Val: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs font-bold"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold text-gray-500 mb-1">지표 3 설명문구</label>
+                            <input
+                              type="text"
+                              value={editingConfig.metric3Lab}
+                              onChange={(e) => setEditingConfig({ ...editingConfig, metric3Lab: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs font-medium"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {contentSubTab === "intro" && (
+                  <div className="space-y-5">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                        소개 배지 텍스트
+                      </label>
+                      <input
+                        type="text"
+                        value={editingConfig.introBadge || ""}
+                        onChange={(e) => setEditingConfig({ ...editingConfig, introBadge: e.target.value })}
+                        placeholder="ABOUT · 베네피플"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                        소개 메인 타이틀
+                      </label>
+                      <input
+                        type="text"
+                        value={editingConfig.introTitle || ""}
+                        onChange={(e) => setEditingConfig({ ...editingConfig, introTitle: e.target.value })}
+                        placeholder="이름에 담은 약속, Benefit + People"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                        소개 상세 설명글 (줄바꿈 가능)
+                      </label>
+                      <textarea
+                        rows={4}
+                        value={editingConfig.introDesc || ""}
+                        onChange={(e) => setEditingConfig({ ...editingConfig, introDesc: e.target.value })}
+                        placeholder="소개 상세 설명을 입력해 주세요."
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition font-sans leading-relaxed"
+                      />
+                    </div>
+
+                    <div className="pt-4 border-t border-gray-100 space-y-4">
+                      <h3 className="font-extrabold text-xs text-[#073B31] uppercase tracking-wider">3대 핵심 기둥 (Pillars)</h3>
+                      
+                      <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-3">
+                        <span className="text-[10px] font-bold text-emerald-700 uppercase">첫 번째 기둥</span>
+                        <input
+                          type="text"
+                          value={editingConfig.introPillar1Title || ""}
+                          onChange={(e) => setEditingConfig({ ...editingConfig, introPillar1Title: e.target.value })}
+                          placeholder="브랜드 의미"
+                          className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs font-bold"
+                        />
+                        <textarea
+                          rows={2}
+                          value={editingConfig.introPillar1Desc || ""}
+                          onChange={(e) => setEditingConfig({ ...editingConfig, introPillar1Desc: e.target.value })}
+                          placeholder="설명을 입력하세요."
+                          className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs"
+                        />
+                      </div>
+
+                      <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-3">
+                        <span className="text-[10px] font-bold text-emerald-700 uppercase">두 번째 기둥</span>
+                        <input
+                          type="text"
+                          value={editingConfig.introPillar2Title || ""}
+                          onChange={(e) => setEditingConfig({ ...editingConfig, introPillar2Title: e.target.value })}
+                          placeholder="미션 · 비전"
+                          className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs font-bold"
+                        />
+                        <textarea
+                          rows={2}
+                          value={editingConfig.introPillar2Desc || ""}
+                          onChange={(e) => setEditingConfig({ ...editingConfig, introPillar2Desc: e.target.value })}
+                          placeholder="설명을 입력하세요."
+                          className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs"
+                        />
+                      </div>
+
+                      <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-3">
+                        <span className="text-[10px] font-bold text-emerald-700 uppercase">세 번째 기둥</span>
+                        <input
+                          type="text"
+                          value={editingConfig.introPillar3Title || ""}
+                          onChange={(e) => setEditingConfig({ ...editingConfig, introPillar3Title: e.target.value })}
+                          placeholder="서비스 가치"
+                          className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs font-bold"
+                        />
+                        <textarea
+                          rows={2}
+                          value={editingConfig.introPillar3Desc || ""}
+                          onChange={(e) => setEditingConfig({ ...editingConfig, introPillar3Desc: e.target.value })}
+                          placeholder="설명을 입력하세요."
+                          className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {contentSubTab === "why" && (
+                  <div className="space-y-5">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                        필요성 배지 텍스트
+                      </label>
+                      <input
+                        type="text"
+                        value={editingConfig.whyBadge || ""}
+                        onChange={(e) => setEditingConfig({ ...editingConfig, whyBadge: e.target.value })}
+                        placeholder="THE REGULATORY CONTEXT"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                        필요성 영역 제목
+                      </label>
+                      <input
+                        type="text"
+                        value={editingConfig.whyTitle || ""}
+                        onChange={(e) => setEditingConfig({ ...editingConfig, whyTitle: e.target.value })}
+                        placeholder="왜 지금 장애인 고용인가?"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                        필요성 설명문구
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={editingConfig.whyDesc || ""}
+                        onChange={(e) => setEditingConfig({ ...editingConfig, whyDesc: e.target.value })}
+                        placeholder="의무 고용의 필요성을 간략히 설명해 주세요."
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition font-sans leading-relaxed"
+                      />
+                    </div>
+
+                    <div className="pt-4 border-t border-gray-100 space-y-4">
+                      <h3 className="font-extrabold text-xs text-[#073B31] uppercase tracking-wider">주요 상황 지표 카드 (4 Cards)</h3>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-3.5 bg-gray-50 border border-gray-100 rounded-xl space-y-2">
+                          <span className="text-[9px] font-bold text-emerald-800">지표 카드 1</span>
+                          <input
+                            type="text"
+                            value={editingConfig.whyCard1Title || ""}
+                            onChange={(e) => setEditingConfig({ ...editingConfig, whyCard1Title: e.target.value })}
+                            placeholder="의무고용률 지속 강화"
+                            className="w-full px-3 py-1.5 border border-gray-200 bg-white rounded-lg text-xs font-bold"
+                          />
+                          <textarea
+                            rows={2}
+                            value={editingConfig.whyCard1Desc || ""}
+                            onChange={(e) => setEditingConfig({ ...editingConfig, whyCard1Desc: e.target.value })}
+                            placeholder="설명"
+                            className="w-full px-3 py-1.5 border border-gray-200 bg-white rounded-lg text-xs"
+                          />
+                        </div>
+
+                        <div className="p-3.5 bg-gray-50 border border-gray-100 rounded-xl space-y-2">
+                          <span className="text-[9px] font-bold text-emerald-800">지표 카드 2</span>
+                          <input
+                            type="text"
+                            value={editingConfig.whyCard2Title || ""}
+                            onChange={(e) => setEditingConfig({ ...editingConfig, whyCard2Title: e.target.value })}
+                            placeholder="고용부담금 매년 인상"
+                            className="w-full px-3 py-1.5 border border-gray-200 bg-white rounded-lg text-xs font-bold"
+                          />
+                          <textarea
+                            rows={2}
+                            value={editingConfig.whyCard2Desc || ""}
+                            onChange={(e) => setEditingConfig({ ...editingConfig, whyCard2Desc: e.target.value })}
+                            placeholder="설명"
+                            className="w-full px-3 py-1.5 border border-gray-200 bg-white rounded-lg text-xs"
+                          />
+                        </div>
+
+                        <div className="p-3.5 bg-gray-50 border border-gray-100 rounded-xl space-y-2">
+                          <span className="text-[9px] font-bold text-emerald-800">지표 카드 3</span>
+                          <input
+                            type="text"
+                            value={editingConfig.whyCard3Title || ""}
+                            onChange={(e) => setEditingConfig({ ...editingConfig, whyCard3Title: e.target.value })}
+                            placeholder="ESG 가이드라인 강화"
+                            className="w-full px-3 py-1.5 border border-gray-200 bg-white rounded-lg text-xs font-bold"
+                          />
+                          <textarea
+                            rows={2}
+                            value={editingConfig.whyCard3Desc || ""}
+                            onChange={(e) => setEditingConfig({ ...editingConfig, whyCard3Desc: e.target.value })}
+                            placeholder="설명"
+                            className="w-full px-3 py-1.5 border border-gray-200 bg-white rounded-lg text-xs"
+                          />
+                        </div>
+
+                        <div className="p-3.5 bg-gray-50 border border-gray-100 rounded-xl space-y-2">
+                          <span className="text-[9px] font-bold text-emerald-800">지표 카드 4</span>
+                          <input
+                            type="text"
+                            value={editingConfig.whyCard4Title || ""}
+                            onChange={(e) => setEditingConfig({ ...editingConfig, whyCard4Title: e.target.value })}
+                            placeholder="정부 점검 및 관리 강화"
+                            className="w-full px-3 py-1.5 border border-gray-200 bg-white rounded-lg text-xs font-bold"
+                          />
+                          <textarea
+                            rows={2}
+                            value={editingConfig.whyCard4Desc || ""}
+                            onChange={(e) => setEditingConfig({ ...editingConfig, whyCard4Desc: e.target.value })}
+                            placeholder="설명"
+                            className="w-full px-3 py-1.5 border border-gray-200 bg-white rounded-lg text-xs"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-gray-100 space-y-4">
+                      <h3 className="font-extrabold text-xs text-[#073B31] uppercase tracking-wider">주요 위험 요인 및 하단 경고글</h3>
+                      
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1.5">리스크 박스 타이틀</label>
+                        <input
+                          type="text"
+                          value={editingConfig.whyRiskTitle || ""}
+                          onChange={(e) => setEditingConfig({ ...editingConfig, whyRiskTitle: e.target.value })}
+                          placeholder="장애인 고용 부재의 숨겨진 리스크"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1.5">리스크 박스 설명문구 (줄바꿈 가능)</label>
+                        <textarea
+                          rows={4}
+                          value={editingConfig.whyRiskDesc || ""}
+                          onChange={(e) => setEditingConfig({ ...editingConfig, whyRiskDesc: e.target.value })}
+                          placeholder="리스크 설명을 입력해 주세요."
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition font-sans leading-relaxed"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {contentSubTab === "pain" && (
+                  <div className="space-y-5">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                        고민 배지 텍스트
+                      </label>
+                      <input
+                        type="text"
+                        value={editingConfig.painBadge || ""}
+                        onChange={(e) => setEditingConfig({ ...editingConfig, painBadge: e.target.value })}
+                        placeholder="PAIN POINTS"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                        고민 영역 대제목
+                      </label>
+                      <input
+                        type="text"
+                        value={editingConfig.painTitle || ""}
+                        onChange={(e) => setEditingConfig({ ...editingConfig, painTitle: e.target.value })}
+                        placeholder="기업의 현실적인 고민"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                        고민 영역 서두 설명글
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={editingConfig.painDesc || ""}
+                        onChange={(e) => setEditingConfig({ ...editingConfig, painDesc: e.target.value })}
+                        placeholder="고민 영역 상세설명"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition font-sans leading-relaxed"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                        하단 노란색 강조 경고글
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={editingConfig.painCaution || ""}
+                        onChange={(e) => setEditingConfig({ ...editingConfig, painCaution: e.target.value })}
+                        placeholder="고민하고 망설이는 동안에도, 부담금은 매년 세금처럼 매달 일정하게 증가하고 있습니다."
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition font-sans leading-relaxed"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Right Form: Metrics Panel */}
-              <div className="space-y-5 bg-[#073B31]/5 p-5 rounded-2xl border border-dashed border-[#073B31]/10">
-                <h3 className="font-extrabold text-xs text-[#073B31] uppercase tracking-wider mb-2">하단 수치 지표 관리 (Metrics)</h3>
-                
-                <div className="grid grid-cols-2 gap-3">
+              {/* Right Column: Simulated Live Web Preview (Takes 5 cols) */}
+              <div className="lg:col-span-5 space-y-6">
+                <div className="bg-[#073B31]/5 p-5 rounded-2xl border border-dashed border-[#073B31]/10 h-full flex flex-col justify-between">
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-500 mb-1">지표 1 수치</label>
-                    <input
-                      type="text"
-                      value={editingConfig.metric1Val}
-                      onChange={(e) => setEditingConfig({ ...editingConfig, metric1Val: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs font-bold"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-gray-500 mb-1">지표 1 설명문구</label>
-                    <input
-                      type="text"
-                      value={editingConfig.metric1Lab}
-                      onChange={(e) => setEditingConfig({ ...editingConfig, metric1Lab: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs font-medium"
-                    />
-                  </div>
-                </div>
+                    <span className="text-[10px] font-black text-[#073B31] block tracking-widest uppercase mb-4">
+                      🖥️ 실시간 웹 랜더링 미리보기
+                    </span>
+                    
+                    {contentSubTab === "hero" && (
+                      <div className="bg-brand-green text-white p-5 rounded-xl shadow-lg space-y-4">
+                        <span className="text-[9px] font-bold bg-white/10 px-2 py-0.5 rounded-full text-brand-accent inline-block">{editingConfig.heroBadge}</span>
+                        <h4 className="text-sm font-extrabold whitespace-pre-line leading-relaxed">{editingConfig.heroTitle}</h4>
+                        <p className="text-[11px] text-gray-300 leading-relaxed">{editingConfig.heroSubtitle}</p>
+                        
+                        <div className="pt-3 border-t border-white/10 grid grid-cols-3 gap-2 text-center text-white">
+                          <div>
+                            <p className="text-xs font-black text-[#EBB63F]">{editingConfig.metric1Val}</p>
+                            <p className="text-[8px] text-gray-300 scale-90 origin-center">{editingConfig.metric1Lab}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-black text-[#EBB63F]">{editingConfig.metric2Val}</p>
+                            <p className="text-[8px] text-gray-300 scale-90 origin-center">{editingConfig.metric2Lab}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-black text-[#EBB63F]">{editingConfig.metric3Val}</p>
+                            <p className="text-[8px] text-gray-300 scale-90 origin-center">{editingConfig.metric3Lab}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[10px] font-bold text-gray-500 mb-1">지표 2 수치</label>
-                    <input
-                      type="text"
-                      value={editingConfig.metric2Val}
-                      onChange={(e) => setEditingConfig({ ...editingConfig, metric2Val: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs font-bold"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-gray-500 mb-1">지표 2 설명문구</label>
-                    <input
-                      type="text"
-                      value={editingConfig.metric2Lab}
-                      onChange={(e) => setEditingConfig({ ...editingConfig, metric2Lab: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs font-medium"
-                    />
-                  </div>
-                </div>
+                    {contentSubTab === "intro" && (
+                      <div className="bg-[#073B31] text-white p-5 rounded-xl shadow-lg space-y-4">
+                        <div className="border-l-2 border-brand-accent pl-2">
+                          <span className="text-[9px] font-bold text-brand-accent block">{editingConfig.introBadge || "ABOUT · 베네피플"}</span>
+                          <h4 className="text-xs font-bold">{editingConfig.introTitle || "이름에 담은 약속"}</h4>
+                        </div>
+                        <p className="text-[10px] text-gray-300 whitespace-pre-line">{editingConfig.introDesc || ""}</p>
+                        
+                        <div className="space-y-2 pt-2">
+                          <div className="p-2.5 bg-[#0D5C4E]/40 border border-[#0D5C4E] rounded-lg text-[10px]">
+                            <p className="font-bold text-brand-accent">{editingConfig.introPillar1Title || "브랜드 의미"}</p>
+                            <p className="text-gray-300 mt-1">{editingConfig.introPillar1Desc || ""}</p>
+                          </div>
+                          <div className="p-2.5 bg-[#0D5C4E]/40 border border-[#0D5C4E] rounded-lg text-[10px]">
+                            <p className="font-bold text-brand-accent">{editingConfig.introPillar2Title || "미션 · 비전"}</p>
+                            <p className="text-gray-300 mt-1">{editingConfig.introPillar2Desc || ""}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[10px] font-bold text-gray-500 mb-1">지표 3 수치</label>
-                    <input
-                      type="text"
-                      value={editingConfig.metric3Val}
-                      onChange={(e) => setEditingConfig({ ...editingConfig, metric3Val: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs font-bold"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-gray-500 mb-1">지표 3 설명문구</label>
-                    <input
-                      type="text"
-                      value={editingConfig.metric3Lab}
-                      onChange={(e) => setEditingConfig({ ...editingConfig, metric3Lab: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-200 bg-white rounded-lg outline-none text-xs font-medium"
-                    />
-                  </div>
-                </div>
+                    {contentSubTab === "why" && (
+                      <div className="bg-white border border-gray-100 p-5 rounded-xl shadow-lg space-y-4 text-gray-800">
+                        <span className="text-[9px] font-bold bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded-full">{editingConfig.whyBadge || "THE REGULATORY CONTEXT"}</span>
+                        <h4 className="text-xs font-black text-emerald-950">{editingConfig.whyTitle || "왜 지금인가?"}</h4>
+                        <p className="text-[10px] text-gray-500">{editingConfig.whyDesc || ""}</p>
+                        
+                        <div className="p-3.5 bg-red-50/50 border border-red-100 rounded-lg text-[10px] text-red-900">
+                          <p className="font-bold">{editingConfig.whyRiskTitle || "숨겨진 리스크"}</p>
+                          <p className="text-red-700 mt-1 whitespace-pre-line">{editingConfig.whyRiskDesc || ""}</p>
+                        </div>
+                      </div>
+                    )}
 
-                {/* Simulated Web Preview Card */}
-                <div className="p-4 bg-brand-green text-white rounded-xl shadow-sm mt-6">
-                  <span className="text-[9px] font-bold text-brand-accent block">REAL-TIME WEB RENDER PREVIEW</span>
-                  <div className="mt-2 border-l-2 border-brand-accent pl-2">
-                    <span className="text-[9px] font-bold bg-white/10 px-1.5 py-0.5 rounded-full text-brand-accent inline-block mb-1">{editingConfig.heroBadge}</span>
-                    <h4 className="text-xs font-extrabold whitespace-pre-line leading-relaxed">{editingConfig.heroTitle}</h4>
+                    {contentSubTab === "pain" && (
+                      <div className="bg-[#F8FAF9] border border-gray-200 p-5 rounded-xl shadow-lg space-y-4 text-gray-800">
+                        <span className="text-[9px] font-bold bg-emerald-100/50 text-emerald-950 px-2 py-0.5 rounded-full">{editingConfig.painBadge || "PAIN POINTS"}</span>
+                        <h4 className="text-xs font-black text-emerald-950">{editingConfig.painTitle || "고민"}</h4>
+                        <p className="text-[10px] text-gray-500">{editingConfig.painDesc || ""}</p>
+                        
+                        <div className="p-2.5 bg-amber-50 border border-amber-100 rounded-lg text-[9px] text-amber-800 font-bold">
+                          {editingConfig.painCaution || ""}
+                        </div>
+                      </div>
+                    )}
                   </div>
+
+                  <p className="text-[10px] text-gray-400 font-sans mt-4">
+                    * 우측 화면은 홈페이지의 실제 모듈 구성을 그대로 축소 묘사한 모바일 지향 프리뷰 카드입니다.
+                  </p>
                 </div>
               </div>
             </div>

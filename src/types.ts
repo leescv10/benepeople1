@@ -66,6 +66,35 @@ export interface HomepageConfig {
   metric2Lab: string;
   metric3Val: string;
   metric3Lab: string;
+  // Intro Section
+  introBadge?: string;
+  introTitle?: string;
+  introDesc?: string;
+  introPillar1Title?: string;
+  introPillar1Desc?: string;
+  introPillar2Title?: string;
+  introPillar2Desc?: string;
+  introPillar3Title?: string;
+  introPillar3Desc?: string;
+  // Why Section
+  whyBadge?: string;
+  whyTitle?: string;
+  whyDesc?: string;
+  whyCard1Title?: string;
+  whyCard1Desc?: string;
+  whyCard2Title?: string;
+  whyCard2Desc?: string;
+  whyCard3Title?: string;
+  whyCard3Desc?: string;
+  whyCard4Title?: string;
+  whyCard4Desc?: string;
+  whyRiskTitle?: string;
+  whyRiskDesc?: string;
+  // Pain Points Section
+  painBadge?: string;
+  painTitle?: string;
+  painDesc?: string;
+  painCaution?: string;
 }
 
 export interface Inquiry {

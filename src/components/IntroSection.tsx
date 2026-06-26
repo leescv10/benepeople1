@@ -1,7 +1,25 @@
 import { motion } from "motion/react";
 import { Heart, Target, Sparkles, MapPin, BookOpen, Settings } from "lucide-react";
+import { HomepageConfig } from "../types";
 
-export default function IntroSection() {
+interface IntroSectionProps {
+  config?: HomepageConfig;
+}
+
+export default function IntroSection({ config }: IntroSectionProps) {
+  const introBadge = config?.introBadge || "ABOUT · 베네피플";
+  const introTitle = config?.introTitle || "이름에 담은 약속, Benefit + People";
+  const introDesc = config?.introDesc || "베네피플은 '혜택(Benefit)'과 '사람(People)'을 더한 이름입니다.\n좋은 인재와 좋은 일터를 안전하고 투명하게 연결하여, 기업과 근로자 모두에게 윈윈(Win-Win)의 가치를 확실히 제공합니다.";
+  
+  const pillar1Title = config?.introPillar1Title || "브랜드 의미";
+  const pillar1Desc = config?.introPillar1Desc || "라틴어 Bene(좋은 · 이롭게)에서 출발해, 기업의 이익 창출과 사회공헌 활동 모두 중심에 '사람'을 둡니다.";
+  
+  const pillar2Title = config?.introPillar2Title || "미션 · 비전";
+  const pillar2Desc = config?.introPillar2Desc || "베네피플은 누구도 일에서 소외되지 않는 사회를 만들고, 장애인 고용을 단순 비용 지출이 아닌 경영 성과로 바꾸어 기업과 사회가 함께 성장하는 미래를 만듭니다.";
+  
+  const pillar3Title = config?.introPillar3Title || "서비스 가치";
+  const pillar3Desc = config?.introPillar3Desc || "장애가 있는 우수한 인재와 기업 고객을 정밀 매칭하고, 채용 · 노무 위탁 · 전용 ERP · 사후관리 전 과정을 합법적으로 완벽 일임하여 완벽히 행정 부담을 덜어드립니다.";
+
   return (
     <section id="about" className="py-24 bg-[#073B31] text-white relative overflow-hidden">
       {/* Decorative patterns */}
@@ -11,16 +29,23 @@ export default function IntroSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="border-l-4 border-[#EBB63F] pl-4 mb-6">
           <span className="font-mono text-xs uppercase tracking-widest text-brand-accent font-bold">
-            ABOUT · 베네피플
+            {introBadge}
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-2 text-white font-sans">
-            이름에 담은 약속, <span className="text-brand-accent">Benefit + People</span>
+            {introTitle.includes("Benefit + People") ? (
+              <>
+                {introTitle.split("Benefit + People")[0]}
+                <span className="text-brand-accent">Benefit + People</span>
+                {introTitle.split("Benefit + People")[1]}
+              </>
+            ) : (
+              introTitle
+            )}
           </h2>
         </div>
 
-        <p className="text-gray-300 max-w-4xl text-sm sm:text-base leading-relaxed mb-16">
-          베네피플은 <strong>'혜택(Benefit)'</strong>과 <strong>'사람(People)'</strong>을 더한 이름입니다.  
-          좋은 인재와 좋은 일터를 안전하고 투명하게 연결하여, 기업과 근로자 모두에게 <strong>윈윈(Win-Win)의 가치</strong>를 확실히 제공합니다.
+        <p className="text-gray-300 max-w-4xl text-sm sm:text-base leading-relaxed mb-16 whitespace-pre-line">
+          {introDesc}
         </p>
 
         {/* Three core brand pillars */}
@@ -29,9 +54,9 @@ export default function IntroSection() {
             <div className="w-12 h-12 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent mb-6">
               <Heart className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-white mb-3">브랜드 의미</h3>
+            <h3 className="text-lg font-bold text-white mb-3">{pillar1Title}</h3>
             <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-              라틴어 <strong>Bene(좋은 · 이롭게)</strong>에서 출발해, 기업의 이익 창출과 사회공헌 활동 모두 중심에 <strong className="text-[#EBB63F]">'사람'</strong>을 둡니다.
+              {pillar1Desc}
             </p>
           </div>
 
@@ -39,9 +64,9 @@ export default function IntroSection() {
             <div className="w-12 h-12 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent mb-6">
               <Target className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-white mb-3">미션 · 비전</h3>
+            <h3 className="text-lg font-bold text-white mb-3">{pillar2Title}</h3>
             <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-              베네피플은 누구도 일에서 소외되지 않는 사회를 만들고, 장애인 고용을 단순 비용 지출이 아닌 <strong className="text-[#EBB63F]">경영 성과</strong>로 바꾸어 기업과 사회가 함께 성장하는 미래를 만듭니다.
+              {pillar2Desc}
             </p>
           </div>
 
@@ -49,9 +74,9 @@ export default function IntroSection() {
             <div className="w-12 h-12 rounded-xl bg-brand-accent/10 border border-brand-accent/20 flex items-center justify-center text-brand-accent mb-6">
               <Sparkles className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-bold text-white mb-3">서비스 가치</h3>
+            <h3 className="text-lg font-bold text-white mb-3">{pillar3Title}</h3>
             <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-              장애가 있는 우수한 인재와 기업 고객을 정밀 매칭하고, <strong>채용 · 노무 위탁 · 전용 ERP · 사후관리 전 과정</strong>을 합법적으로 완벽 일임하여 완벽히 행정 부담을 덜어드립니다.
+              {pillar3Desc}
             </p>
           </div>
         </div>

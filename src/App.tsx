@@ -25,7 +25,36 @@ const DEFAULT_HOMEPAGE_CONFIG: HomepageConfig = {
   metric2Val: "25개",
   metric2Lab: "전국 거점 지사",
   metric3Val: "100%",
-  metric3Lab: "노무 법적 무결점 승인"
+  metric3Lab: "노무 법적 무결점 승인",
+  // Intro Section
+  introBadge: "ABOUT · 베네피플",
+  introTitle: "이름에 담은 약속, Benefit + People",
+  introDesc: "베네피플은 '혜택(Benefit)'과 '사람(People)'을 더한 이름입니다.\n좋은 인재와 좋은 일터를 안전하고 투명하게 연결하여, 기업과 근로자 모두에게 윈윈(Win-Win)의 가치를 확실히 제공합니다.",
+  introPillar1Title: "브랜드 의미",
+  introPillar1Desc: "라틴어 Bene(좋은 · 이롭게)에서 출발해, 기업의 이익 창출과 사회공헌 활동 모두 중심에 '사람'을 둡니다.",
+  introPillar2Title: "미션 · 비전",
+  introPillar2Desc: "베네피플은 누구도 일에서 소외되지 않는 사회를 만들고, 장애인 고용을 단순 비용 지출이 아닌 경영 성과로 바꾸어 기업과 사회가 함께 성장하는 미래를 만듭니다.",
+  introPillar3Title: "서비스 가치",
+  introPillar3Desc: "장애가 있는 우수한 인재와 기업 고객을 정밀 매칭하고, 채용 · 노무 위탁 · 전용 ERP · 사후관리 전 과정을 합법적으로 완벽 일임하여 완벽히 행정 부담을 덜어드립니다.",
+  // Why Section
+  whyBadge: "THE REGULATORY CONTEXT",
+  whyTitle: "왜 지금 장애인 고용인가?",
+  whyDesc: "기업의 장애인 의무 고용은 단순한 도덕적 선택이 아닌, 강력한 법적 의무이자 ESG 경영의 중추적 핵심 요소입니다.",
+  whyCard1Title: "의무고용률 지속 강화",
+  whyCard1Desc: "100인 이상 사업장 장애인 의무고용율 3.1% 기준이 지속적으로 강화되고 있으며, 미준수 시 법적 제재 부담을 강하게 안게 됩니다.",
+  whyCard2Title: "고용부담금 매년 인상",
+  whyCard2Desc: "미달 인원당 최저임금 연동 제도가 적용되어, 연간 미달 인원에 부과되는 고용부담금 금액이 매년 고공 행진하고 있습니다.",
+  whyCard3Title: "ESG 가이드라인 강화",
+  whyCard3Desc: "공인 지속가능경영 평가에서 S(사회적 임팩트) 부문의 장애인 일자리 창출 실적 및 포용 고용 비중이 대폭 강화되고 있습니다.",
+  whyCard4Title: "정부 점검 및 관리 강화",
+  whyCard4Desc: "장애인 고용 및 실제 근무지의 실질적인 운영 실태와 가짜 고용 필터링에 대한 보건복지부/공단의 사후 현장 점검이 강화되고 있습니다.",
+  whyRiskTitle: "장애인 고용 부재의 숨겨진 리스크",
+  whyRiskDesc: "많은 기업이 막대한 부담금을 매년 납부하면서도, 정작 실질적인 맞춤형 직무와 체계적인 재택근무 관리 방법을 찾지 못해 매월 깊은 고충을 격하게 겪고 있는 것이 오늘날 대한민국 기업들의 냉정한 현실입니다.",
+  // Pain Points Section
+  painBadge: "PAIN POINTS",
+  painTitle: "기업의 현실적인 고민",
+  painDesc: "장애인 고용에는 생각보다 복잡한 허들들이 다양하게 존재합니다.",
+  painCaution: "고민하고 망설이는 동안에도, 부담금은 매년 세금처럼 매달 일정하게 증가하고 있습니다."
 };
 
 export default function App() {
@@ -130,7 +159,16 @@ export default function App() {
                 </div>
 
                 <h1 className="text-4xl sm:text-5xl xl:text-6xl font-black leading-[1.3] tracking-tight whitespace-pre-line">
-                  {homepageConfig.heroTitle}
+                  {homepageConfig.heroTitle.split("베네피플").map((part, index, array) => (
+                    <React.Fragment key={index}>
+                      {part}
+                      {index < array.length - 1 && (
+                        <span className="text-brand-accent">
+                          베네피플
+                        </span>
+                      )}
+                    </React.Fragment>
+                  ))}
                 </h1>
 
                 <p className="text-gray-300 text-sm sm:text-base xl:text-lg leading-relaxed max-w-2xl mx-auto lg:mx-0 font-sans">
@@ -204,13 +242,13 @@ export default function App() {
           </section>
 
           {/* 2. Intro Section */}
-          <IntroSection />
+          <IntroSection config={homepageConfig} />
 
           {/* 3. Why Section */}
-          <WhySection />
+          <WhySection config={homepageConfig} />
 
           {/* 4. Pain Points Section */}
-          <PainPointsSection />
+          <PainPointsSection config={homepageConfig} />
 
           {/* 5. Three Pillars Section */}
           <ThreePillarsSection />

@@ -1,7 +1,17 @@
 import { motion } from "motion/react";
 import { HelpCircle, AlertCircle } from "lucide-react";
+import { HomepageConfig } from "../types";
 
-export default function PainPointsSection() {
+interface PainPointsSectionProps {
+  config?: HomepageConfig;
+}
+
+export default function PainPointsSection({ config }: PainPointsSectionProps) {
+  const painBadge = config?.painBadge || "PAIN POINTS";
+  const painTitle = config?.painTitle || "기업의 현실적인 고민";
+  const painDesc = config?.painDesc || "장애인 고용에는 생각보다 복잡한 허들들이 다양하게 존재합니다.";
+  const painCaution = config?.painCaution || "고민하고 망설이는 동안에도, 부담금은 매년 세금처럼 매달 일정하게 증가하고 있습니다.";
+
   const qas = [
     {
       id: "qa-1",
@@ -40,13 +50,13 @@ export default function PainPointsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="font-mono text-xs uppercase tracking-widest text-brand-lightgreen px-3 py-1 bg-brand-lightgreen/10 rounded-full font-bold">
-            PAIN POINTS
+            {painBadge}
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-4 text-brand-green">
-            기업의 현실적인 고민
+            {painTitle}
           </h2>
           <p className="text-gray-600 mt-4 text-sm sm:text-base leading-relaxed">
-            장애인 고용에는 생각보다 복잡한 허들들이 다양하게 존재합니다.
+            {painDesc}
           </p>
         </div>
 
@@ -90,7 +100,7 @@ export default function PainPointsSection() {
         <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center max-w-2xl mx-auto flex items-center justify-center gap-2.5">
           <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
           <span className="text-xs sm:text-sm font-bold text-amber-800">
-            고민하고 망설이는 동안에도, 부담금은 매년 세금처럼 매달 일정하게 증가하고 있습니다.
+            {painCaution}
           </span>
         </div>
       </div>
