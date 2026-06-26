@@ -61,6 +61,28 @@ export default function AIDiagnosisSection() {
 
       const data = await response.json();
       setResult(data);
+
+      // Save inquiry to localStorage for Admin Dashboard review
+      try {
+        const saved = localStorage.getItem("bene_people_inquiries");
+        const list = saved ? JSON.parse(saved) : [];
+        const newInquiry = {
+          id: `inq-${Date.now()}`,
+          companyName: form.companyName,
+          totalEmployees: parseInt(form.totalEmployees, 10),
+          currentDisabledEmployees: parseInt(form.currentDisabledEmployees, 10) || 0,
+          managerName: form.managerName,
+          managerContact: form.managerContact,
+          managerEmail: form.managerEmail,
+          date: new Date().toISOString().split("T")[0],
+          savingsYearly: data.savingsYearly || 0,
+          status: "접수대기",
+        };
+        list.unshift(newInquiry);
+        localStorage.setItem("bene_people_inquiries", JSON.stringify(list));
+      } catch (storageError) {
+        console.warn("Could not save inquiry to local storage:", storageError);
+      }
     } catch (err: any) {
       console.error(err);
       setError("AI 진단서 생성 중 연결 실패가 발생했습니다. 잠시 후 다시 시도해 주세요.");

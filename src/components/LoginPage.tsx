@@ -40,15 +40,19 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
     // Simulate authenticating server call
     setTimeout(() => {
       setLoading(false);
-      if (
+      
+      // Explicit Admin Check
+      if (email === "admins" && password === "chon1092!!") {
+        onLoginSuccess("최고관리자 (ADMIN)");
+      } else if (
         (email === "admin@benepeople.com" && password === "benepeople1234") ||
         (email === "partner@esgcorp.kr" && password === "esgpartner77") ||
-        password.length >= 6 // allow mock logins too
+        (email !== "admins" && password.length >= 6)
       ) {
         const company = email.includes("esgcorp") ? "ESG 환경코퍼레이션" : "(주)베네피플 일렉트릭";
         onLoginSuccess(company);
       } else {
-        setError("일치하는 회원사 계정 정보가 없습니다. 비밀번호나 메일 주소를 확인해 주세요. (또는 하단의 데모 계정을 클릭하여 간편하게 테스트하세요)");
+        setError("일치하는 계정 정보가 없습니다. 아이디와 비밀번호를 다시 확인해 주세요. (관리자 아이디: admins / 패스워드: chon1092!!)");
       }
     }, 1200);
   };
@@ -95,24 +99,24 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email Field */}
+            {/* Email / ID Field */}
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
-                회원사 관리자 이메일
+                회원사 이메일 또는 관리자 ID
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
                   <Mail className="w-4 h-4" />
                 </div>
                 <input
-                  type="email"
+                  type="text"
                   required
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
                     setError(null);
                   }}
-                  placeholder="name@company.com"
+                  placeholder="name@company.com 또는 admins"
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen focus:border-transparent outline-none text-xs sm:text-sm font-medium transition"
                   disabled={loading}
                 />

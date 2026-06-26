@@ -55,3 +55,29 @@ export interface DiagnosisResult {
   savingsPercent: number;
   geminiReport: string;
 }
+
+export interface HomepageConfig {
+  heroBadge: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  metric1Val: string;
+  metric1Lab: string;
+  metric2Val: string;
+  metric2Lab: string;
+  metric3Val: string;
+  metric3Lab: string;
+}
+
+export interface Inquiry {
+  id: string;
+  companyName: string;
+  totalEmployees: number;
+  currentDisabledEmployees: number;
+  managerName: string;
+  managerContact: string;
+  managerEmail: string;
+  date: string;
+  savingsYearly: number;
+  status: "접수대기" | "상담완료" | "보류";
+}
+

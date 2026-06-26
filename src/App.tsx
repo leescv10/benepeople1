@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Sparkles, ArrowRight, ShieldCheck, CheckCircle2, Award, LogOut, Check } from "lucide-react";
 import Header from "./components/Header";
@@ -13,10 +13,46 @@ import ESGImpactSection from "./components/ESGImpactSection";
 import AIDiagnosisSection from "./components/AIDiagnosisSection";
 import Footer from "./components/Footer";
 import LoginPage from "./components/LoginPage";
+import AdminDashboard from "./components/AdminDashboard";
+import { HomepageConfig } from "./types";
+
+const DEFAULT_HOMEPAGE_CONFIG: HomepageConfig = {
+  heroBadge: "대한민국 1등 장애인 고용 솔루션 파트너",
+  heroTitle: "장애인 고용부담금 절감\n베네피플이 귀사의 성과로\n전환해 드립니다.",
+  heroSubtitle: "21년 이상의 전문 아웃소싱 노하우와 맞춤형 장애인 인재 풀을 통해 채용부터 근태관리, 노무 행정까지 원스톱으로 무결점 안전 처리합니다.",
+  metric1Val: "21+",
+  metric1Lab: "업무 및 아웃소싱 연혁",
+  metric2Val: "25개",
+  metric2Lab: "전국 거점 지사",
+  metric3Val: "100%",
+  metric3Lab: "노무 법적 무결점 승인"
+};
 
 export default function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [loggedInCompany, setLoggedInCompany] = useState<string | null>(null);
+
+  const [homepageConfig, setHomepageConfig] = useState<HomepageConfig>(() => {
+    const saved = localStorage.getItem("bene_people_homepage_config");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return DEFAULT_HOMEPAGE_CONFIG;
+      }
+    }
+    return DEFAULT_HOMEPAGE_CONFIG;
+  });
+
+  const handleUpdateHomepageConfig = (newConfig: HomepageConfig) => {
+    setHomepageConfig(newConfig);
+    localStorage.setItem("bene_people_homepage_config", JSON.stringify(newConfig));
+  };
+
+  const handleResetHomepageConfig = () => {
+    setHomepageConfig(DEFAULT_HOMEPAGE_CONFIG);
+    localStorage.setItem("bene_people_homepage_config", JSON.stringify(DEFAULT_HOMEPAGE_CONFIG));
+  };
 
   const handleLogout = () => {
     setLoggedInCompany(null);
@@ -50,8 +86,23 @@ export default function App() {
         </motion.div>
       )}
 
-      {loggedInCompany ? (
-        /* If logged in, ONLY show the ERP Program Workspace */
+      {loggedInCompany === "최고관리자 (ADMIN)" ? (
+        /* If Admin logs in, ONLY show the Admin Dashboard Program Workspace */
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex-1 pt-24 pb-12"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <AdminDashboard
+              homepageConfig={homepageConfig}
+              onUpdateHomepageConfig={handleUpdateHomepageConfig}
+              onResetHomepageConfig={handleResetHomepageConfig}
+            />
+          </div>
+        </motion.div>
+      ) : loggedInCompany ? (
+        /* If corporate logged in, ONLY show the ERP Program Workspace */
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -75,33 +126,30 @@ export default function App() {
               <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 border border-white/10 rounded-full text-xs sm:text-sm font-bold text-brand-accent tracking-wide uppercase">
                   <Sparkles className="w-4 h-4 animate-spin-slow" />
-                  대한민국 1등 장애인 고용 솔루션 파트너
+                  {homepageConfig.heroBadge}
                 </div>
 
-                <h1 className="text-4xl sm:text-5xl xl:text-6xl font-black leading-[1.25] tracking-tight">
-                  장애인 고용부담금 절감 <br />
-                  <span className="text-[#EBB63F]">베네피플</span>이 귀사의 성과로 <br />
-                  전환해 드립니다.
+                <h1 className="text-4xl sm:text-5xl xl:text-6xl font-black leading-[1.3] tracking-tight whitespace-pre-line">
+                  {homepageConfig.heroTitle}
                 </h1>
 
                 <p className="text-gray-300 text-sm sm:text-base xl:text-lg leading-relaxed max-w-2xl mx-auto lg:mx-0 font-sans">
-                  21년 이상의 전문 아웃소싱 노하우와 맞춤형 장애인 인재 풀을 통해 
-                  <strong> 채용부터 근태관리, 노무 행정</strong>까지 원스톱으로 무결점 안전 처리합니다.
+                  {homepageConfig.heroSubtitle}
                 </p>
 
                 {/* Quick trust metrics */}
                 <div className="grid grid-cols-3 gap-4 pt-10 border-t border-white/5 max-w-lg mx-auto lg:mx-0">
                   <div>
-                    <span className="text-2xl sm:text-3xl font-black text-brand-accent font-mono">21+</span>
-                    <p className="text-[10px] sm:text-xs text-gray-400 mt-1">업무 및 아웃소싱 연혁</p>
+                    <span className="text-2xl sm:text-3xl font-black text-brand-accent font-mono">{homepageConfig.metric1Val}</span>
+                    <p className="text-[10px] sm:text-xs text-gray-400 mt-1">{homepageConfig.metric1Lab}</p>
                   </div>
                   <div>
-                    <span className="text-2xl sm:text-3xl font-black text-brand-accent font-mono">25개</span>
-                    <p className="text-[10px] sm:text-xs text-gray-400 mt-1">전국 거점 지사</p>
+                    <span className="text-2xl sm:text-3xl font-black text-brand-accent font-mono">{homepageConfig.metric2Val}</span>
+                    <p className="text-[10px] sm:text-xs text-gray-400 mt-1">{homepageConfig.metric2Lab}</p>
                   </div>
                   <div>
-                    <span className="text-2xl sm:text-3xl font-black text-brand-accent font-mono">100%</span>
-                    <p className="text-[10px] sm:text-xs text-gray-400 mt-1">노무 법적 무결점 승인</p>
+                    <span className="text-2xl sm:text-3xl font-black text-brand-accent font-mono">{homepageConfig.metric3Val}</span>
+                    <p className="text-[10px] sm:text-xs text-gray-400 mt-1">{homepageConfig.metric3Lab}</p>
                   </div>
                 </div>
               </div>
