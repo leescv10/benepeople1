@@ -16,7 +16,7 @@ export default function ThreePillarsSection() {
             기업을 위한 <span className="text-brand-accent underline decoration-4 decoration-brand-accent">Bene People 3대 솔루션</span>
           </h2>
           <p className="text-gray-300 mt-4 text-sm sm:text-base leading-relaxed">
-            비용, 법적 Risk, 사후 관리에 대해 기업별 맞춤형 솔루션을 완벽 제공합니다.
+            비용과 법적 리스크, 사후 관리에 대해 기업별 맞춤형 솔루션을 제공합니다.
           </p>
         </div>
 
@@ -62,7 +62,7 @@ export default function ThreePillarsSection() {
                 <Check className="w-4 h-4" />
               </div>
               <p className="text-sm font-bold text-white">전문 공인노무사 합법 보증</p>
-              <span className="text-[10px] text-gray-400 mt-1">의무고용 100% 정상 법적 승인</span>
+              <span className="text-[10px] text-gray-400 mt-1">의무고용 기준에 맞춘 합법적 승인</span>
             </div>
           </div>
 
