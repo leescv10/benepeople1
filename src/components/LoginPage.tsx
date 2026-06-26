@@ -7,6 +7,19 @@ interface LoginPageProps {
   onLoginSuccess: (companyName: string) => void;
 }
 
+const DEMO_ACCOUNTS = [
+  {
+    type: "demo1",
+    email: "admin@benepeople.com",
+    label: "1번 데모 회원사",
+  },
+  {
+    type: "demo2",
+    email: "partner@esgcorp.kr",
+    label: "2번 데모 회원사",
+  },
+] as const;
+
 export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,17 +29,15 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleDemoFill = (type: "demo1" | "demo2") => {
-    if (type === "demo1") {
-      setEmail("admin@benepeople.com");
-      setPassword("benepeople1234");
-    } else {
-      setEmail("partner@esgcorp.kr");
-      setPassword("esgpartner77");
+    const account = DEMO_ACCOUNTS.find((demoAccount) => demoAccount.type === type);
+    if (account) {
+      setEmail(account.email);
+      setPassword("");
     }
     setError(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -37,24 +48,25 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
 
     setLoading(true);
 
-    // Simulate authenticating server call
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/demo-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const result = await response.json();
       setLoading(false);
-      
-      // Explicit Admin Check
-      if (email === "admins" && password === "chon1092!!") {
-        onLoginSuccess("최고관리자 (ADMIN)");
-      } else if (
-        (email === "admin@benepeople.com" && password === "benepeople1234") ||
-        (email === "partner@esgcorp.kr" && password === "esgpartner77") ||
-        (email !== "admins" && password.length >= 6)
-      ) {
-        const company = email.includes("esgcorp") ? "ESG 환경코퍼레이션" : "(주)베네피플 일렉트릭";
-        onLoginSuccess(company);
+
+      if (response.ok && result.companyName) {
+        onLoginSuccess(result.companyName);
       } else {
-        setError("일치하는 계정 정보가 없습니다. 아이디와 비밀번호를 다시 확인해 주세요. (관리자 아이디: admins / 패스워드: chon1092!!)");
+        setError(result.error || "일치하는 계정 정보가 없습니다. 아이디와 비밀번호를 다시 확인해 주세요.");
       }
-    }, 1200);
+    } catch {
+      setLoading(false);
+      setError("로그인 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+    }
   };
 
   return (
@@ -211,24 +223,20 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
               <span>간편 데모 체험용 로그인 계정</span>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleDemoFill("demo1")}
-                className="text-left bg-gray-50 hover:bg-brand-lightgreen/5 border border-gray-200 hover:border-brand-lightgreen/30 p-2.5 rounded-lg text-[10px] text-gray-600 transition"
-              >
-                <strong className="block text-brand-green font-bold">1번 데모 회원사</strong>
-                admin@benepeople.com
-                <span className="block text-[9px] text-gray-400 mt-0.5">PW: benepeople1234</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleDemoFill("demo2")}
-                className="text-left bg-gray-50 hover:bg-brand-lightgreen/5 border border-gray-200 hover:border-brand-lightgreen/30 p-2.5 rounded-lg text-[10px] text-gray-600 transition"
-              >
-                <strong className="block text-brand-green font-bold">2번 데모 회원사</strong>
-                partner@esgcorp.kr
-                <span className="block text-[9px] text-gray-400 mt-0.5">PW: esgpartner77</span>
-              </button>
+              {DEMO_ACCOUNTS.map((account) => (
+                <button
+                  key={account.type}
+                  type="button"
+                  onClick={() => handleDemoFill(account.type)}
+                  className="text-left bg-gray-50 hover:bg-brand-lightgreen/5 border border-gray-200 hover:border-brand-lightgreen/30 p-2.5 rounded-lg text-[10px] text-gray-600 transition"
+                >
+                  <strong className="block text-brand-green font-bold">{account.label}</strong>
+                  {account.email}
+                  <span className="block text-[9px] text-gray-400 mt-0.5">
+                    데모 비밀번호는 운영 환경 변수로 관리됩니다
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
 
