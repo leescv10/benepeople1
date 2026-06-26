@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   Settings,
   Users,
@@ -21,7 +21,11 @@ import {
   TrendingDown,
   Calendar,
   Building2,
-  Phone
+  Phone,
+  Plus,
+  Upload,
+  X,
+  Search
 } from "lucide-react";
 import { HomepageConfig, Inquiry } from "../types";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from "recharts";
@@ -41,6 +45,119 @@ export default function AdminDashboard({
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [editingConfig, setEditingConfig] = useState<HomepageConfig>({ ...homepageConfig });
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  // Member companies list
+  const [companies, setCompanies] = useState<any[]>(() => {
+    const saved = localStorage.getItem("bene_people_member_companies");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return [
+      {
+        id: "comp-1",
+        name: "(주)베네피플 일렉트릭",
+        code: "BPE-01",
+        status: "ONLINE",
+        description: "재택사무지원 8명 및 ESG리서치 4명 탑재. 출퇴근 IP 일치 확인 완료 및 화상 생체인증 가동률 100%.",
+        totalEmployeesCount: 12,
+      },
+      {
+        id: "comp-2",
+        name: "ESG 환경코퍼레이션",
+        code: "ESG-02",
+        status: "ONLINE",
+        description: "친환경 탄소 데이터 가공인력 15명 탑재. 전원 원격 GPS 지오펜싱(Geo-fencing) 실시간 정상 검증 가동중.",
+        totalEmployeesCount: 15,
+      }
+    ];
+  });
+
+  // Disabled employees list
+  const [disabledEmployees, setDisabledEmployees] = useState<any[]>(() => {
+    const saved = localStorage.getItem("bene_people_company_employees");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return [
+      {
+        id: "emp-1",
+        companyId: "comp-1",
+        name: "김민우",
+        code: "BP-0138",
+        dept: "ESG 환경지원팀",
+        disabilityType: "지체장애 중증 (하반신)",
+        role: "친환경 탄소배출 데이터 모니터링",
+        status: "재직중",
+        attendanceMethod: "재택근무지 IP 일치인증",
+        avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150&h=150",
+        documentName: "장애인증명서_김민우.pdf"
+      },
+      {
+        id: "emp-2",
+        companyId: "comp-2",
+        name: "이소연",
+        code: "BP-0142",
+        dept: "경영기획부",
+        disabilityType: "청각장애 경증",
+        role: "ESG 지표 연구자료 수집 및 정렬",
+        status: "재직중",
+        attendanceMethod: "안면인식 로그인 완료",
+        avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150&h=150",
+        documentName: "장애인증명서_이소연.pdf"
+      },
+      {
+        id: "emp-3",
+        companyId: "comp-1",
+        name: "박준서",
+        code: "BP-0155",
+        dept: "행정사무지원",
+        disabilityType: "지체장애 중증 (상지 가능)",
+        role: "사내 공문서 검수정리 OCR 분석",
+        status: "재직중",
+        attendanceMethod: "모바일 근태앱 전송",
+        avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150&h=150",
+        documentName: "복지카드_박준서.png"
+      }
+    ];
+  });
+
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>("comp-1");
+  const [showAddEmployeeModal, setShowAddEmployeeModal] = useState<boolean>(false);
+  const [showAddCompanyModal, setShowAddCompanyModal] = useState<boolean>(false);
+
+  // New Employee Form state
+  const [newEmpName, setNewEmpName] = useState("");
+  const [newEmpCode, setNewEmpCode] = useState("");
+  const [newEmpDept, setNewEmpDept] = useState("");
+  const [newEmpDisabilityType, setNewEmpDisabilityType] = useState("지체장애 중증 (하반신)");
+  const [newEmpRole, setNewEmpRole] = useState("");
+  const [newEmpStatus, setNewEmpStatus] = useState<"재직중" | "휴직" | "퇴사">("재직중");
+  const [newEmpAttendanceMethod, setNewEmpAttendanceMethod] = useState("재택근무지 IP 일치인증");
+  const [newEmpAvatar, setNewEmpAvatar] = useState("");
+  const [newEmpDocument, setNewEmpDocument] = useState("");
+  const [newEmpAvatarFile, setNewEmpAvatarFile] = useState<File | null>(null);
+  const [newEmpDocFile, setNewEmpDocFile] = useState<File | null>(null);
+
+  // New Company form
+  const [newCompName, setNewCompName] = useState("");
+  const [newCompDesc, setNewCompDesc] = useState("");
+
+  // Drag over states
+  const [dragOverAvatar, setDragOverAvatar] = useState(false);
+  const [dragOverDoc, setDragOverDoc] = useState(false);
+
+  // Handle saving states
+  useEffect(() => {
+    localStorage.setItem("bene_people_member_companies", JSON.stringify(companies));
+  }, [companies]);
+
+  useEffect(() => {
+    localStorage.setItem("bene_people_company_employees", JSON.stringify(disabledEmployees));
+  }, [disabledEmployees]);
 
   // Sync editing configuration with prop updates
   useEffect(() => {
@@ -142,6 +259,173 @@ export default function AdminDashboard({
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     }
+  };
+
+  // Helper to read file as base64
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: "avatar" | "doc") => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (type === "avatar") {
+      setNewEmpAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewEmpAvatar(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setNewEmpDocFile(file);
+      setNewEmpDocument(file.name);
+    }
+  };
+
+  // Drag and Drop helpers
+  const handleDragOver = (e: React.DragEvent, type: "avatar" | "doc") => {
+    e.preventDefault();
+    if (type === "avatar") setDragOverAvatar(true);
+    else setDragOverDoc(true);
+  };
+
+  const handleDragLeave = (type: "avatar" | "doc") => {
+    if (type === "avatar") setDragOverAvatar(false);
+    else setDragOverDoc(false);
+  };
+
+  const handleDrop = (e: React.DragEvent, type: "avatar" | "doc") => {
+    e.preventDefault();
+    if (type === "avatar") {
+      setDragOverAvatar(false);
+      const file = e.dataTransfer.files?.[0];
+      if (file && file.type.startsWith("image/")) {
+        setNewEmpAvatarFile(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setNewEmpAvatar(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
+    } else {
+      setDragOverDoc(false);
+      const file = e.dataTransfer.files?.[0];
+      if (file) {
+        setNewEmpDocFile(file);
+        setNewEmpDocument(file.name);
+      }
+    }
+  };
+
+  // Add Employee Handler
+  const handleAddEmployee = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newEmpName || !newEmpCode || !newEmpDept || !newEmpRole) {
+      alert("모든 필수 입력 사항을 기입해 주세요.");
+      return;
+    }
+
+    // Check if code is unique
+    if (disabledEmployees.some(emp => emp.code === newEmpCode)) {
+      alert("이미 등록된 사원코드입니다. 다른 사원코드를 기입해 주세요.");
+      return;
+    }
+
+    const defaultAvatars = [
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150&h=150",
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150&h=150",
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150&h=150",
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150&h=150"
+    ];
+
+    const randomAvatar = defaultAvatars[Math.floor(Math.random() * defaultAvatars.length)];
+
+    const createdEmp = {
+      id: `emp-${Date.now()}`,
+      companyId: selectedCompanyId,
+      name: newEmpName,
+      code: newEmpCode,
+      dept: newEmpDept,
+      disabilityType: newEmpDisabilityType,
+      role: newEmpRole,
+      status: newEmpStatus,
+      attendanceMethod: newEmpAttendanceMethod,
+      avatarUrl: newEmpAvatar || randomAvatar,
+      documentName: newEmpDocument || "장애인증명서_미등록.pdf"
+    };
+
+    const updatedEmployees = [createdEmp, ...disabledEmployees];
+    setDisabledEmployees(updatedEmployees);
+
+    // Update Company Employee Count
+    const updatedCompanies = companies.map(comp => {
+      if (comp.id === selectedCompanyId) {
+        return {
+          ...comp,
+          totalEmployeesCount: (comp.totalEmployeesCount || 0) + 1
+        };
+      }
+      return comp;
+    });
+    setCompanies(updatedCompanies);
+
+    // Clear form
+    setNewEmpName("");
+    setNewEmpCode("");
+    setNewEmpDept("");
+    setNewEmpDisabilityType("지체장애 중증 (하반신)");
+    setNewEmpRole("");
+    setNewEmpStatus("재직중");
+    setNewEmpAttendanceMethod("재택근무지 IP 일치인증");
+    setNewEmpAvatar("");
+    setNewEmpDocument("");
+    setNewEmpAvatarFile(null);
+    setNewEmpDocFile(null);
+    setShowAddEmployeeModal(false);
+
+    alert(`${newEmpName} 근로자가 성공적으로 등록 및 업로드 되었습니다.`);
+  };
+
+  // Delete Employee Handler
+  const handleDeleteEmployee = (id: string, name: string) => {
+    if (confirm(`정말로 ${name} 근로자의 등록 정보를 영구 삭제하시겠습니까? (출퇴근 DB에서도 제외됩니다)`)) {
+      const updated = disabledEmployees.filter(emp => emp.id !== id);
+      setDisabledEmployees(updated);
+
+      // Decrement Company Employee Count
+      const updatedCompanies = companies.map(comp => {
+        if (comp.id === selectedCompanyId) {
+          return {
+            ...comp,
+            totalEmployeesCount: Math.max(0, (comp.totalEmployeesCount || 0) - 1)
+          };
+        }
+        return comp;
+      });
+      setCompanies(updatedCompanies);
+    }
+  };
+
+  // Add Company Handler
+  const handleAddCompany = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCompName) {
+      alert("회원사명을 입력해 주세요.");
+      return;
+    }
+
+    const newComp = {
+      id: `comp-${Date.now()}`,
+      name: newCompName,
+      code: `BPC-${companies.length + 1}`,
+      status: "ONLINE",
+      description: newCompDesc || "신규 등록된 장애인 맞춤형 일자리 위탁 회원사 채널입니다.",
+      totalEmployeesCount: 0
+    };
+
+    setCompanies([...companies, newComp]);
+    setSelectedCompanyId(newComp.id);
+    setNewCompName("");
+    setNewCompDesc("");
+    setShowAddCompanyModal(false);
+
+    alert(`'${newCompName}' 회원사가 성공적으로 생성 및 등록되었습니다.`);
   };
 
   // Stats calculation
@@ -677,52 +961,481 @@ export default function AdminDashboard({
 
         {/* Tab 4: Simulated Accounts Monitoring */}
         {activeTab === "accounts" && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-6"
-          >
-            <div>
-              <h2 className="text-base sm:text-lg font-black text-[#073B31]">베네피플 위탁 채널 활성 목록</h2>
-              <p className="text-xs text-gray-500 mt-1 font-sans">
-                현재 시스템에 탑재된 주요 연동 회원사의 실시간 GPS 출퇴근 근태 증빙 현황을 관찰할 수 있습니다.
-              </p>
+          <div className="space-y-6">
+            {/* Header with actions */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 border border-gray-100 rounded-2xl shadow-sm">
+              <div>
+                <h2 className="text-base sm:text-lg font-black text-[#073B31]">회원사 위탁 채널 & 장애인 근로자 관리</h2>
+                <p className="text-xs text-gray-500 mt-1 font-sans">
+                  각 연동 회원사별 장애인 근로자의 인적사항 및 직무, 장애 정도, 출퇴근 증빙 서류를 통합 등록 및 관리합니다.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowAddCompanyModal(true)}
+                className="bg-[#073B31] hover:bg-emerald-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-1.5 transition shadow-sm"
+              >
+                <Plus className="w-4 h-4" />
+                <span>신규 회원사 등록</span>
+              </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="p-5 border border-emerald-500/10 bg-emerald-500/5 rounded-2xl flex items-start gap-4">
-                <div className="p-3 bg-[#073B31] text-white rounded-xl">
-                  <Building2 className="w-6 h-6" />
-                </div>
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-extrabold text-sm text-[#073B31]">(주)베네피플 일렉트릭</h3>
-                    <span className="text-[10px] bg-emerald-500 text-white font-bold px-1.5 py-0.5 rounded">ONLINE</span>
-                  </div>
-                  <p className="text-xs text-gray-500 leading-relaxed font-sans">
-                    재택사무지원 8명 및 ESG리서치 4명 탑재. <br />
-                    출퇴근 IP 일치 확인 완료 및 화상 생체인증 가동률 100%.
-                  </p>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left Column: Companies List (lg:col-span-4) */}
+              <div className="lg:col-span-4 space-y-3">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider px-1">위탁 회원사 채널</h3>
+                <div className="space-y-3 max-h-[550px] overflow-y-auto pr-1">
+                  {companies.map((comp) => {
+                    const isSelected = selectedCompanyId === comp.id;
+                    const compEmployeesCount = disabledEmployees.filter(emp => emp.companyId === comp.id).length;
+                    return (
+                      <div
+                        key={comp.id}
+                        onClick={() => setSelectedCompanyId(comp.id)}
+                        className={`p-5 border cursor-pointer rounded-2xl transition flex flex-col justify-between gap-3 relative overflow-hidden ${
+                          isSelected
+                            ? "border-emerald-600 bg-emerald-500/5 shadow-md"
+                            : "border-gray-100 bg-white hover:border-gray-200 shadow-sm"
+                        }`}
+                      >
+                        {isSelected && (
+                          <div className="absolute top-0 right-0 w-2 h-full bg-emerald-600" />
+                        )}
+                        <div className="flex items-start gap-3">
+                          <div className={`p-2.5 rounded-xl ${isSelected ? "bg-emerald-600 text-white" : "bg-gray-100 text-gray-500"}`}>
+                            <Building2 className="w-5 h-5" />
+                          </div>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <h4 className="font-extrabold text-sm text-[#073B31]">{comp.name}</h4>
+                              <span className="text-[9px] bg-emerald-500 text-white font-bold px-1 py-0.5 rounded-full font-mono">ONLINE</span>
+                            </div>
+                            <span className="text-[10px] text-gray-400 block font-mono">ID: {comp.code}</span>
+                          </div>
+                        </div>
+
+                        <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed font-sans">
+                          {comp.description}
+                        </p>
+
+                        <div className="flex justify-between items-center pt-3 border-t border-gray-100/50 text-[11px] font-sans">
+                          <span className="text-gray-400">등록 완료 장애인 인력</span>
+                          <span className="font-bold text-emerald-600">{compEmployeesCount}명</span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
-              <div className="p-5 border border-emerald-500/10 bg-emerald-500/5 rounded-2xl flex items-start gap-4">
-                <div className="p-3 bg-[#073B31] text-white rounded-xl">
-                  <Building2 className="w-6 h-6" />
-                </div>
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-extrabold text-sm text-[#073B31]">ESG 환경코퍼레이션</h3>
-                    <span className="text-[10px] bg-emerald-500 text-white font-bold px-1.5 py-0.5 rounded">ONLINE</span>
-                  </div>
-                  <p className="text-xs text-gray-500 leading-relaxed font-sans">
-                    친환경 탄소 데이터 가공인력 15명 탑재. <br />
-                    전원 원격 GPS 지오펜싱(Geo-fencing) 실시간 정상 검증 가동중.
-                  </p>
-                </div>
+              {/* Right Column: Employees Master List (lg:col-span-8) */}
+              <div className="lg:col-span-8 space-y-3">
+                {(() => {
+                  const currentComp = companies.find((c) => c.id === selectedCompanyId) || companies[0];
+                  if (!currentComp) return null;
+                  const currentEmployees = disabledEmployees.filter((emp) => emp.companyId === currentComp.id);
+
+                  return (
+                    <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-6">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-gray-100 pb-5">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-black text-base text-[#073B31]">
+                              {currentComp.name}
+                            </h3>
+                            <span className="text-xs text-gray-400 font-sans">등록 장애인 명부</span>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1 font-sans">
+                            해당 위탁 회원사에 소속되어 실시간 화상 근태/생체 검증을 진행중인 장애인 근로자 목록입니다.
+                          </p>
+                        </div>
+
+                        {/* Direct upload / register employee button */}
+                        <button
+                          onClick={() => setShowAddEmployeeModal(true)}
+                          className="bg-emerald-600 hover:bg-emerald-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 transition shrink-0 shadow-md"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span>장애인 근로자 직접 등록 (업로드)</span>
+                        </button>
+                      </div>
+
+                      {/* Employees List */}
+                      <div className="space-y-4">
+                        {currentEmployees.length === 0 ? (
+                          <div className="text-center py-12 border-2 border-dashed border-gray-100 rounded-2xl font-sans">
+                            <Users className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                            <p className="text-sm text-gray-500 font-bold">등록된 장애인 근로자가 없습니다.</p>
+                            <p className="text-xs text-gray-400 mt-1">상단의 '장애인 근로자 직접 등록 (업로드)' 버튼을 통해 근로자 정보와 복지카드/증빙 문서를 수동으로 등록해 주세요.</p>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {currentEmployees.map((emp) => (
+                              <div key={emp.id} className="p-4 border border-gray-100 rounded-xl hover:border-emerald-500/30 transition bg-gray-50/30 flex flex-col justify-between gap-4">
+                                <div className="flex items-start gap-3">
+                                  <img
+                                    src={emp.avatarUrl || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150&h=150"}
+                                    alt={emp.name}
+                                    className="w-12 h-12 rounded-xl object-cover shrink-0 border border-gray-200"
+                                    referrerPolicy="no-referrer"
+                                  />
+                                  <div className="space-y-1 flex-1 min-w-0">
+                                    <div className="flex justify-between items-start gap-2">
+                                      <div>
+                                        <h4 className="font-extrabold text-sm text-[#073B31] truncate">{emp.name}</h4>
+                                        <span className="text-[9px] text-gray-400 font-mono tracking-wider">{emp.code} | {emp.dept}</span>
+                                      </div>
+                                      <span className="text-[9px] bg-emerald-100 text-emerald-800 font-extrabold px-1.5 py-0.5 rounded shrink-0">
+                                        {emp.status}
+                                      </span>
+                                    </div>
+
+                                    <div className="text-[11px] text-gray-600 font-sans leading-relaxed mt-2 space-y-0.5">
+                                      <div>장애등급: <strong>{emp.disabilityType}</strong></div>
+                                      <div>담당직무: <strong>{emp.role}</strong></div>
+                                      <div className="flex items-center gap-1 text-[10px] text-emerald-700 font-bold mt-1.5 font-sans">
+                                        <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                                        <span>출퇴근인증: {emp.attendanceMethod}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="border-t border-gray-100/70 pt-3 flex items-center justify-between">
+                                  {/* Uploaded Certificate / Welfare card info */}
+                                  <div className="flex items-center gap-1.5 text-[10px] text-gray-500 bg-white border border-gray-200 rounded-lg px-2 py-1 max-w-[75%] truncate font-mono">
+                                    <FileText className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                    <span className="truncate" title={emp.documentName || "장애인증명서_인증됨.pdf"}>
+                                      {emp.documentName || "장애인증명서_인증됨.pdf"}
+                                    </span>
+                                  </div>
+
+                                  <button
+                                    onClick={() => handleDeleteEmployee(emp.id, emp.name)}
+                                    className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg border border-red-100 transition"
+                                    title="근로자 삭제"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
-          </motion.div>
+
+            {/* Modal 1: Add Disabled Employee Modal */}
+            <AnimatePresence>
+              {showAddEmployeeModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm overflow-y-auto">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 sm:p-8 space-y-6"
+                  >
+                    <div className="flex justify-between items-center border-b border-gray-100 pb-4">
+                      <div>
+                        <h3 className="font-black text-lg text-[#073B31]">장애인 근로자 직접 등록 & 증빙서류 업로드</h3>
+                        <p className="text-xs text-gray-500 mt-1">기업 부담금 면제를 위해 근로자 프로필 정보와 복지카드/증명서를 수동으로 직접 업로드합니다.</p>
+                      </div>
+                      <button
+                        onClick={() => setShowAddEmployeeModal(false)}
+                        className="p-1.5 bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-lg transition"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleAddEmployee} className="space-y-4 text-xs">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-600 mb-1">근로자 성명 *</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="예: 김동현"
+                            value={newEmpName}
+                            onChange={(e) => setNewEmpName(e.target.value)}
+                            className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-600 mb-1">발급용 사원코드 *</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="예: BP-0219"
+                            value={newEmpCode}
+                            onChange={(e) => setNewEmpCode(e.target.value)}
+                            className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-600 mb-1">배정 소속 부서 *</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="예: ESG 환경지원팀"
+                            value={newEmpDept}
+                            onChange={(e) => setNewEmpDept(e.target.value)}
+                            className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-600 mb-1">장애 유형 및 정도 *</label>
+                          <select
+                            value={newEmpDisabilityType}
+                            onChange={(e) => setNewEmpDisabilityType(e.target.value)}
+                            className="w-full px-3.5 py-2.5 border border-gray-200 bg-white rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-sans"
+                          >
+                            <option value="지체장애 중증 (하반신)">지체장애 중증 (하반신)</option>
+                            <option value="지체장애 중증 (상지 가능)">지체장애 중증 (상지 가능)</option>
+                            <option value="지체장애 경증">지체장애 경증</option>
+                            <option value="청각장애 경증">청각장애 경증</option>
+                            <option value="청각장애 중증">청각장애 중증</option>
+                            <option value="시각장애 경증">시각장애 경증</option>
+                            <option value="시각장애 중증">시각장애 중증</option>
+                            <option value="발달장애 중증">발달장애 중증</option>
+                            <option value="뇌병변장애 중증">뇌병변장애 중증</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold text-gray-600 mb-1">수행 직무 (수행할 업무 내용) *</label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="예: 친환경 탄소 가공 데이터 분류 및 데이터 라벨링"
+                          value={newEmpRole}
+                          onChange={(e) => setNewEmpRole(e.target.value)}
+                          className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-600 mb-1">재직 상태 *</label>
+                          <select
+                            value={newEmpStatus}
+                            onChange={(e) => setNewEmpStatus(e.target.value as any)}
+                            className="w-full px-3.5 py-2.5 border border-gray-200 bg-white rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-sans"
+                          >
+                            <option value="재직중">재직중</option>
+                            <option value="휴직">휴직</option>
+                            <option value="퇴사">퇴사</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[11px] font-bold text-gray-600 mb-1">실시간 출퇴근 인증 수단 *</label>
+                          <select
+                            value={newEmpAttendanceMethod}
+                            onChange={(e) => setNewEmpAttendanceMethod(e.target.value)}
+                            className="w-full px-3.5 py-2.5 border border-gray-200 bg-white rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none font-sans"
+                          >
+                            <option value="재택근무지 IP 일치인증">재택근무지 IP 일치인증</option>
+                            <option value="안면인식 로그인 완료">안면인식 로그인 완료</option>
+                            <option value="모바일 근태앱 전송">모바일 근태앱 전송</option>
+                            <option value="실시간 원격 화상 생체인증">실시간 원격 화상 생체인증</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* File Upload zone 1: Avatar Profile Image */}
+                      <div>
+                        <label className="block text-[11px] font-bold text-gray-600 mb-1">근로자 프로필 이미지 (드래그 앤 드롭 또는 선택)</label>
+                        <div
+                          onDragOver={(e) => handleDragOver(e, "avatar")}
+                          onDragLeave={() => handleDragLeave("avatar")}
+                          onDrop={(e) => handleDrop(e, "avatar")}
+                          className={`border-2 border-dashed rounded-xl p-4 text-center transition flex flex-col items-center justify-center gap-2 ${
+                            dragOverAvatar
+                              ? "border-emerald-500 bg-emerald-500/5"
+                              : "border-gray-200 hover:border-gray-300"
+                          }`}
+                        >
+                          {newEmpAvatar ? (
+                            <div className="flex items-center gap-3">
+                              <img src={newEmpAvatar} alt="preview" className="w-12 h-12 rounded-xl object-cover border border-gray-200" referrerPolicy="no-referrer" />
+                              <div className="text-left">
+                                <span className="text-[10px] text-emerald-600 font-bold block">이미지 로드 완료</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setNewEmpAvatar("")}
+                                  className="text-[9px] text-red-500 underline"
+                                >
+                                  이미지 삭제
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <Upload className="w-6 h-6 text-gray-400" />
+                              <p className="text-[11px] text-gray-400">
+                                <strong>드래그 앤 드롭</strong> 하거나 클릭하여 이미지를 등록하세요.
+                              </p>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleFileChange(e, "avatar")}
+                                className="hidden"
+                                id="avatar-file-input"
+                              />
+                              <label
+                                htmlFor="avatar-file-input"
+                                className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg font-bold cursor-pointer transition text-[10px]"
+                              >
+                                파일 선택
+                              </label>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* File Upload zone 2: Disability card/Certificate document */}
+                      <div>
+                        <label className="block text-[11px] font-bold text-gray-600 mb-1">장애인증명서 또는 복지카드 사본 사본 업로드 (필수 증빙서류) *</label>
+                        <div
+                          onDragOver={(e) => handleDragOver(e, "doc")}
+                          onDragLeave={() => handleDragLeave("doc")}
+                          onDrop={(e) => handleDrop(e, "doc")}
+                          className={`border-2 border-dashed rounded-xl p-4 text-center transition flex flex-col items-center justify-center gap-2 ${
+                            dragOverDoc
+                              ? "border-emerald-500 bg-emerald-500/5"
+                              : "border-gray-200 hover:border-gray-300"
+                          }`}
+                        >
+                          {newEmpDocument ? (
+                            <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 text-emerald-800 px-3 py-1.5 rounded-lg">
+                              <CheckCircle className="w-4 h-4 text-emerald-500" />
+                              <span className="font-mono text-[10px] font-bold">{newEmpDocument} (등록 완료)</span>
+                              <button
+                                type="button"
+                                onClick={() => setNewEmpDocument("")}
+                                className="text-gray-400 hover:text-red-500 ml-1"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              <FileText className="w-6 h-6 text-gray-400" />
+                              <p className="text-[11px] text-gray-400">
+                                <strong>장애인 증빙 PDF 또는 이미지 사본</strong>을 드래그하여 등록하세요.
+                              </p>
+                              <input
+                                type="file"
+                                accept=".pdf,.png,.jpg,.jpeg font-sans"
+                                onChange={(e) => handleFileChange(e, "doc")}
+                                className="hidden"
+                                id="doc-file-input"
+                              />
+                              <label
+                                htmlFor="doc-file-input"
+                                className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg font-bold cursor-pointer transition text-[10px]"
+                              >
+                                증빙서류 선택
+                              </label>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Buttons */}
+                      <div className="flex justify-end gap-2 pt-4 border-t border-gray-100">
+                        <button
+                          type="button"
+                          onClick={() => setShowAddEmployeeModal(false)}
+                          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition"
+                        >
+                          취소
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-5 py-2 bg-emerald-600 hover:bg-emerald-800 text-white font-bold rounded-xl transition shadow-md"
+                        >
+                          등록 및 업로드 완료
+                        </button>
+                      </div>
+                    </form>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>
+
+            {/* Modal 2: Add Company Modal */}
+            <AnimatePresence>
+              {showAddCompanyModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 sm:p-8 space-y-6"
+                  >
+                    <div className="flex justify-between items-center border-b border-gray-100 pb-4">
+                      <h3 className="font-black text-lg text-[#073B31]">신규 위탁 회원사 채널 생성</h3>
+                      <button
+                        onClick={() => setShowAddCompanyModal(false)}
+                        className="p-1.5 bg-gray-100 hover:bg-gray-200 text-gray-500 rounded-lg transition"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleAddCompany} className="space-y-4 text-xs">
+                      <div>
+                        <label className="block text-[11px] font-bold text-gray-600 mb-1">회원사 이름 *</label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="예: (주)한국미래정보기술"
+                          value={newCompName}
+                          onChange={(e) => setNewCompName(e.target.value)}
+                          className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold text-gray-600 mb-1">위탁 업무 및 채널 요약 정보</label>
+                        <textarea
+                          rows={3}
+                          placeholder="예: 재택 빅데이터 라벨링 근로자 5명 위탁 운영 중."
+                          value={newCompDesc}
+                          onChange={(e) => setNewCompDesc(e.target.value)}
+                          className="w-full px-3.5 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none"
+                        />
+                      </div>
+
+                      <div className="flex justify-end gap-2 pt-4 border-t border-gray-100">
+                        <button
+                          type="button"
+                          onClick={() => setShowAddCompanyModal(false)}
+                          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition"
+                        >
+                          취소
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-5 py-2 bg-[#073B31] hover:bg-emerald-800 text-white font-bold rounded-xl transition shadow-md"
+                        >
+                          회원사 등록 생성
+                        </button>
+                      </div>
+                    </form>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>
+          </div>
         )}
       </div>
     </div>
