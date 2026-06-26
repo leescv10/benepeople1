@@ -13,7 +13,7 @@ export default function WorkflowSection() {
       step: "02",
       icon: <FileCheck className="w-5 h-5 text-brand-green" />,
       title: "계약 및 승인",
-      desc: "근로기준 지침을 준수하는 합법적 계약 체결 및 유관기관 고용부담 승인 처리"
+      desc: "근로기준 지침을 준수하는 합법적 계약 체결 및 유관기관 고용부담금 승인 처리"
     },
     {
       step: "03",
@@ -90,7 +90,7 @@ export default function WorkflowSection() {
             베네피플은 채용만 대행하고 무책임하게 방치하는 대행사가 아닙니다.
           </p>
           <p className="text-xs sm:text-sm text-gray-300 mt-2">
-            채용부터 행정 지원, 완벽한 사후관리까지 기업이 만족할 수 있도록 전 과정을 성실하게 책임 지원합니다.
+            채용부터 행정 지원, 완벽한 사후관리까지 기업이 만족할 수 있도록 전 과정을 성실하게 책임지고 지원합니다.
           </p>
         </div>
       </div>

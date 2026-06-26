@@ -7,7 +7,7 @@ export default function WhySection() {
       id: "why-1",
       icon: <TrendingUp className="w-6 h-6 text-brand-lightgreen" />,
       title: "의무고용률 지속 강화",
-      desc: "100인 이상 사업장 장애인 의무고용율 3.1% 기준이 지속적으로 강화되고 있으며, 미준수 시 법적 제재 부담을 강하게 안게 됩니다."
+      desc: "100인 이상 사업장 장애인 의무고용률 3.1% 기준이 지속적으로 강화되고 있으며, 미준수 시 법적 제재 부담을 크게 안게 됩니다."
     },
     {
       id: "why-2",
@@ -79,7 +79,7 @@ export default function WhySection() {
           <div>
             <h4 className="font-bold text-red-950 text-sm sm:text-base">장애인 고용 부재의 숨겨진 리스크</h4>
             <p className="text-xs sm:text-sm text-red-800 leading-relaxed mt-2.5">
-              많은 기업이 막대한 부담금을 매년 납부하면서도, 정작 <strong>실질적인 맞춤형 직무</strong>와 <strong>체계적인 재택근무 관리 방법</strong>을 찾지 못해 매월 깊은 고충을 격하게 겪고 있는 것이 오늘날 대한민국 기업들의 냉정한 현실입니다.
+              많은 기업이 막대한 부담금을 매년 납부하면서도, 정작 <strong>실질적인 맞춤형 직무</strong>와 <strong>체계적인 재택근무 관리 방법</strong>을 찾지 못해 매월 큰 고충을 겪고 있는 것이 오늘날 대한민국 기업들의 냉정한 현실입니다.
             </p>
           </div>
         </div>

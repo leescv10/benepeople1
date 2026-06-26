@@ -15,14 +15,14 @@ export default function ESGImpactSection() {
       icon: <Heart className="w-6 h-6 text-pink-600" />,
       tag: "Social",
       title: "중증 장애 취약 일자리 창출",
-      desc: "경증 및 중증 장애인 모두에게 동등한 사회적 직업 활동의 소중한 기회를 확대합니다. 장애인의 경제적 자립 기반을 주체적으로 마련하며 사회적 보이지 않는 장벽을 극적으로 줄이고 배려와 포용 문화를 전격적으로 확산합니다."
+      desc: "경증 및 중증 장애인 모두에게 동등한 사회적 직업 활동의 소중한 기회를 확대합니다. 장애인의 경제적 자립 기반을 주체적으로 마련하며 보이지 않는 사회적 장벽을 줄이고 배려와 포용 문화를 확산합니다."
     },
     {
       id: "esg-gov",
       icon: <Scale className="w-6 h-6 text-blue-600" />,
       tag: "Governance",
       title: "법적 의무 이행",
-      desc: "공정하고 합법적인 절차를 통해 장애인 고용부담금(벌금) 발생 리스크를 완전히 예방합니다. 국가적 장애인 의무고용 법률적 기준을 완전 충족하여 기업의 지배구조 신뢰도와 대외 이미지를 확고하게 격상시킵니다."
+      desc: "공정하고 합법적인 절차를 통해 장애인 고용부담금 발생 리스크를 예방합니다. 국가적 장애인 의무고용 법적 기준을 충족하여 기업의 지배구조 신뢰도와 대외 이미지를 높입니다."
     }
   ];
 
@@ -34,7 +34,7 @@ export default function ESGImpactSection() {
             SUSTAINABLE ESG IMPACT
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-4 text-brand-green">
-            ESG 경영의 완벽한 달성
+            ESG 경영의 완벽한 실현
           </h2>
           <p className="text-gray-600 mt-4 text-sm sm:text-base leading-relaxed">
             장애인 고용 솔루션은 기업의 직접적인 고정 비용 절감뿐만 아니라, 세계적인 핵심 평가 지표인 ESG의 3대 요소를 빈틈없이 충족합니다.

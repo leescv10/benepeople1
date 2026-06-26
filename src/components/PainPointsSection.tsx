@@ -21,12 +21,12 @@ export default function PainPointsSection() {
     {
       id: "qa-4",
       q: "복잡한 법적 노무 관리와 4대보험, 퇴직금 처리는 어떻게 하나요?",
-      a: "베네피플의 전담 공인노무사를 통해 법적 Risk 부담을 완벽히 해소합니다."
+      a: "베네피플의 전담 공인노무사를 통해 법적 리스크 부담을 해소합니다."
     },
     {
       id: "qa-5",
       q: "채용 이후 발생할 수 있는 중도 퇴사 등 사후관리가 부담됩니다.",
-      a: "베네피플의 사후 관리 시스템은 퇴사자 사전 면담, overlapping 근무 등을 통해 위기 상황에 신속하게 선대응합니다."
+      a: "베네피플의 사후 관리 시스템은 퇴사자 사전 면담, 중복 근무 인수인계 등을 통해 위기 상황에 신속하게 선제 대응합니다."
     },
     {
       id: "qa-6",
@@ -90,7 +90,7 @@ export default function PainPointsSection() {
         <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center max-w-2xl mx-auto flex items-center justify-center gap-2.5">
           <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
           <span className="text-xs sm:text-sm font-bold text-amber-800">
-            고민하고 망설이는 동안에도, 부담금은 매년 세금처럼 매달 일정하게 증가하고 있습니다.
+            고민하고 망설이는 동안에도, 부담금은 매년 세금처럼 지속적으로 증가하고 있습니다.
           </span>
         </div>
       </div>

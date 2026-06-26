@@ -51,7 +51,7 @@ export default function IntroSection() {
             </div>
             <h3 className="text-lg font-bold text-white mb-3">서비스 가치</h3>
             <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-              장애가 있는 우수한 인재와 기업 고객을 정밀 매칭하고, <strong>채용 · 노무 위탁 · 전용 ERP · 사후관리 전 과정</strong>을 합법적으로 완벽 일임하여 완벽히 행정 부담을 덜어드립니다.
+              장애가 있는 우수한 인재와 기업 고객을 정밀 매칭하고, <strong>채용 · 노무 위탁 · 전용 ERP · 사후관리 전 과정</strong>을 합법적으로 일임받아 행정 부담을 덜어드립니다.
             </p>
           </div>
         </div>
@@ -66,7 +66,7 @@ export default function IntroSection() {
                 <h4 className="font-bold text-base text-white">전국 인프라망</h4>
               </div>
               <p className="text-xs text-gray-400 mb-6 leading-relaxed">
-                전국 주요 25개 직할 거점을 통해 신속하고 안정적인 채용 모집 및 출퇴근 모니터링 관리 체계를 지원합니다.
+                전국 주요 25개 직영 거점을 통해 신속하고 안정적인 채용 모집 및 출퇴근 모니터링 관리 체계를 지원합니다.
               </p>
             </div>
 
@@ -167,7 +167,7 @@ export default function IntroSection() {
 
         {/* Bottom Banner slogan line */}
         <div className="mt-16 bg-[#EBB63F] text-brand-green p-4 sm:p-5 rounded-2xl shadow-xl font-bold text-center text-xs sm:text-sm tracking-tight">
-          기업의 장애인 고용을 신속하고, 합법적으로, 효율적인 시스템을 통해 <span className="underline decoration-2 font-black">'Bene People'</span>이 모든 최상의 솔루션을 제공해 드립니다.
+          기업의 장애인 고용을 신속하고 합법적인 효율 시스템으로 지원하며, <span className="underline decoration-2 font-black">'Bene People'</span>이 최상의 솔루션을 제공해 드립니다.
         </div>
       </div>
     </section>
