@@ -1,0 +1,125 @@
+import { useState, useEffect } from "react";
+import { Menu, X, ShieldAlert, LogIn } from "lucide-react";
+
+interface HeaderProps {
+  onLoginClick: () => void;
+}
+
+export default function Header({ onLoginClick }: HeaderProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const menuItems = [
+    { label: "장애인 고용이 필요한 이유", href: "#why" },
+    { label: "기업의 고민", href: "#pain-points" },
+    { label: "솔루션 TOP 3", href: "#three-pillars" },
+    { label: "부담금 계산기", href: "#calculator" },
+    { label: "원스톱 행정", href: "#workflow" },
+    { label: "근태관리 데모", href: "#erp-demo" },
+    { label: "ESG 효과", href: "#esg" },
+  ];
+
+  return (
+    <header
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+        isScrolled
+          ? "bg-[#073B31]/95 backdrop-blur-md border-b border-white/5 py-3 shadow-lg"
+          : "bg-transparent py-5"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center">
+          {/* Brand Logo */}
+          <a href="#" className="flex items-center gap-2.5 group">
+            <div className="w-10 h-10 rounded-xl bg-[#EBB63F] flex items-center justify-center font-black text-brand-green text-xl shadow-md group-hover:scale-105 transition duration-300">
+              B
+            </div>
+            <div>
+              <span className="font-extrabold text-base tracking-tight text-white block">
+                Bene People
+              </span>
+              <span className="text-[9px] text-brand-accent font-semibold block tracking-wide">
+                (주)베네피플
+              </span>
+            </div>
+          </a>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-1.5 xl:gap-4">
+            {menuItems.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="text-gray-300 hover:text-brand-accent transition text-xs xl:text-sm font-semibold px-2 py-1.5 rounded-lg hover:bg-white/5"
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+
+          {/* Header Action Button */}
+          <div className="hidden lg:block">
+            <button
+              onClick={onLoginClick}
+              className="bg-[#EBB63F] text-brand-green font-bold text-xs px-4 py-2.5 rounded-xl shadow-md hover:bg-amber-400 hover:shadow-lg hover:scale-[1.02] transition duration-300 flex items-center gap-1.5 cursor-pointer"
+            >
+              <LogIn className="w-4 h-4" />
+              회원사 로그인
+            </button>
+          </div>
+
+          {/* Mobile Hamburger menu */}
+          <div className="lg:hidden">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-gray-300 hover:text-white p-2 rounded-lg hover:bg-white/5 outline-none transition"
+              aria-label="Toggle Navigation Menu"
+            >
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Drawer Navigation */}
+      {isOpen && (
+        <div className="lg:hidden absolute top-full left-0 w-full bg-[#073B31] border-b border-white/10 shadow-2xl py-4 px-4 space-y-2 animate-fadeIn">
+          {menuItems.map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              onClick={() => setIsOpen(false)}
+              className="block text-gray-300 hover:text-brand-accent transition text-sm font-semibold py-2 px-3.5 rounded-lg hover:bg-white/5"
+            >
+              {item.label}
+            </a>
+          ))}
+          <div className="pt-2">
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                onLoginClick();
+              }}
+              className="w-full bg-[#EBB63F] text-brand-green font-bold text-xs py-3 rounded-xl shadow-md hover:bg-amber-400 hover:shadow-lg transition flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <LogIn className="w-4 h-4" />
+              회원사 로그인
+            </button>
+          </div>
+        </div>
+      )}
+    </header>
+  );
+}
