@@ -78,9 +78,10 @@ export default function App() {
                   대한민국 1등 장애인 고용 솔루션 파트너
                 </div>
 
-                <h1 className="text-4xl sm:text-5xl xl:text-6xl font-black leading-[1.15] tracking-tight">
-                  장애인 고용부담금 절감, <br className="hidden sm:inline" />
-                  귀사의 <span className="text-[#EBB63F] underline decoration-4 decoration-brand-accent">성과</span>로 전환해 드립니다.
+                <h1 className="text-4xl sm:text-5xl xl:text-6xl font-black leading-[1.25] tracking-tight">
+                  장애인 고용부담금 절감 <br />
+                  <span className="text-[#EBB63F]">베네피플</span>이 귀사의 성과로 <br />
+                  전환해 드립니다.
                 </h1>
 
                 <p className="text-gray-300 text-sm sm:text-base xl:text-lg leading-relaxed max-w-2xl mx-auto lg:mx-0 font-sans">

@@ -1,4 +1,5 @@
 import { Shield, Sparkles } from "lucide-react";
+import logoImg from "../assets/images/benepeople_logo_1782482488645.jpg";
 
 export default function Footer() {
   return (
@@ -8,9 +9,12 @@ export default function Footer() {
           {/* Logo & Slogan Column */}
           <div className="lg:col-span-4 space-y-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-[#EBB63F] flex items-center justify-center font-black text-brand-green text-xl shadow-md">
-                B
-              </div>
+              <img
+                src={logoImg}
+                alt="Bene People Logo"
+                className="w-10 h-10 rounded-xl object-cover shadow-md"
+                referrerPolicy="no-referrer"
+              />
               <div>
                 <span className="font-extrabold text-base tracking-tight text-white block">
                   Bene People

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Menu, X, ShieldAlert, LogIn, LogOut, LayoutDashboard } from "lucide-react";
+import logoImg from "../assets/images/benepeople_logo_1782482488645.jpg";
 
 interface HeaderProps {
   onLoginClick: () => void;
@@ -45,9 +46,12 @@ export default function Header({ onLoginClick, loggedInCompany, onLogout }: Head
         <div className="flex justify-between items-center">
           {/* Brand Logo */}
           <a href="#" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-[#EBB63F] flex items-center justify-center font-black text-brand-green text-xl shadow-md group-hover:scale-105 transition duration-300">
-              B
-            </div>
+            <img
+              src={logoImg}
+              alt="Bene People Logo"
+              className="w-10 h-10 rounded-xl object-cover shadow-md group-hover:scale-105 transition duration-300"
+              referrerPolicy="no-referrer"
+            />
             <div>
               <span className="font-extrabold text-base tracking-tight text-white block">
                 Bene People
