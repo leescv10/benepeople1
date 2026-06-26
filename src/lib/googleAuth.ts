@@ -1,10 +1,24 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, User } from "firebase/auth";
-import firebaseConfig from "../../firebase-applet-config.json";
+import type { Auth } from "firebase/auth";
 
-// Initialize Firebase App & Auth
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+let authPromise: Promise<Auth> | null = null;
+
+async function getAuthInstance(): Promise<Auth> {
+  if (!authPromise) {
+    authPromise = fetch("/api/firebase-config")
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Firebase configuration is unavailable.");
+        }
+
+        return response.json();
+      })
+      .then((firebaseConfig) => getAuth(initializeApp(firebaseConfig)));
+  }
+
+  return authPromise;
+}
 
 // Initialize Google OAuth provider with necessary scopes for Google Drive
 const provider = new GoogleAuthProvider();
@@ -28,25 +42,34 @@ export const initAuth = (
   onAuthSuccess?: (user: User, token: string) => void,
   onAuthFailure?: () => void
 ) => {
-  return onAuthStateChanged(auth, async (user: User | null) => {
-    if (user) {
-      if (cachedAccessToken) {
-        if (onAuthSuccess) onAuthSuccess(user, cachedAccessToken);
-      } else if (!isSigningIn) {
-        // Token has expired or needs refreshing; client can call login
+  let unsubscribe: (() => void) | null = null;
+
+  getAuthInstance().then((auth) => {
+    unsubscribe = onAuthStateChanged(auth, async (user: User | null) => {
+      if (user) {
+        if (cachedAccessToken) {
+          if (onAuthSuccess) onAuthSuccess(user, cachedAccessToken);
+        } else if (!isSigningIn) {
+          // Token has expired or needs refreshing; client can call login
+          if (onAuthFailure) onAuthFailure();
+        }
+      } else {
+        cachedAccessToken = null;
         if (onAuthFailure) onAuthFailure();
       }
-    } else {
-      cachedAccessToken = null;
-      if (onAuthFailure) onAuthFailure();
-    }
+    });
+  }).catch(() => {
+    if (onAuthFailure) onAuthFailure();
   });
+
+  return () => unsubscribe?.();
 };
 
 // Sign-in method
 export const googleSignIn = async (): Promise<{ user: User; accessToken: string } | null> => {
   try {
     isSigningIn = true;
+    const auth = await getAuthInstance();
     const result = await signInWithPopup(auth, provider);
     const credential = GoogleAuthProvider.credentialFromResult(result);
     if (!credential?.accessToken) {
@@ -65,6 +88,7 @@ export const googleSignIn = async (): Promise<{ user: User; accessToken: string 
 
 // Sign-out method
 export const googleSignOut = async () => {
+  const auth = await getAuthInstance();
   await auth.signOut();
   cachedAccessToken = null;
 };
