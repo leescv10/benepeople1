@@ -15,6 +15,7 @@ import Footer from "./components/Footer";
 import LoginPage from "./components/LoginPage";
 import AdminDashboard from "./components/AdminDashboard";
 import { HomepageConfig } from "./types";
+import Background3D from "./components/Background3D";
 
 const DEFAULT_HOMEPAGE_CONFIG: HomepageConfig = {
   heroBadge: "대한민국 1등 장애인 고용 솔루션 파트너",
@@ -54,7 +55,75 @@ const DEFAULT_HOMEPAGE_CONFIG: HomepageConfig = {
   painBadge: "PAIN POINTS",
   painTitle: "기업의 현실적인 고민",
   painDesc: "장애인 고용에는 생각보다 복잡한 허들들이 다양하게 존재합니다.",
-  painCaution: "고민하고 망설이는 동안에도, 부담금은 매년 세금처럼 매달 일정하게 증가하고 있습니다."
+  painCaution: "고민하고 망설이는 동안에도, 부담금은 매년 세금처럼 매달 일정하게 증가하고 있습니다.",
+
+  // General & Identity Defaults
+  logoUrl: "", // Defaults to standard build assets if empty
+  companyName: "Bene People",
+  companyLogoText: "(주)베네피플",
+
+  // Budget Calculator defaults
+  calcBadge: "Interactive Budget Simulator",
+  calcTitle: "우리 회사 예상 '장애인 고용 부담금' 및 절감액 계산기",
+  calcDesc: "상시 근로자 수와 현재 장애인 고용 수를 입력하시면, 부담금 리스크와 베네피플 솔루션 도입 시의 정확한 연간 비용 절감액을 실시간으로 확인해 드립니다.",
+  obligationRate: 0.031,
+  finePerMonth: 2156880,
+  beneCostPerMonth: 663000,
+  savingsPercentFixed: 69,
+
+  // Three Pillars Section defaults
+  pillarsBadge: "OUR THREE PILLARS",
+  pillarsTitle: "기업을 위한 Bene People 3대 솔루션",
+  pillarsDesc: "비용, 법적 Risk, 사후 관리에 대해 기업별 맞춤형 솔루션을 완벽 제공합니다.",
+  pillar1Title: "극적인 비용 절감 효과",
+  pillar1Sub: "300명 기업 기준 연간 부담금 약 2.33억원 대비",
+  pillar1Val: "약 1.61억원 SAVE",
+  pillar1ValSub: "69% 극적 절감 효과",
+  pillar2Title: "법무/노무 리스크 완전 배제",
+  pillar2Sub: "노무사를 통한 철저하고 합법적인 계약 및 행정 관리",
+  pillar2Val: "전문 공인노무사 합법 보증",
+  pillar2ValSub: "의무고용 100% 정상 법적 승인",
+  pillar3Title: "원스톱 스마트 운영 시스템",
+  pillar3Sub: "기업 커스텀 고도화 웹&앱 모니터링 ERP 무상 지원",
+  pillar3Val: "전용 근태 & 업무 ERP 무상 제공",
+  pillar3ValSub: "안면인식 · 고유 IP · GPS 연동",
+
+  // Workflow Section defaults
+  workflowBadge: "OUR WORKFLOW",
+  workflowTitle: "One-Stop 고용 프로세스",
+  workflowDesc: "채용부터 근태 관리, 행정지원, 사후 리포트까지 베네피플이 전 과정을 전폭적으로 지원합니다.",
+  workflowStep1Title: "채용 및 매칭",
+  workflowStep1Desc: "직무 분석에 근거하여 기업에 꼭 알맞은 장애인 인재 1:1 면접 선발",
+  workflowStep2Title: "계약 및 승인",
+  workflowStep2Desc: "근로기준 지침을 준수하는 합법적 계약 체결 및 유관기관 고용부담 승인 처리",
+  workflowStep3Title: "통합 운영 관리",
+  workflowStep3Desc: "베네피플 ERP를 통해 직원현황, 근태관리, 성과관리 등 모든 업무를 지원합니다.",
+  workflowStep4Title: "행정 지원",
+  workflowStep4Desc: "매월 4대보험 급여 신고, 퇴직 정산 등 모든 복잡한 노무 해결",
+  workflowStep5Title: "사후 관리",
+  workflowStep5Desc: "정부 제출 자료 및 결원 등 위기 관리",
+  workflowFooterTitle: "베네피플은 채용만 대행하고 무책임하게 방치하는 대행사가 아닙니다.",
+  workflowFooterText: "채용부터 행정 지원, 완벽한 사후관리까지 기업이 만족할 수 있도록 전 과정을 성실하게 책임 지원합니다.",
+
+  // ESG Impact Defaults
+  esgBadge: "SUSTAINABLE ESG IMPACT",
+  esgTitle: "ESG 경영의 완벽한 달성",
+  esgDesc: "장애인 고용 솔루션은 기업의 직접적인 고정 비용 절감뿐만 아니라, 세계적인 핵심 평가 지표인 ESG의 3대 요소를 빈틈없이 충족합니다.",
+  esgCard1Title: "친환경적인 근무 지원",
+  esgCard1Desc: "재택 또는 근거리 원격 근무 포맷을 정밀 구축하여 출퇴근 차량 이동으로 유발되는 탄소 배출을 최소화하고 일회용품 감소 등 친환경 가치를 직접 실천합니다.",
+  esgCard2Title: "중증 장애 취약 일자리 창출",
+  esgCard2Desc: "경증 및 중증 장애인 모두에게 동등한 사회적 직업 활동의 소중한 기회를 확대합니다. 장애인의 경제적 자립 기반을 주체적으로 마련하며 사회적 보이지 않는 장벽을 극적으로 줄이고 배려와 포용 문화를 전격적으로 확산합니다.",
+  esgCard3Title: "법적 의무 이행",
+  esgCard3Desc: "공정하고 합법적인 절차를 통해 장애인 고용부담금(벌금) 발생 리스크를 완전히 예방합니다. 국가적 장애인 의무고용 법률적 기준을 완전 충족하여 기업의 지배구조 신뢰도와 대외 이미지를 확고하게 격상시킵니다.",
+
+  // Footer Section defaults
+  footerSlogan: "장애인 인재 채용부터 고용부담금 처리, 전용 ERP 시스템 무상 제공까지 — 베네피플이 채용 · 운영의 전 과정을 완벽히 책임지고 동행합니다.",
+  companyOwner: "박성진",
+  companyPhone: "02-1234-5678",
+  companyFax: "02-1234-5679",
+  companyEmail: "info@benepeople.com",
+  companyAddress: "경기도 고양시 행신동 948-1 엘지프라자 7층 (본사 · 전국 25개 거점 운영)",
+  footerCopyright: "© 2026 Bene People Inc. All rights reserved. 대한민국 No.1 장애인 고용 통합 위탁 솔루션."
 };
 
 export default function App() {
@@ -95,6 +164,7 @@ export default function App() {
         onLoginClick={() => setShowLogin(true)}
         loggedInCompany={loggedInCompany}
         onLogout={handleLogout}
+        config={homepageConfig}
       />
 
       {/* Login Welcome Banner if logged in */}
@@ -143,9 +213,13 @@ export default function App() {
         </motion.div>
       ) : (
         /* Else, show the entire Landing and Homepage */
-        <>
+        <div className="relative z-10 bg-[#04241E]">
+          {/* 3D Moving Interactive Canvas Background */}
+          <Background3D />
+
           {/* Hero Banner Section */}
-          <section className="relative min-h-screen bg-[#073B31] text-white flex items-center justify-center pt-28 pb-20 overflow-hidden">
+          <section className="relative min-h-screen bg-transparent text-white flex items-center justify-center pt-28 pb-20 overflow-hidden">
+
             {/* Glowing aura decorations */}
             <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#EBB63F]/10 rounded-full filter blur-[120px] pointer-events-none animate-pulse"></div>
             <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-emerald-500/10 rounded-full filter blur-[100px] pointer-events-none"></div>
@@ -211,7 +285,7 @@ export default function App() {
                     <div className="flex items-start gap-3">
                       <CheckCircle2 className="w-4 h-4 text-brand-accent shrink-0 mt-0.5" />
                       <p className="text-xs text-gray-300 leading-relaxed font-sans">
-                        <strong>합법적 의무고용 승인:</strong> 전담 공인 노무사가 상시 근무 실태 조사를 밀착 대조하여 관공서 정상 인정을 완벽 대행합니다.
+                        <strong>합법적 의무고용 승인:</strong> 전담 공인 노무사가 상시 근무 실태 조사를 밀착 대조하여 관공서 인증을 대행합니다.
                       </p>
                     </div>
                     <div className="flex items-start gap-3">
@@ -251,27 +325,27 @@ export default function App() {
           <PainPointsSection config={homepageConfig} />
 
           {/* 5. Three Pillars Section */}
-          <ThreePillarsSection />
+          <ThreePillarsSection config={homepageConfig} />
 
           {/* 6. Budget Calculator */}
-          <BudgetCalculator />
+          <BudgetCalculator config={homepageConfig} />
 
           {/* 7. Workflow Process Section */}
-          <WorkflowSection />
+          <WorkflowSection config={homepageConfig} />
 
           {/* 8. ERP Program Simulator */}
           <ERPDemo />
 
           {/* 9. ESG Impact Section */}
-          <ESGImpactSection />
+          <ESGImpactSection config={homepageConfig} />
 
           {/* 10. AI Diagnostics Consultation Form */}
-          <AIDiagnosisSection />
-        </>
-      )}
+          <AIDiagnosisSection config={homepageConfig} />
 
-      {/* Brand Footer */}
-      <Footer />
+          {/* Brand Footer */}
+          <Footer config={homepageConfig} />
+        </div>
+      )}
 
       {/* LoginPage Modal */}
       <AnimatePresence>

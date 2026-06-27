@@ -46,16 +46,16 @@ export default function PainPointsSection({ config }: PainPointsSectionProps) {
   ];
 
   return (
-    <section id="pain-points" className="py-24 bg-[#F8FAF9] text-[#1A2E2A]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="pain-points" className="py-24 bg-transparent text-white relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="font-mono text-xs uppercase tracking-widest text-brand-lightgreen px-3 py-1 bg-brand-lightgreen/10 rounded-full font-bold">
+          <span className="font-mono text-xs uppercase tracking-widest text-brand-accent px-3 py-1 bg-brand-accent/10 rounded-full font-bold">
             {painBadge}
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-4 text-brand-green">
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-4 text-white">
             {painTitle}
           </h2>
-          <p className="text-gray-600 mt-4 text-sm sm:text-base leading-relaxed">
+          <p className="text-gray-300 mt-4 text-sm sm:text-base leading-relaxed">
             {painDesc}
           </p>
         </div>
@@ -65,22 +65,22 @@ export default function PainPointsSection({ config }: PainPointsSectionProps) {
           {qas.map((item, idx) => (
             <div
               key={item.id}
-              className="bg-white border border-gray-100 hover:border-brand-accent/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-sm hover:shadow-md transition duration-300 relative group"
+              className="bg-[#0D5C4E]/25 backdrop-blur-md border border-white/5 hover:border-brand-accent/30 rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-lg hover:shadow-2xl transition duration-300 relative group"
             >
               {/* Question */}
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 shrink-0 text-xs font-bold font-mono">
+                  <div className="w-6 h-6 rounded-full bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-400 shrink-0 text-xs font-bold font-mono">
                     Q
                   </div>
-                  <h3 className="text-xs sm:text-sm font-bold text-gray-800 leading-snug">
+                  <h3 className="text-xs sm:text-sm font-bold text-white leading-snug">
                     {item.q}
                   </h3>
                 </div>
 
                 {/* Answer box */}
-                <div className="bg-brand-bg border-l-4 border-brand-lightgreen p-4 rounded-r-xl">
-                  <p className="text-xs sm:text-sm text-brand-green font-medium leading-relaxed font-sans">
+                <div className="bg-white/[0.03] border-l-4 border-brand-accent p-4 rounded-r-xl">
+                  <p className="text-xs sm:text-sm text-gray-300 font-medium leading-relaxed font-sans">
                     {item.a}
                   </p>
                 </div>
@@ -88,7 +88,7 @@ export default function PainPointsSection({ config }: PainPointsSectionProps) {
 
               {/* Number tag */}
               <div className="mt-4 flex justify-end">
-                <span className="text-gray-200 group-hover:text-brand-lightgreen/30 transition text-4xl font-black font-mono tracking-tighter select-none">
+                <span className="text-gray-700/40 group-hover:text-brand-accent/20 transition text-4xl font-black font-mono tracking-tighter select-none">
                   0{idx + 1}
                 </span>
               </div>
@@ -97,9 +97,9 @@ export default function PainPointsSection({ config }: PainPointsSectionProps) {
         </div>
 
         {/* Bottom caution box */}
-        <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center max-w-2xl mx-auto flex items-center justify-center gap-2.5">
-          <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
-          <span className="text-xs sm:text-sm font-bold text-amber-800">
+        <div className="bg-amber-500/10 backdrop-blur-md border border-amber-500/20 rounded-xl p-4 text-center max-w-2xl mx-auto flex items-center justify-center gap-2.5">
+          <AlertCircle className="w-5 h-5 text-brand-accent shrink-0" />
+          <span className="text-xs sm:text-sm font-bold text-amber-200">
             {painCaution}
           </span>
         </div>

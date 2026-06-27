@@ -95,6 +95,74 @@ export interface HomepageConfig {
   painTitle?: string;
   painDesc?: string;
   painCaution?: string;
+
+  // General & Branding Identity
+  logoUrl?: string;
+  companyName?: string;
+  companyLogoText?: string;
+
+  // Budget Calculator Formula & Texts
+  calcBadge?: string;
+  calcTitle?: string;
+  calcDesc?: string;
+  obligationRate?: number; // default: 0.031
+  finePerMonth?: number; // default: 2156880
+  beneCostPerMonth?: number; // default: 663000
+  savingsPercentFixed?: number; // default: 69
+
+  // Three Pillars Section
+  pillarsBadge?: string;
+  pillarsTitle?: string;
+  pillarsDesc?: string;
+  pillar1Title?: string;
+  pillar1Sub?: string;
+  pillar1Val?: string;
+  pillar1ValSub?: string;
+  pillar2Title?: string;
+  pillar2Sub?: string;
+  pillar2Val?: string;
+  pillar2ValSub?: string;
+  pillar3Title?: string;
+  pillar3Sub?: string;
+  pillar3Val?: string;
+  pillar3ValSub?: string;
+
+  // Workflow Section
+  workflowBadge?: string;
+  workflowTitle?: string;
+  workflowDesc?: string;
+  workflowStep1Title?: string;
+  workflowStep1Desc?: string;
+  workflowStep2Title?: string;
+  workflowStep2Desc?: string;
+  workflowStep3Title?: string;
+  workflowStep3Desc?: string;
+  workflowStep4Title?: string;
+  workflowStep4Desc?: string;
+  workflowStep5Title?: string;
+  workflowStep5Desc?: string;
+  workflowFooterTitle?: string;
+  workflowFooterText?: string;
+
+  // ESG Impact Section
+  esgBadge?: string;
+  esgTitle?: string;
+  esgDesc?: string;
+  esgCard1Title?: string;
+  esgCard1Desc?: string;
+  esgCard2Title?: string;
+  esgCard2Desc?: string;
+  esgCard3Title?: string;
+  esgCard3Desc?: string;
+
+  // Footer Section
+  footerSlogan?: string;
+  companyOwner?: string;
+  companyPhone?: string;
+  companyFax?: string;
+  companyEmail?: string;
+  companyAddress?: string;
+  footerCopyright?: string;
 }
 
 export interface Inquiry {

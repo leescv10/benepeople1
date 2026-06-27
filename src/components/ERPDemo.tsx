@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Users, Clock, Award, CheckCircle, FileText, Check, Calendar, ArrowRight, Cloud } from "lucide-react";
-import disabledWorkImg from "../assets/images/disabled_employee_work_1782464944552.jpg";
 import GoogleDriveTab from "./GoogleDriveTab";
 
 export default function ERPDemo() {
@@ -92,7 +91,7 @@ export default function ERPDemo() {
         "14:30 - 탄소발자국 정밀 분류 입력 작업 수행",
         "17:45 - 일일 마감 보고서 자동 제출 및 로그아웃"
       ],
-      photoUrl: disabledWorkImg
+      photoUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600"
     },
     "emp-2": {
       title: "국내 대기업 ESG 평가 지표 리서치 리포팅",
@@ -127,16 +126,16 @@ export default function ERPDemo() {
   const selectedPerformance = performanceRecords[selectedEmployeeId] || performanceRecords["emp-1"];
 
   return (
-    <section id="erp-demo" className="py-20 bg-gray-50 text-[#1A2E2A]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="erp-demo" className="py-20 bg-transparent text-white relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <span className="font-mono text-xs uppercase tracking-widest text-brand-lightgreen px-3 py-1 bg-brand-lightgreen/10 rounded-full font-bold">
+          <span className="font-mono text-xs uppercase tracking-widest text-brand-accent px-3 py-1 bg-brand-accent/10 rounded-full font-bold">
             Enterprise App Preview
           </span>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mt-4 text-brand-green">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mt-4 text-white">
             베네피플 전용 ERP 시스템 직접 체험하기
           </h2>
-          <p className="text-gray-600 mt-4 text-sm sm:text-base">
+          <p className="text-gray-300 mt-4 text-sm sm:text-base font-sans">
             기업 담당자에게 무상으로 지원되는 베네피플 ERP 프로그램을 Web과 APP으로 직접 체험해 보세요.
           </p>
         </div>
@@ -216,14 +215,7 @@ export default function ERPDemo() {
                 </div>
               </div>
 
-              {/* Sidebar bottom box */}
-              <div className="bg-slate-900 border border-slate-800 rounded-lg p-3 text-[11px] text-slate-400 leading-relaxed">
-                <p className="font-bold text-slate-300 flex items-center gap-1.5 mb-1 text-xs">
-                  <span className="w-1.5 h-1.5 bg-brand-accent rounded-full animate-pulse"></span>
-                  실시간 근태 시스템의 무상 위력
-                </p>
-                IP 보안 및 지문/안면 전송 대조, 지적장애 보정 GPS 체크를 일체 내장하여 신뢰를 완전 확보합니다.
-              </div>
+
             </aside>
 
             {/* Mobile Navigation Header */}

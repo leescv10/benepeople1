@@ -54,16 +54,16 @@ export default function WhySection({ config }: WhySectionProps) {
   ];
 
   return (
-    <section id="why" className="py-24 bg-white text-[#1A2E2A]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="why" className="py-24 bg-transparent text-white relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="font-mono text-xs uppercase tracking-widest text-brand-lightgreen px-3 py-1 bg-brand-lightgreen/10 rounded-full font-bold">
+          <span className="font-mono text-xs uppercase tracking-widest text-brand-accent px-3 py-1 bg-brand-accent/10 rounded-full font-bold">
             {whyBadge}
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-4 text-brand-green">
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-4 text-white">
             {whyTitle}
           </h2>
-          <p className="text-gray-600 mt-4 text-sm sm:text-base leading-relaxed">
+          <p className="text-gray-300 mt-4 text-sm sm:text-base leading-relaxed">
             {whyDesc}
           </p>
         </div>
@@ -73,21 +73,21 @@ export default function WhySection({ config }: WhySectionProps) {
           {cards.map((card, idx) => (
             <div
               key={card.id}
-              className="bg-brand-bg hover:bg-white border border-gray-100 hover:border-brand-lightgreen/20 rounded-2xl p-6 sm:p-8 shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between group"
+              className="bg-brand-lightgreen/30 backdrop-blur-md hover:bg-brand-lightgreen/50 border border-white/5 hover:border-brand-accent/20 rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-2xl transition duration-300 flex flex-col justify-between group"
             >
               <div>
-                <div className="w-12 h-12 rounded-xl bg-white border border-gray-100 flex items-center justify-center shadow-sm mb-6 group-hover:scale-105 transition duration-300">
+                <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shadow-sm mb-6 group-hover:scale-105 transition duration-300 text-brand-accent">
                   {card.icon}
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-brand-green mb-3">
+                <h3 className="text-base sm:text-lg font-bold text-white mb-3 group-hover:text-brand-accent transition-colors">
                   {card.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-500 leading-relaxed font-sans">
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-sans">
                   {card.desc}
                 </p>
               </div>
               <div className="mt-6 flex justify-end">
-                <span className="text-slate-300 group-hover:text-brand-lightgreen transition font-mono text-xs font-bold flex items-center gap-1">
+                <span className="text-gray-400 group-hover:text-brand-accent transition font-mono text-xs font-bold flex items-center gap-1">
                   0{idx + 1} <ArrowUpRight className="w-4 h-4" />
                 </span>
               </div>
@@ -96,13 +96,13 @@ export default function WhySection({ config }: WhySectionProps) {
         </div>
 
         {/* Bottom highlighted block (Correction 4) */}
-        <div className="bg-red-50/50 border border-red-100 rounded-2xl p-6 sm:p-8 flex items-start gap-4 max-w-4xl mx-auto shadow-sm">
-          <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
+        <div className="bg-red-950/20 backdrop-blur-md border border-red-500/20 rounded-2xl p-6 sm:p-8 flex items-start gap-4 max-w-4xl mx-auto shadow-lg">
+          <div className="w-10 h-10 rounded-full bg-red-900/40 border border-red-500/30 flex items-center justify-center text-red-400 shrink-0">
             <AlertTriangle className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="font-bold text-red-950 text-sm sm:text-base">{whyRiskTitle}</h4>
-            <p className="text-xs sm:text-sm text-red-800 leading-relaxed mt-2.5 whitespace-pre-line">
+            <h4 className="font-bold text-red-200 text-sm sm:text-base">{whyRiskTitle}</h4>
+            <p className="text-xs sm:text-sm text-red-300 leading-relaxed mt-2.5 whitespace-pre-line font-sans">
               {whyRiskDesc}
             </p>
           </div>

@@ -1,48 +1,64 @@
 import { Shield, Sparkles } from "lucide-react";
-import logoImg from "../assets/images/benepeople_logo_1782482488645.jpg";
+import logoImg from "../assets/images/benepeople_logo_1782496128774.jpg";
+import { HomepageConfig } from "../types";
 
-export default function Footer() {
+interface FooterProps {
+  config?: HomepageConfig;
+}
+
+export default function Footer({ config }: FooterProps) {
+  const logoSource = config?.logoUrl || logoImg;
+  const companyNameText = config?.companyName || "Bene People";
+  const companyLogoSubtext = config?.companyLogoText || "(주)베네피플";
+  const slogan = config?.footerSlogan || "장애인 인재 채용부터 고용부담금 처리, 전용 ERP 시스템 무상 제공까지 — 베네피플이 채용 · 운영의 전 과정을 완벽히 책임지고 동행합니다.";
+  const owner = config?.companyOwner || "박성진";
+  const phone = config?.companyPhone || "02-1234-5678";
+  const fax = config?.companyFax || "02-1234-5679";
+  const email = config?.companyEmail || "info@benepeople.com";
+  const address = config?.companyAddress || "경기도 고양시 행신동 948-1 엘지프라자 7층 (본사 · 전국 25개 거점 운영)";
+  const copyright = config?.footerCopyright || "© 2026 (주)베네피플 (Bene People Inc.) All rights reserved.";
+
   return (
-    <footer className="bg-[#073B31] text-gray-300 border-t border-white/5 pt-16 pb-8 font-sans">
+    <footer className="bg-black/15 backdrop-blur-[2px] text-gray-300 border-t border-white/5 pt-16 pb-8 font-sans relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 pb-12 border-b border-white/5">
           {/* Logo & Slogan Column */}
           <div className="lg:col-span-4 space-y-4">
             <div className="flex items-center gap-2.5">
               <img
-                src={logoImg}
+                src={logoSource}
                 alt="Bene People Logo"
                 className="w-10 h-10 rounded-xl object-cover shadow-md"
                 referrerPolicy="no-referrer"
               />
               <div>
                 <span className="font-extrabold text-base tracking-tight text-white block">
-                  Bene People
+                  {companyNameText}
                 </span>
                 <span className="text-[9px] text-brand-accent font-semibold block tracking-wide">
-                  (주)베네피플
+                  {companyLogoSubtext}
                 </span>
               </div>
             </div>
             <p className="text-xs sm:text-sm text-gray-400 leading-relaxed max-w-sm">
-              장애인 인재 채용부터 고용부담금 처리, 전용 ERP 시스템 무상 제공까지 — <strong>베네피플</strong>이 채용 · 운영의 전 과정을 완벽히 책임지고 동행합니다.
+              {slogan}
             </p>
           </div>
 
           {/* Company Information Column */}
           <div className="lg:col-span-5 space-y-4">
             <h4 className="text-sm font-extrabold text-[#EBB63F] uppercase tracking-wider">
-              (주)베네피플 본사 정보
+              {companyLogoSubtext} 본사 정보
             </h4>
             <div className="space-y-2 text-xs text-gray-400 leading-relaxed font-sans">
               <p>
-                <strong className="text-white">상호명:</strong> (주)베네피플 | <strong className="text-white">대표이사:</strong> 박성진
+                <strong className="text-white">상호명:</strong> {companyLogoSubtext} | <strong className="text-white">대표이사:</strong> {owner}
               </p>
               <p>
-                <strong className="text-white">대표전화:</strong> 02-1234-5678 | <strong className="text-white">팩스:</strong> 02-1234-5679 | <strong className="text-white">이메일:</strong> info@benepeople.com
+                <strong className="text-white">대표전화:</strong> {phone} | <strong className="text-white">팩스:</strong> {fax} | <strong className="text-white">이메일:</strong> {email}
               </p>
               <p>
-                <strong className="text-white">주소:</strong> 경기도 고양시 행신동 948-1 엘지프라자 7층 (본사 · 전국 25개 거점 운영)
+                <strong className="text-white">주소:</strong> {address}
               </p>
             </div>
           </div>
@@ -69,7 +85,7 @@ export default function Footer() {
 
         {/* Bottom copyright & Terms links */}
         <div className="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500">
-          <p>© 2026 (주)베네피플 (Bene People Inc.) All rights reserved.</p>
+          <p>{copyright}</p>
           <div className="flex items-center gap-4">
             <a href="#" className="hover:text-[#EBB63F] transition">
               이용약관

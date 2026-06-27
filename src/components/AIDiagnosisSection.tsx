@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Sparkles, Send, Loader2, AlertCircle, RefreshCw, FileText, Check, PhoneCall, Award } from "lucide-react";
-import { DiagnosisResult } from "../types";
+import { DiagnosisResult, HomepageConfig } from "../types";
 
-export default function AIDiagnosisSection() {
+interface AIDiagnosisSectionProps {
+  config?: HomepageConfig;
+}
+
+export default function AIDiagnosisSection({ config }: AIDiagnosisSectionProps) {
   const [form, setForm] = useState({
     companyName: "",
     totalEmployees: "",
@@ -52,6 +56,11 @@ export default function AIDiagnosisSection() {
           managerName: form.managerName,
           managerContact: form.managerContact,
           managerEmail: form.managerEmail,
+          // Custom formula variables passed dynamically to the backend calculations
+          obligationRate: config?.obligationRate,
+          finePerMonth: config?.finePerMonth,
+          beneCostPerMonth: config?.beneCostPerMonth,
+          savingsPercentFixed: config?.savingsPercentFixed,
         }),
       });
 
@@ -156,7 +165,7 @@ export default function AIDiagnosisSection() {
   };
 
   return (
-    <section id="ai-diagnosis" className="py-24 bg-brand-green text-white relative overflow-hidden">
+    <section id="ai-diagnosis" className="py-24 bg-transparent text-white relative overflow-hidden">
       {/* Background decorations */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-[#0D5C4E] rounded-full filter blur-[100px] opacity-30 -ml-20 -mt-20"></div>
 

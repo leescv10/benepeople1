@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
 import { Menu, X, ShieldAlert, LogIn, LogOut, LayoutDashboard } from "lucide-react";
-import logoImg from "../assets/images/benepeople_logo_1782482488645.jpg";
+import logoImg from "../assets/images/benepeople_logo_1782496128774.jpg";
+import { HomepageConfig } from "../types";
 
 interface HeaderProps {
   onLoginClick: () => void;
   loggedInCompany: string | null;
   onLogout: () => void;
+  config?: HomepageConfig;
 }
 
-export default function Header({ onLoginClick, loggedInCompany, onLogout }: HeaderProps) {
+export default function Header({ onLoginClick, loggedInCompany, onLogout, config }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -34,6 +36,10 @@ export default function Header({ onLoginClick, loggedInCompany, onLogout }: Head
     { label: "ESG 효과", href: "#esg" },
   ];
 
+  const logoSource = config?.logoUrl || logoImg;
+  const companyNameText = config?.companyName || "Bene People";
+  const companyLogoSubtext = config?.companyLogoText || "(주)베네피플";
+
   return (
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
@@ -47,17 +53,17 @@ export default function Header({ onLoginClick, loggedInCompany, onLogout }: Head
           {/* Brand Logo */}
           <a href="#" className="flex items-center gap-2.5 group">
             <img
-              src={logoImg}
+              src={logoSource}
               alt="Bene People Logo"
               className="w-10 h-10 rounded-xl object-cover shadow-md group-hover:scale-105 transition duration-300"
               referrerPolicy="no-referrer"
             />
             <div>
               <span className="font-extrabold text-base tracking-tight text-white block">
-                Bene People
+                {companyNameText}
               </span>
               <span className="text-[9px] text-brand-accent font-semibold block tracking-wide">
-                (주)베네피플 {loggedInCompany ? "ERP" : ""}
+                {companyLogoSubtext} {loggedInCompany ? "ERP" : ""}
               </span>
             </div>
           </a>

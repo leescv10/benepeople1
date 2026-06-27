@@ -39,25 +39,33 @@ app.post("/api/diagnose", async (req, res) => {
       managerName,
       managerContact,
       managerEmail,
+      obligationRate,
+      finePerMonth,
+      beneCostPerMonth,
+      savingsPercentFixed,
     } = req.body;
 
     const employees = parseInt(totalEmployees, 10) || 0;
     const current = parseInt(currentDisabledEmployees, 10) || 0;
 
-    // Standard Korean disabled employment rate (3.1%)
-    const requiredDisabledCount = Math.floor(employees * 0.031);
+    // Use customized parameters if present, otherwise fall back to standard defaults
+    const oRate = obligationRate !== undefined ? parseFloat(obligationRate) : 0.031;
+    const fPerMonth = finePerMonth !== undefined ? parseInt(finePerMonth, 10) : 2156880;
+    const bCostPerMonth = beneCostPerMonth !== undefined ? parseInt(beneCostPerMonth, 10) : 663000;
+
+    const requiredDisabledCount = Math.floor(employees * oRate);
     const shortage = Math.max(0, requiredDisabledCount - current);
 
-    // Standard high-rate penalty in Korea: 2,156,880 KRW per month per missing employee
-    const pureFineMonthly = shortage * 2156880;
+    const pureFineMonthly = shortage * fPerMonth;
     const pureFineYearly = pureFineMonthly * 12;
 
-    // Bene People full-package solution: 663,000 KRW per month per missing employee
-    const benePeopleCostMonthly = shortage * 663000;
+    const benePeopleCostMonthly = shortage * bCostPerMonth;
     const benePeopleCostYearly = benePeopleCostMonthly * 12;
 
     const savingsYearly = pureFineYearly - benePeopleCostYearly;
-    const savingsPercent = pureFineYearly > 0 ? Math.round((savingsYearly / pureFineYearly) * 100) : 0;
+    const savingsPercent = pureFineYearly > 0 
+      ? (savingsPercentFixed !== undefined ? parseInt(savingsPercentFixed, 10) : Math.round((savingsYearly / pureFineYearly) * 100))
+      : 0;
 
     let geminiReport = "";
 
