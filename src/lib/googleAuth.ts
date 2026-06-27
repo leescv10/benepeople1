@@ -1,10 +1,12 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, User } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 import firebaseConfig from "../../firebase-applet-config.json";
 
-// Initialize Firebase App & Auth
+// Initialize Firebase App, Auth, & Firestore
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+export const db = getFirestore(app);
 
 // Initialize Google OAuth provider with necessary scopes for Google Drive
 const provider = new GoogleAuthProvider();

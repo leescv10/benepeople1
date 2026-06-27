@@ -16,6 +16,8 @@ import LoginPage from "./components/LoginPage";
 import AdminDashboard from "./components/AdminDashboard";
 import { HomepageConfig } from "./types";
 import Background3D from "./components/Background3D";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "./lib/googleAuth";
 
 const DEFAULT_HOMEPAGE_CONFIG: HomepageConfig = {
   heroBadge: "대한민국 1등 장애인 고용 솔루션 파트너",
@@ -142,14 +144,44 @@ export default function App() {
     return DEFAULT_HOMEPAGE_CONFIG;
   });
 
-  const handleUpdateHomepageConfig = (newConfig: HomepageConfig) => {
+  // Load config from Firestore on mount
+  useEffect(() => {
+    const loadConfig = async () => {
+      try {
+        const docRef = doc(db, "configs", "homepage");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const cloudConfig = docSnap.data() as HomepageConfig;
+          setHomepageConfig(cloudConfig);
+          localStorage.setItem("bene_people_homepage_config", JSON.stringify(cloudConfig));
+        }
+      } catch (err) {
+        console.warn("Could not load homepage config from Firestore, using local cache:", err);
+      }
+    };
+    loadConfig();
+  }, []);
+
+  const handleUpdateHomepageConfig = async (newConfig: HomepageConfig) => {
     setHomepageConfig(newConfig);
     localStorage.setItem("bene_people_homepage_config", JSON.stringify(newConfig));
+    try {
+      const docRef = doc(db, "configs", "homepage");
+      await setDoc(docRef, newConfig);
+    } catch (err) {
+      console.error("Could not save homepage config to Firestore:", err);
+    }
   };
 
-  const handleResetHomepageConfig = () => {
+  const handleResetHomepageConfig = async () => {
     setHomepageConfig(DEFAULT_HOMEPAGE_CONFIG);
     localStorage.setItem("bene_people_homepage_config", JSON.stringify(DEFAULT_HOMEPAGE_CONFIG));
+    try {
+      const docRef = doc(db, "configs", "homepage");
+      await setDoc(docRef, DEFAULT_HOMEPAGE_CONFIG);
+    } catch (err) {
+      console.error("Could not reset homepage config in Firestore:", err);
+    }
   };
 
   const handleLogout = () => {

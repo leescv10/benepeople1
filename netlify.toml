@@ -9,6 +9,12 @@
 [functions]
   directory = "netlify/functions"
 
+# Netlify API redirects to serverless functions
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
 # Support SPA Client-side routing fallback
 # This ensures that deep linking and page refreshes work flawlessly in React
 [[redirects]]

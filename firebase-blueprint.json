@@ -1,0 +1,47 @@
+{
+  "entities": {
+    "HomepageConfig": {
+      "title": "Homepage Configuration",
+      "description": "Stores editable text and metric configs for the homepage",
+      "type": "object",
+      "properties": {
+        "heroBadge": { "type": "string", "description": "Hero badge text" },
+        "heroTitle": { "type": "string", "description": "Hero main title text" },
+        "heroSubtitle": { "type": "string", "description": "Hero subtitle text" },
+        "metric1Val": { "type": "string", "description": "Metric 1 value" },
+        "metric1Lab": { "type": "string", "description": "Metric 1 label" },
+        "metric2Val": { "type": "string", "description": "Metric 2 value" },
+        "metric2Lab": { "type": "string", "description": "Metric 2 label" },
+        "metric3Val": { "type": "string", "description": "Metric 3 value" },
+        "metric3Lab": { "type": "string", "description": "Metric 3 label" }
+      }
+    },
+    "Inquiry": {
+      "title": "Diagnosis Inquiry",
+      "description": "Stores consultation inquiries submitted by company managers",
+      "type": "object",
+      "properties": {
+        "companyName": { "type": "string" },
+        "totalEmployees": { "type": "integer" },
+        "currentDisabledEmployees": { "type": "integer" },
+        "managerName": { "type": "string" },
+        "managerContact": { "type": "string" },
+        "managerEmail": { "type": "string" },
+        "date": { "type": "string" },
+        "savingsYearly": { "type": "integer" },
+        "status": { "type": "string", "enum": ["접수대기", "상담완료", "보류"] }
+      },
+      "required": ["companyName", "totalEmployees", "managerName", "managerEmail"]
+    }
+  },
+  "firestore": {
+    "/configs/{configId}": {
+      "schema": "HomepageConfig",
+      "description": "Site-wide configuration documents"
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": "Inquiry",
+      "description": "Submitted consultation inquiries"
+    }
+  }
+}
