@@ -22,7 +22,7 @@ import { db } from "./lib/googleAuth";
 const DEFAULT_HOMEPAGE_CONFIG: HomepageConfig = {
   heroBadge: "대한민국 1등 장애인 고용 솔루션 파트너",
   heroTitle: "장애인 고용부담금 절감\n베네피플이 귀사의 성과로\n전환해 드립니다.",
-  heroSubtitle: "21년 이상의 전문 아웃소싱 노하우와 맞춤형 장애인 인재 풀을 통해 채용부터 근태관리, 노무 행정까지 원스톱으로 무결점 안전 처리합니다.",
+  heroSubtitle: "21년 이상의 전문 아웃소싱 노하우와 맞춤형 장애인 인재 풀을 통해 채용부터 근태관리, 노무 행정까지 원스톱으로 진행합니다.",
   metric1Val: "21+",
   metric1Lab: "업무 및 아웃소싱 연혁",
   metric2Val: "25개",
@@ -136,7 +136,11 @@ export default function App() {
     const saved = localStorage.getItem("bene_people_homepage_config");
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved) as HomepageConfig;
+        if (parsed.heroSubtitle && parsed.heroSubtitle.includes("원스톱으로 무결점 안전 처리합니다")) {
+          parsed.heroSubtitle = parsed.heroSubtitle.replace("원스톱으로 무결점 안전 처리합니다", "원스톱으로 진행합니다");
+        }
+        return parsed;
       } catch (e) {
         return DEFAULT_HOMEPAGE_CONFIG;
       }
@@ -152,6 +156,11 @@ export default function App() {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const cloudConfig = docSnap.data() as HomepageConfig;
+          if (cloudConfig.heroSubtitle && cloudConfig.heroSubtitle.includes("원스톱으로 무결점 안전 처리합니다")) {
+            cloudConfig.heroSubtitle = cloudConfig.heroSubtitle.replace("원스톱으로 무결점 안전 처리합니다", "원스톱으로 진행합니다");
+            // Sync the updated config back to Firestore
+            await setDoc(docRef, cloudConfig);
+          }
           setHomepageConfig(cloudConfig);
           localStorage.setItem("bene_people_homepage_config", JSON.stringify(cloudConfig));
         }
