@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Sliders, Palette, RotateCw, X, RotateCcw, MousePointer } from "lucide-react";
 
 interface Point3D {
   x: number;
@@ -568,8 +567,8 @@ export default function Background3D() {
           let innerColor = "rgba(255, 255, 255, ";
           
           if (currentTheme === "light") {
-            nodeColor = "rgba(7, 59, 49, ";
-            innerColor = "rgba(37, 99, 235, ";
+            nodeColor = "rgba(13, 92, 78, ";
+            innerColor = "rgba(235, 182, 63, ";
           } else if (currentTheme === "cosmic") {
             nodeColor = "rgba(6, 182, 212, ";
             innerColor = "rgba(255, 255, 255, ";
@@ -645,7 +644,7 @@ export default function Background3D() {
           // Get the dynamic crystal colors for current theme
           const dynamicCrystalColors = {
             dark: ["#EBB63F", "#10B981", "#38BDF8"],
-            light: ["#073B31", "#3B82F6", "#14B8A6"],
+            light: ["#EBB63F", "#0D5C4E", "#4BA3E3"],
             cosmic: ["#06B6D4", "#8B5CF6", "#EC4899"],
             luxury: ["#D97706", "#EF4444", "#F59E0B"],
           };
@@ -715,22 +714,22 @@ export default function Background3D() {
   }, [dimensions]);
 
   const bgColors = {
-    dark: "#031c17",      // Calm Dark
-    light: "#F3F6F5",     // Bright Business
+    dark: "#02120f",      // Rich Imperial Dark Teal
+    light: "#F8FAF9",     // Bright Business
     cosmic: "#070514",    // Cosmic Purple
     luxury: "#170D0B",    // Sunset Luxury
   };
 
   const radialOverlays = {
-    dark: "radial-gradient(circle at 50% 50%, rgba(3, 28, 23, 0.45) 0%, rgba(2, 16, 13, 0.96) 80%)",
-    light: "radial-gradient(circle at 50% 50%, rgba(243, 246, 245, 0.2) 0%, rgba(225, 230, 228, 0.75) 90%)",
+    dark: "radial-gradient(circle at 50% 35%, rgba(13, 92, 78, 0.45) 0%, rgba(235, 182, 63, 0.1) 32%, rgba(2, 18, 15, 0.94) 75%, rgba(1, 10, 8, 0.99) 100%)",
+    light: "radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.88) 0%, rgba(242, 246, 244, 0.94) 100%)",
     cosmic: "radial-gradient(circle at 50% 50%, rgba(13, 11, 30, 0.4) 0%, rgba(7, 5, 20, 0.98) 85%)",
     luxury: "radial-gradient(circle at 50% 50%, rgba(35, 21, 18, 0.45) 0%, rgba(23, 13, 11, 0.98) 85%)",
   };
 
   const canvasOpacities = {
-    dark: "opacity-[0.38]",
-    light: "opacity-[0.45]",
+    dark: "opacity-[0.46]",
+    light: "opacity-[0.62]",
     cosmic: "opacity-[0.48]",
     luxury: "opacity-[0.35]",
   };
@@ -753,151 +752,6 @@ export default function Background3D() {
         className={`w-full h-full block relative z-0 transition-opacity duration-1000 ${canvasOpacities[theme]}`}
         style={{ pointerEvents: "none" }}
       />
-
-      {/* Floating 3D/Theme Controls (Bottom Right FAB + Glass Container) */}
-      <div className="fixed bottom-6 right-6 z-50 pointer-events-auto select-none">
-        {isExpanded ? (
-          <div className="w-80 bg-black/45 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-2xl animate-fadeIn text-white">
-            <div className="flex justify-between items-center mb-4 border-b border-white/5 pb-2">
-              <div className="flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-brand-accent animate-pulse" />
-                <span className="font-sans font-bold text-sm tracking-tight text-white">3D 배경 설정 컨트롤러</span>
-              </div>
-              <button 
-                onClick={() => setIsExpanded(false)}
-                className="p-1 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition cursor-pointer"
-                title="닫기"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Theme Select section */}
-            <div className="space-y-3 mb-5">
-              <label className="text-xs text-gray-300 font-semibold flex items-center gap-1.5">
-                <Palette className="w-3.5 h-3.5 text-brand-accent" />
-                환경 테마 설정
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => setTheme("dark")}
-                  className={`flex items-center gap-2 p-2 rounded-xl text-xs font-semibold border transition cursor-pointer ${
-                    theme === "dark" 
-                      ? "bg-emerald-850/40 border-brand-accent text-white shadow-inner" 
-                      : "bg-white/5 border-white/5 hover:bg-white/10 text-gray-300"
-                  }`}
-                >
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#0D5C4E] border border-white/20"></span>
-                  차분한 다크
-                </button>
-                <button
-                  onClick={() => setTheme("light")}
-                  className={`flex items-center gap-2 p-2 rounded-xl text-xs font-semibold border transition cursor-pointer ${
-                    theme === "light" 
-                      ? "bg-white/25 border-[#073B31]/30 text-emerald-100 shadow-inner" 
-                      : "bg-white/5 border-white/5 hover:bg-white/10 text-gray-300"
-                  }`}
-                >
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#F4F7F5] border border-gray-400"></span>
-                  밝은 비즈니스
-                </button>
-                <button
-                  onClick={() => setTheme("cosmic")}
-                  className={`flex items-center gap-2 p-2 rounded-xl text-xs font-semibold border transition cursor-pointer ${
-                    theme === "cosmic" 
-                      ? "bg-purple-950/40 border-purple-500 text-white shadow-inner" 
-                      : "bg-white/5 border-white/5 hover:bg-white/10 text-gray-300"
-                  }`}
-                >
-                  <span className="w-2.5 h-2.5 rounded-full bg-purple-700 border border-white/20"></span>
-                  신비한 우주
-                </button>
-                <button
-                  onClick={() => setTheme("luxury")}
-                  className={`flex items-center gap-2 p-2 rounded-xl text-xs font-semibold border transition cursor-pointer ${
-                    theme === "luxury" 
-                      ? "bg-amber-950/40 border-amber-500 text-white shadow-inner" 
-                      : "bg-white/5 border-white/5 hover:bg-white/10 text-gray-300"
-                  }`}
-                >
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-700 border border-white/20"></span>
-                  럭셔리 골드
-                </button>
-              </div>
-            </div>
-
-            {/* Rotation Speed Control */}
-            <div className="space-y-2 mb-5">
-              <div className="flex justify-between items-center text-xs text-gray-300">
-                <span className="font-semibold flex items-center gap-1.5">
-                  <RotateCw className="w-3.5 h-3.5 text-brand-accent animate-spin" style={{ animationDuration: `${4 / Math.max(0.1, speedMultiplier)}s` }} />
-                  실시간 회전 속도
-                </span>
-                <span className="font-mono text-brand-accent font-bold">{speedMultiplier.toFixed(1)}x</span>
-              </div>
-              <input
-                type="range"
-                min="0.0"
-                max="3.0"
-                step="0.1"
-                value={speedMultiplier}
-                onChange={(e) => setSpeedMultiplier(parseFloat(e.target.value))}
-                className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-brand-accent"
-              />
-              <div className="flex justify-between text-[10px] text-gray-500 font-mono">
-                <span>정지 (0.0x)</span>
-                <span>보통 (1.0x)</span>
-                <span>빠름 (3.0x)</span>
-              </div>
-            </div>
-
-            {/* Interactive Options */}
-            <div className="space-y-3 mb-4">
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-300 font-semibold flex items-center gap-1.5">
-                  <MousePointer className="w-3.5 h-3.5 text-brand-accent" />
-                  마우스 인터랙션 반응
-                </span>
-                <button
-                  onClick={() => setEnableMouseParallax(!enableMouseParallax)}
-                  className={`w-10 h-5 rounded-full transition duration-300 relative ${
-                    enableMouseParallax ? "bg-brand-accent" : "bg-white/10"
-                  }`}
-                >
-                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition duration-300 shadow-md ${
-                    enableMouseParallax ? "left-5" : "left-1"
-                  }`} />
-                </button>
-              </div>
-            </div>
-
-            {/* Reset Button */}
-            <button
-              onClick={() => {
-                setTheme("dark");
-                setSpeedMultiplier(1.0);
-                setEnableMouseParallax(true);
-              }}
-              className="w-full py-2 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-gray-300 hover:text-white cursor-pointer"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              기본 설정으로 복원
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => setIsExpanded(true)}
-            className="flex items-center gap-2 px-4 py-3 bg-brand-green/90 backdrop-blur-md hover:bg-brand-lightgreen border border-white/10 text-white rounded-full shadow-2xl transition hover:scale-[1.05] active:scale-95 cursor-pointer group"
-          >
-            <Sliders className="w-4 h-4 text-brand-accent group-hover:rotate-45 transition duration-300" />
-            <span className="font-sans text-xs font-bold tracking-tight">3D 배경 설정</span>
-            <span className="flex h-2 w-2 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-accent opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-accent"></span>
-            </span>
-          </button>
-        )}
-      </div>
     </div>
   );
 }
