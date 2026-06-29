@@ -29,6 +29,8 @@ import {
 } from "lucide-react";
 import { HomepageConfig, Inquiry } from "../types";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from "recharts";
+import { db } from "../lib/googleAuth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 interface AdminDashboardProps {
   homepageConfig: HomepageConfig;
@@ -152,32 +154,125 @@ export default function AdminDashboard({
   const [dragOverDoc, setDragOverDoc] = useState(false);
 
   // Handle saving states
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  // Load collections from Firestore or localStorage fallback on mount
   useEffect(() => {
+    const loadAllData = async () => {
+      try {
+        // 1. Load Companies
+        const compRef = doc(db, "configs", "companies");
+        const compSnap = await getDoc(compRef);
+        let activeComps = [];
+        if (compSnap.exists()) {
+          activeComps = compSnap.data().list || [];
+          setCompanies(activeComps);
+          localStorage.setItem("bene_people_member_companies", JSON.stringify(activeComps));
+        } else {
+          // Fallback to local
+          const savedComp = localStorage.getItem("bene_people_member_companies");
+          if (savedComp) {
+            try {
+              activeComps = JSON.parse(savedComp);
+              setCompanies(activeComps);
+            } catch (e) {}
+          }
+        }
+
+        // 2. Load Employees
+        const empRef = doc(db, "configs", "employees");
+        const empSnap = await getDoc(empRef);
+        let activeEmps = [];
+        if (empSnap.exists()) {
+          activeEmps = empSnap.data().list || [];
+          setDisabledEmployees(activeEmps);
+          localStorage.setItem("bene_people_company_employees", JSON.stringify(activeEmps));
+        } else {
+          // Fallback to local
+          const savedEmp = localStorage.getItem("bene_people_company_employees");
+          if (savedEmp) {
+            try {
+              activeEmps = JSON.parse(savedEmp);
+              setDisabledEmployees(activeEmps);
+            } catch (e) {}
+          }
+        }
+
+        // 3. Load Inquiries
+        const inqRef = doc(db, "configs", "inquiries");
+        const inqSnap = await getDoc(inqRef);
+        let activeInqs = [];
+        if (inqSnap.exists()) {
+          activeInqs = inqSnap.data().list || [];
+          setInquiries(activeInqs);
+          localStorage.setItem("bene_people_inquiries", JSON.stringify(activeInqs));
+        } else {
+          // Fallback to local
+          const savedInq = localStorage.getItem("bene_people_inquiries");
+          if (savedInq) {
+            try {
+              activeInqs = JSON.parse(savedInq);
+              setInquiries(activeInqs);
+            } catch (e) {
+              generateMockInquiries();
+            }
+          } else {
+            generateMockInquiries();
+          }
+        }
+      } catch (err) {
+        console.warn("Could not load from Firestore, using local cache:", err);
+      } finally {
+        setDataLoaded(true);
+      }
+    };
+    loadAllData();
+  }, []);
+
+  // Save changes to Firestore and localStorage
+  useEffect(() => {
+    if (!dataLoaded) return;
     localStorage.setItem("bene_people_member_companies", JSON.stringify(companies));
-  }, [companies]);
+    const saveCompanies = async () => {
+      try {
+        await setDoc(doc(db, "configs", "companies"), { list: companies });
+      } catch (e) {
+        console.error("Failed to save companies to Firestore:", e);
+      }
+    };
+    saveCompanies();
+  }, [companies, dataLoaded]);
 
   useEffect(() => {
+    if (!dataLoaded) return;
     localStorage.setItem("bene_people_company_employees", JSON.stringify(disabledEmployees));
-  }, [disabledEmployees]);
+    const saveEmployees = async () => {
+      try {
+        await setDoc(doc(db, "configs", "employees"), { list: disabledEmployees });
+      } catch (e) {
+        console.error("Failed to save employees to Firestore:", e);
+      }
+    };
+    saveEmployees();
+  }, [disabledEmployees, dataLoaded]);
+
+  useEffect(() => {
+    if (!dataLoaded) return;
+    localStorage.setItem("bene_people_inquiries", JSON.stringify(inquiries));
+    const saveInquiries = async () => {
+      try {
+        await setDoc(doc(db, "configs", "inquiries"), { list: inquiries });
+      } catch (e) {
+        console.error("Failed to save inquiries to Firestore:", e);
+      }
+    };
+    saveInquiries();
+  }, [inquiries, dataLoaded]);
 
   // Sync editing configuration with prop updates
   useEffect(() => {
     setEditingConfig({ ...homepageConfig });
   }, [homepageConfig]);
-
-  // Load inquiries from localStorage or generate mock ones if empty
-  useEffect(() => {
-    const saved = localStorage.getItem("bene_people_inquiries");
-    if (saved) {
-      try {
-        setInquiries(JSON.parse(saved));
-      } catch (e) {
-        generateMockInquiries();
-      }
-    } else {
-      generateMockInquiries();
-    }
-  }, []);
 
   const generateMockInquiries = () => {
     const mockInquiries: Inquiry[] = [

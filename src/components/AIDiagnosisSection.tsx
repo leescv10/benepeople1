@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Sparkles, Send, Loader2, AlertCircle, RefreshCw, FileText, Check, PhoneCall, Award } from "lucide-react";
 import { DiagnosisResult, HomepageConfig } from "../types";
+import { db } from "../lib/googleAuth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 interface AIDiagnosisSectionProps {
   config?: HomepageConfig;
@@ -131,10 +133,22 @@ export default function AIDiagnosisSection({ config }: AIDiagnosisSectionProps) 
 
       setResult(data);
 
-      // Save inquiry to localStorage for Admin Dashboard review
+      // Save inquiry to localStorage and Firestore for Admin Dashboard review
       try {
-        const saved = localStorage.getItem("bene_people_inquiries");
-        const list = saved ? JSON.parse(saved) : [];
+        const inqRef = doc(db, "configs", "inquiries");
+        const inqSnap = await getDoc(inqRef);
+        let list = [];
+        if (inqSnap.exists()) {
+          list = inqSnap.data().list || [];
+        } else {
+          const saved = localStorage.getItem("bene_people_inquiries");
+          if (saved) {
+            try {
+              list = JSON.parse(saved);
+            } catch (e) {}
+          }
+        }
+
         const newInquiry = {
           id: `inq-${Date.now()}`,
           companyName: form.companyName,
@@ -147,10 +161,12 @@ export default function AIDiagnosisSection({ config }: AIDiagnosisSectionProps) 
           savingsYearly: data.savingsYearly || 0,
           status: "접수대기",
         };
+
         list.unshift(newInquiry);
         localStorage.setItem("bene_people_inquiries", JSON.stringify(list));
+        await setDoc(inqRef, { list });
       } catch (storageError) {
-        console.warn("Could not save inquiry to local storage:", storageError);
+        console.warn("Could not save inquiry to Firestore/local storage:", storageError);
       }
     } catch (err: any) {
       console.error(err);

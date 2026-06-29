@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Users, Clock, Award, CheckCircle, FileText, Check, Calendar, ArrowRight, Cloud } from "lucide-react";
 import GoogleDriveTab from "./GoogleDriveTab";
+import { db } from "../lib/googleAuth";
+import { doc, getDoc } from "firebase/firestore";
 
 interface ERPDemoProps {
   loggedInCompany?: string | null;
@@ -22,7 +24,7 @@ export default function ERPDemo({ loggedInCompany = null }: ERPDemoProps) {
   }, [loggedInCompany]);
 
   // Employees List Data
-  const employees = [
+  const DEFAULT_EMPLOYEES = [
     {
       id: "emp-1",
       name: "김민우",
@@ -54,6 +56,74 @@ export default function ERPDemo({ loggedInCompany = null }: ERPDemoProps) {
       dept: "행정사무지원"
     }
   ];
+
+  const [employees, setEmployees] = useState<any[]>(DEFAULT_EMPLOYEES);
+
+  // Load companies and employees dynamically from Firestore or local storage to show administrator's updates
+  useEffect(() => {
+    const loadDynamicData = async () => {
+      try {
+        // Load companies from Firestore first, then localStorage
+        let comps = [];
+        const compSnap = await getDoc(doc(db, "configs", "companies"));
+        if (compSnap.exists()) {
+          comps = compSnap.data().list || [];
+        } else {
+          const savedComp = localStorage.getItem("bene_people_member_companies");
+          if (savedComp) {
+            try {
+              comps = JSON.parse(savedComp);
+            } catch (e) {}
+          }
+        }
+
+        // Load employees from Firestore first, then localStorage
+        let empsList = [];
+        const empSnap = await getDoc(doc(db, "configs", "employees"));
+        if (empSnap.exists()) {
+          empsList = empSnap.data().list || [];
+        } else {
+          const savedEmp = localStorage.getItem("bene_people_company_employees");
+          if (savedEmp) {
+            try {
+              empsList = JSON.parse(savedEmp);
+            } catch (e) {}
+          }
+        }
+
+        if (comps.length > 0 && empsList.length > 0) {
+          // Find the logged-in company's details
+          const currentComp = comps.find((c: any) => c.name === loggedInCompany);
+          if (currentComp) {
+            // Filter employees who belong to this company
+            const filtered = empsList
+              .filter((e: any) => e.companyId === currentComp.id)
+              .map((e: any) => ({
+                ...e,
+                avatar: e.avatar || e.avatarUrl || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150&h=150"
+              }));
+
+            if (filtered.length > 0) {
+              setEmployees(filtered);
+              setSelectedEmployeeId(filtered[0].id || filtered[0].code);
+            }
+          } else {
+            // Fallback: If no company found matching loggedInCompany, map loaded list
+            const normalized = empsList.map((e: any) => ({
+              ...e,
+              avatar: e.avatar || e.avatarUrl || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150&h=150"
+            }));
+            setEmployees(normalized);
+          }
+        }
+      } catch (err) {
+        console.warn("Could not load dynamic corporate employees for ERP:", err);
+      }
+    };
+    if (loggedInCompany) {
+      loadDynamicData();
+    }
+  }, [loggedInCompany]);
 
   // Daily Attendance Feed Data
   const attendanceFeed = [
