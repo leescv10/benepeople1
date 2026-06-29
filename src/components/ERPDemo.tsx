@@ -636,9 +636,9 @@ export default function ERPDemo({ loggedInCompany = null }: ERPDemoProps) {
 
         {/* Outer ERP Demo Banner */}
         {!loggedInCompany && (
-          <div className="mt-8 bg-brand-lightgreen/10 border border-brand-lightgreen/20 p-4 sm:p-5 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-xs sm:text-sm text-brand-green/85 text-center sm:text-left">
-              <strong>* 위 ERP 대시보드는 실제 베네피플 풀패키지 도입 시 무료로 즉시 활성화됩니다.</strong> 고도화된 안면생체인식 및 고유 IP 2중 보안을 통해 장애가 있더라도 자율적이고 투명하게 근무할 수 있는 환경을 선사합니다.
+          <div className="mt-8 bg-emerald-950/40 border border-emerald-500/20 p-4 sm:p-5 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 backdrop-blur-sm">
+            <p className="text-xs sm:text-sm text-slate-200 text-center sm:text-left leading-relaxed">
+              <strong className="text-brand-accent font-bold">* 위 ERP 대시보드는 실제 베네피플 풀패키지 도입 시 무료로 즉시 활성화됩니다.</strong> 고도화된 안면생체인식 및 고유 IP 2중 보안을 통해 장애가 있더라도 자율적이고 투명하게 근무할 수 있는 환경을 선사합니다.
             </p>
             <a
               href="#ai-diagnosis"

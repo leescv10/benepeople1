@@ -1,12 +1,23 @@
+import { useState } from "react";
 import { Shield, Sparkles } from "lucide-react";
 import logoImg from "../assets/images/benepeople_logo_1782496128774.jpg";
 import { HomepageConfig } from "../types";
+import { AnimatePresence } from "motion/react";
+import TermsModal from "./TermsModal";
 
 interface FooterProps {
   config?: HomepageConfig;
 }
 
 export default function Footer({ config }: FooterProps) {
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"terms" | "privacy">("terms");
+
+  const openTermsModal = (tab: "terms" | "privacy") => {
+    setActiveTab(tab);
+    setIsTermsOpen(true);
+  };
+
   const logoSource = config?.logoUrl || logoImg;
   const companyNameText = config?.companyName || "Bene People";
   const companyLogoSubtext = config?.companyLogoText || "(주)베네피플";
@@ -87,16 +98,32 @@ export default function Footer({ config }: FooterProps) {
         <div className="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-500">
           <p>{copyright}</p>
           <div className="flex items-center gap-4">
-            <a href="#" className="hover:text-[#EBB63F] transition">
+            <button
+              onClick={() => openTermsModal("terms")}
+              className="hover:text-[#EBB63F] transition cursor-pointer text-left focus:outline-none"
+            >
               이용약관
-            </a>
+            </button>
             <span className="text-gray-700">|</span>
-            <a href="#" className="hover:text-[#EBB63F] transition font-bold">
+            <button
+              onClick={() => openTermsModal("privacy")}
+              className="hover:text-[#EBB63F] transition font-bold cursor-pointer text-left focus:outline-none"
+            >
               개인정보처리방침
-            </a>
+            </button>
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {isTermsOpen && (
+          <TermsModal
+            isOpen={isTermsOpen}
+            initialTab={activeTab}
+            onClose={() => setIsTermsOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </footer>
   );
 }
