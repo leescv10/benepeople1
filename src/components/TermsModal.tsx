@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { X, ShieldCheck, FileText, Lock } from "lucide-react";
 
@@ -11,19 +11,29 @@ interface TermsModalProps {
 export default function TermsModal({ isOpen, onClose, initialTab = "terms" }: TermsModalProps) {
   const [currentTab, setCurrentTab] = useState<"terms" | "privacy">(initialTab);
 
+  // Prevent background scrolling when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
-    <div id="terms-modal-overlay" className="fixed inset-0 bg-black/75 backdrop-blur-md z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <div id="terms-modal-overlay" className="fixed inset-0 bg-slate-950 z-[100] flex flex-col w-screen h-screen overflow-hidden">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 15 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 15 }}
-        transition={{ type: "spring", duration: 0.4 }}
-        className="bg-slate-900 border border-slate-800 text-slate-100 w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 20 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="text-slate-100 w-full h-full flex flex-col overflow-hidden"
       >
         {/* Header */}
-        <div className="p-5 sm:p-6 border-b border-slate-800/60 flex items-center justify-between bg-slate-950/40">
+        <div className="p-5 sm:p-6 border-b border-slate-800/60 flex items-center justify-between bg-slate-950">
           <div className="flex items-center gap-2.5">
             <div className="p-2 bg-brand-lightgreen/10 rounded-lg text-brand-lightgreen">
               {currentTab === "terms" ? (
