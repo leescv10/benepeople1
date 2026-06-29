@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { motion } from "motion/react";
 import { X, ShieldCheck, FileText, Lock } from "lucide-react";
 
@@ -8,6 +9,8 @@ interface TermsModalProps {
 }
 
 export default function TermsModal({ isOpen, onClose, initialTab = "terms" }: TermsModalProps) {
+  const [currentTab, setCurrentTab] = useState<"terms" | "privacy">(initialTab);
+
   if (!isOpen) return null;
 
   return (
@@ -20,10 +23,10 @@ export default function TermsModal({ isOpen, onClose, initialTab = "terms" }: Te
         className="bg-slate-900 border border-slate-800 text-slate-100 w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden"
       >
         {/* Header */}
-        <div className="p-5 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
+        <div className="p-5 sm:p-6 border-b border-slate-800/60 flex items-center justify-between bg-slate-950/40">
           <div className="flex items-center gap-2.5">
             <div className="p-2 bg-brand-lightgreen/10 rounded-lg text-brand-lightgreen">
-              {initialTab === "terms" ? (
+              {currentTab === "terms" ? (
                 <FileText className="w-5 h-5" />
               ) : (
                 <Lock className="w-5 h-5" />
@@ -31,7 +34,7 @@ export default function TermsModal({ isOpen, onClose, initialTab = "terms" }: Te
             </div>
             <div>
               <h3 className="font-extrabold text-base sm:text-lg text-white">
-                {initialTab === "terms" ? "서비스 이용약관" : "개인정보처리방침"}
+                {currentTab === "terms" ? "서비스 이용약관" : "개인정보처리방침"}
               </h3>
               <p className="text-[10px] sm:text-xs text-slate-400 font-sans mt-0.5">
                 (주)베네피플의 신뢰할 수 있는 법적 표준 및 가이드라인
@@ -47,9 +50,45 @@ export default function TermsModal({ isOpen, onClose, initialTab = "terms" }: Te
           </button>
         </div>
 
+        {/* Tab Switcher */}
+        <div className="flex border-b border-slate-800/60 bg-slate-950/20 px-4 sm:px-6">
+          <button
+            onClick={() => setCurrentTab("terms")}
+            className={`pb-3 pt-3 text-xs sm:text-sm font-bold border-b-2 px-4 transition-all duration-200 cursor-pointer relative focus:outline-none ${
+              currentTab === "terms"
+                ? "border-brand-lightgreen text-brand-lightgreen font-extrabold"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            서비스 이용약관
+            {currentTab === "terms" && (
+              <motion.div
+                layoutId="activeTabUnderline"
+                className="absolute bottom-0 left-0 right-0 h-[2px] bg-brand-lightgreen"
+              />
+            )}
+          </button>
+          <button
+            onClick={() => setCurrentTab("privacy")}
+            className={`pb-3 pt-3 text-xs sm:text-sm font-bold border-b-2 px-4 transition-all duration-200 cursor-pointer relative focus:outline-none ${
+              currentTab === "privacy"
+                ? "border-brand-lightgreen text-brand-lightgreen font-extrabold"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            개인정보처리방침
+            {currentTab === "privacy" && (
+              <motion.div
+                layoutId="activeTabUnderline"
+                className="absolute bottom-0 left-0 right-0 h-[2px] bg-brand-lightgreen"
+              />
+            )}
+          </button>
+        </div>
+
         {/* Content Body */}
         <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 text-xs sm:text-sm text-slate-300 leading-relaxed font-sans scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
-          {initialTab === "terms" ? (
+          {currentTab === "terms" ? (
             <div className="space-y-6">
               <div>
                 <h4 className="text-sm sm:text-base font-extrabold text-[#EBB63F] mb-2">제1조 (목적)</h4>
