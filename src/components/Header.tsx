@@ -32,7 +32,7 @@ export default function Header({ onLoginClick, loggedInCompany, onLogout, config
     { label: "솔루션 TOP 3", href: "#three-pillars" },
     { label: "부담금 계산기", href: "#calculator" },
     { label: "원스톱 행정", href: "#workflow" },
-    { label: "근태관리 데모", href: "#erp-demo" },
+    { label: "근태관리 ERP", href: "#erp-demo" },
     { label: "ESG 효과", href: "#esg" },
   ];
 
@@ -84,7 +84,7 @@ export default function Header({ onLoginClick, loggedInCompany, onLogout, config
           ) : (
             <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-xs font-semibold text-emerald-400">
               <LayoutDashboard className="w-3.5 h-3.5 animate-pulse" />
-              <span>[ {loggedInCompany} ] 회원사 전용 원격 ERP 데모 채널</span>
+              <span>[ {loggedInCompany} ] 회원사 전용 원격 ERP 채널</span>
             </div>
           )}
 

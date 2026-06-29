@@ -246,10 +246,11 @@ export default function App() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="flex-1 pt-24 pb-12"
+          className="flex-1 pt-24 pb-12 bg-[#04241E] relative overflow-hidden min-h-screen"
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <ERPDemo />
+          <Background3D />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <ERPDemo loggedInCompany={loggedInCompany} />
           </div>
         </motion.div>
       ) : (
@@ -394,7 +395,8 @@ export default function App() {
           <LoginPage
             onClose={() => setShowLogin(false)}
             onLoginSuccess={(company) => {
-              setLoggedInCompany(company);
+              const sanitizedCompany = company.replace("데모 ", "").replace("데모", "");
+              setLoggedInCompany(sanitizedCompany);
               setShowLogin(false);
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}

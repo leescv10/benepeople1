@@ -172,6 +172,296 @@ export default function AIDiagnosisSection({ config }: AIDiagnosisSectionProps) 
     setResult(null);
   };
 
+  const downloadPDF = () => {
+    if (!result) return;
+
+    // Create a hidden iframe for print-to-PDF
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow?.document;
+    if (!doc) return;
+
+    // Process and convert markdown content to styled HTML
+    const markdownLines = result.geminiReport.split("\n");
+    let reportHtml = "";
+    markdownLines.forEach((line) => {
+      const trimmed = line.trim();
+      if (trimmed.startsWith("###")) {
+        reportHtml += `<h4 style="font-size: 16px; font-weight: bold; color: #073B31; margin-top: 20px; margin-bottom: 10px; border-left: 4px solid #EBB63F; padding-left: 10px; font-family: sans-serif;">${trimmed.replace("###", "").trim()}</h4>`;
+      } else if (trimmed.startsWith("##")) {
+        reportHtml += `<h3 style="font-size: 18px; font-weight: 800; color: #073B31; margin-top: 25px; margin-bottom: 12px; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; font-family: sans-serif;">${trimmed.replace("##", "").trim()}</h3>`;
+      } else if (trimmed.startsWith("#")) {
+        reportHtml += `<h2 style="font-size: 22px; font-weight: 900; color: #073B31; margin-top: 30px; margin-bottom: 15px; text-align: center; font-family: sans-serif;">${trimmed.replace("#", "").trim()}</h2>`;
+      } else if (trimmed.startsWith("-") || trimmed.startsWith("*")) {
+        let content = trimmed.replace(/^[-*]\s*/, "").trim();
+        content = content.replace(/\*\*(.*?)\*\*/g, '<strong style="color: #073B31;">$1</strong>');
+        reportHtml += `<li style="font-size: 13px; color: #4b5563; margin-left: 20px; margin-top: 6px; margin-bottom: 6px; line-height: 1.6; font-family: sans-serif;">${content}</li>`;
+      } else if (trimmed === "") {
+        reportHtml += `<div style="height: 8px;"></div>`;
+      } else {
+        let content = trimmed.replace(/\*\*(.*?)\*\*/g, '<strong style="color: #073B31;">$1</strong>');
+        reportHtml += `<p style="font-size: 13px; color: #374151; margin-top: 8px; margin-bottom: 8px; line-height: 1.6; font-family: sans-serif;">${content}</p>`;
+      }
+    });
+
+    const formattedDate = new Date().toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>${form.companyName} 장애인 고용 분석 제안서</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+          
+          body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, "Malgun Gothic", "맑은 고딕", sans-serif;
+            margin: 0;
+            padding: 40px;
+            color: #1A2E2A;
+            background-color: #ffffff;
+            line-height: 1.5;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          
+          .header {
+            border-bottom: 3px solid #073B31;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+          }
+          
+          .title-area h1 {
+            font-size: 24px;
+            font-weight: 900;
+            color: #073B31;
+            margin: 0 0 5px 0;
+            letter-spacing: -0.5px;
+          }
+          
+          .title-area p {
+            font-size: 12px;
+            color: #6b7280;
+            margin: 0;
+          }
+          
+          .logo-area {
+            text-align: right;
+          }
+          
+          .logo-text {
+            font-size: 18px;
+            font-weight: 800;
+            color: #073B31;
+            letter-spacing: -0.5px;
+            margin: 0;
+          }
+          
+          .logo-sub {
+            font-size: 9px;
+            color: #EBB63F;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-top: 2px;
+          }
+          
+          .meta-info {
+            background-color: #f9fafb;
+            border: 1px solid #f3f4f6;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 13px;
+          }
+          
+          .meta-item {
+            color: #4b5563;
+          }
+          
+          .meta-item strong {
+            color: #073B31;
+          }
+          
+          .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 35px;
+          }
+          
+          .stat-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            background-color: #ffffff;
+          }
+          
+          .stat-card.accent {
+            background-color: #073B31;
+            border-color: #073B31;
+            color: #ffffff;
+          }
+          
+          .stat-card.accent .stat-val {
+            color: #EBB63F;
+          }
+          
+          .stat-label {
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+          }
+          
+          .stat-card.accent .stat-label {
+            color: #a7f3d0;
+          }
+          
+          .stat-val {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1A2E2A;
+          }
+          
+          .stat-card.red .stat-val {
+            color: #ef4444;
+          }
+          
+          .stat-card.green .stat-val {
+            color: #10b981;
+          }
+          
+          .report-content {
+            background-color: #ffffff;
+            padding: 0;
+            margin-bottom: 40px;
+          }
+          
+          .footer-banner {
+            background-color: #fdfaf2;
+            border: 1px dashed #EBB63F;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 40px;
+            page-break-inside: avoid;
+          }
+          
+          .footer-banner h4 {
+            color: #073B31;
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            font-weight: bold;
+          }
+          
+          .footer-banner p {
+            color: #4b5563;
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.5;
+          }
+          
+          @media print {
+            body {
+              padding: 20px;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="title-area">
+            <h1>장애인 고용 진단 분석 제안서</h1>
+            <p>발행일: ${formattedDate} | 관리번호: BP-${Date.now().toString().slice(-6)}</p>
+          </div>
+          <div class="logo-area">
+            <h2 class="logo-text">(주)베네피플</h2>
+            <div class="logo-sub">BENEPEOPLE ESG SOLUTION</div>
+          </div>
+        </div>
+        
+        <div class="meta-info">
+          <div class="meta-item">귀사명: <strong>${form.companyName}</strong></div>
+          <div class="meta-item">상시 근로자: <strong>${form.totalEmployees}명</strong></div>
+          <div class="meta-item">현재 장애인 고용: <strong>${form.currentDisabledEmployees}명</strong></div>
+          <div class="meta-item">진단 요청자: <strong>${form.managerName} (${form.managerEmail})</strong></div>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card accent">
+            <span class="stat-label">법정 의무고용 (3.1%)</span>
+            <span class="stat-val">${result.requiredDisabledCount}명</span>
+          </div>
+          <div class="stat-card red">
+            <span class="stat-label">현재 부족 인원</span>
+            <span class="stat-val">${result.shortage}명</span>
+          </div>
+          <div class="stat-card red">
+            <span class="stat-label">연간 부담금 리스크</span>
+            <span class="stat-val">₩${result.pureFineYearly.toLocaleString()}</span>
+          </div>
+          <div class="stat-card green">
+            <span class="stat-label">연간 예산 절감액</span>
+            <span class="stat-val">₩${result.savingsYearly.toLocaleString()}</span>
+          </div>
+        </div>
+        
+        <div class="report-content">
+          ${reportHtml}
+        </div>
+        
+        <div class="footer-banner">
+          <h4>(주)베네피플 전문 노무 컨설팅 안내</h4>
+          <p>
+            위 분석 보고서는 기업 정보에 근거한 실시간 인공지능 정밀 시뮬레이션 결과입니다.<br/>
+            추가 무료 유선상담 신청 시, 전문 수석 공인노무사가 귀사 직무를 재분석하여 합법적이고 완벽한 부담금 면제 모델을 제공해 드립니다.<br/>
+            <strong>문의처: 02-1234-5678 | 이메일: info@benepeople.co.kr</strong>
+          </p>
+        </div>
+        
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+            }, 300);
+          }
+        </script>
+      </body>
+      </html>
+    `;
+
+    doc.open();
+    doc.write(htmlContent);
+    doc.close();
+
+    setTimeout(() => {
+      if (document.body.contains(iframe)) {
+        document.body.removeChild(iframe);
+      }
+    }, 10000);
+  };
+
   // Helper function to render markdown generated by Gemini safely into UI
   const parseMarkdownToReact = (text: string) => {
     return text.split("\n").map((line, idx) => {
@@ -410,12 +700,20 @@ export default function AIDiagnosisSection({ config }: AIDiagnosisSectionProps) 
                       {form.companyName} 전용 고용 진단서
                     </h3>
                   </div>
-                  <button
-                    onClick={handleReset}
-                    className="bg-white/10 hover:bg-white/20 border border-white/10 text-xs font-bold px-4 py-2 rounded-lg transition flex items-center gap-1.5 self-stretch sm:self-auto justify-center"
-                  >
-                    <RefreshCw className="w-4 h-4" /> 다시 계산하기
-                  </button>
+                  <div className="flex flex-col sm:flex-row gap-2 self-stretch sm:self-auto">
+                    <button
+                      onClick={downloadPDF}
+                      className="bg-brand-accent hover:bg-amber-400 text-brand-green font-bold text-xs px-4 py-2.5 rounded-lg transition flex items-center gap-1.5 justify-center shadow-md cursor-pointer"
+                    >
+                      <FileText className="w-4 h-4" /> PDF 리포트 다운로드
+                    </button>
+                    <button
+                      onClick={handleReset}
+                      className="bg-white/10 hover:bg-white/20 border border-white/10 text-xs font-bold px-4 py-2.5 rounded-lg transition flex items-center gap-1.5 justify-center cursor-pointer"
+                    >
+                      <RefreshCw className="w-4 h-4" /> 다시 계산하기
+                    </button>
+                  </div>
                 </div>
 
                 {/* Dashboard Stats Panel */}

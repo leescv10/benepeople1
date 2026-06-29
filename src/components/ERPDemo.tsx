@@ -1,12 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Users, Clock, Award, CheckCircle, FileText, Check, Calendar, ArrowRight, Cloud } from "lucide-react";
 import GoogleDriveTab from "./GoogleDriveTab";
 
-export default function ERPDemo() {
+interface ERPDemoProps {
+  loggedInCompany?: string | null;
+}
+
+export default function ERPDemo({ loggedInCompany = null }: ERPDemoProps) {
   const [activeTab, setActiveTab] = useState<string>("employees");
   const [attendancePeriod, setAttendancePeriod] = useState<"daily" | "monthly" | "yearly">("daily");
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("emp-1");
+  const erpContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (loggedInCompany) {
+      setTimeout(() => {
+        erpContainerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 400);
+    }
+  }, [loggedInCompany]);
 
   // Employees List Data
   const employees = [
@@ -133,15 +146,17 @@ export default function ERPDemo() {
             Enterprise App Preview
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mt-4 text-white">
-            베네피플 전용 ERP 시스템 직접 체험하기
+            베네피플 ERP
           </h2>
-          <p className="text-gray-300 mt-4 text-sm sm:text-base font-sans">
-            기업 담당자에게 무상으로 지원되는 베네피플 ERP 프로그램을 Web과 APP으로 직접 체험해 보세요.
-          </p>
+          {!loggedInCompany && (
+            <p className="text-gray-300 mt-4 text-sm sm:text-base font-sans">
+              기업 담당자에게 무상으로 지원되는 베네피플 ERP 프로그램을 Web과 APP으로 직접 체험해 보세요.
+            </p>
+          )}
         </div>
 
         {/* Mock OS Container */}
-        <div className="bg-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-slate-800 flex flex-col h-[650px]">
+        <div ref={erpContainerRef} className="bg-slate-900 rounded-2xl shadow-2xl overflow-hidden border border-slate-800 flex flex-col h-[650px]">
           {/* OS Window Header */}
           <div className="bg-slate-950 px-4 py-3 flex items-center justify-between border-b border-slate-800">
             <div className="flex items-center gap-1.5">
@@ -149,7 +164,9 @@ export default function ERPDemo() {
               <span className="w-3 h-3 bg-yellow-500 rounded-full"></span>
               <span className="w-3 h-3 bg-green-500 rounded-full"></span>
               <span className="text-xs text-slate-500 ml-4 font-mono hidden sm:inline">
-                https://admin.benepeople.com/demo/dashboard
+                {loggedInCompany 
+                  ? "https://admin.benepeople.com/dashboard" 
+                  : "https://admin.benepeople.com/demo/dashboard"}
               </span>
             </div>
             <div className="bg-brand-accent/20 border border-brand-accent/30 text-brand-accent text-[10px] uppercase font-mono px-2 py-0.5 rounded font-black tracking-wider">
@@ -479,10 +496,13 @@ export default function ERPDemo() {
                   {/* Employees Switch Cards */}
                   <div className="grid grid-cols-3 gap-2 sm:gap-4">
                     {employees.map((emp) => (
-                      <button
+                      <motion.button
                         key={emp.id}
                         onClick={() => setSelectedEmployeeId(emp.id)}
-                        className={`p-3 rounded-xl border text-center transition flex flex-col items-center justify-center gap-2 ${
+                        whileHover={{ scale: 1.03, y: -2 }}
+                        whileTap={{ scale: 0.97 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                        className={`p-3 rounded-xl border text-center transition-colors flex flex-col items-center justify-center gap-2 ${
                           selectedEmployeeId === emp.id
                             ? "bg-brand-accent/10 border-brand-accent text-brand-accent"
                             : "bg-slate-950/60 border-slate-800 text-slate-400 hover:bg-slate-800/50 hover:text-white"
@@ -498,7 +518,7 @@ export default function ERPDemo() {
                         <span className="text-[9px] sm:text-[10px] block opacity-85 truncate max-w-full">
                           {emp.name === "김민우" ? "탄소 모니터링" : emp.name === "이소연" ? "ESG 수집" : "OCR 검수"}
                         </span>
-                      </button>
+                      </motion.button>
                     ))}
                   </div>
 
@@ -511,12 +531,52 @@ export default function ERPDemo() {
                           Activity Workspace Photo
                         </span>
                         <div className="aspect-[4/3] rounded-xl overflow-hidden border border-slate-800 bg-slate-900 relative group">
-                          <img
-                            src={selectedPerformance.photoUrl}
-                            alt="Activity Proof Workspace"
-                            referrerPolicy="no-referrer"
-                            className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                          {/* Animated Image Wrapper */}
+                          <div className="w-full h-full relative">
+                            <AnimatePresence mode="wait">
+                              <motion.img
+                                key={selectedEmployeeId}
+                                src={selectedPerformance.photoUrl}
+                                alt="Activity Proof Workspace"
+                                referrerPolicy="no-referrer"
+                                initial={{ opacity: 0, scale: 0.95, filter: "blur(6px)" }}
+                                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                                exit={{ opacity: 0, scale: 1.05, filter: "blur(4px)" }}
+                                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                                className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                              />
+                            </AnimatePresence>
+                          </div>
+
+                          {/* Futuristic Grid Overlay */}
+                          <div className="absolute inset-0 bg-[linear-gradient(rgba(235,182,63,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(235,182,63,0.03)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+
+                          {/* Animated Laser Scanline bar */}
+                          <motion.div
+                            className="absolute left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-brand-accent/50 to-transparent shadow-[0_0_10px_rgba(235,182,63,0.6)] pointer-events-none"
+                            animate={{ y: ["0%", "450%"] }}
+                            transition={{
+                              duration: 3.5,
+                              repeat: Infinity,
+                              ease: "linear"
+                            }}
                           />
+
+                          {/* Live Status Badge */}
+                          <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md border border-white/10 px-2 py-1 rounded-md flex items-center gap-1.5 pointer-events-none shadow-lg">
+                            <span className="relative flex h-1.5 w-1.5">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-accent opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-brand-accent"></span>
+                            </span>
+                            <span className="text-[9px] font-mono font-bold tracking-wider text-slate-200">
+                              SECURE LIVE FEED
+                            </span>
+                          </div>
+
+                          {/* Employee Name Watermark */}
+                          <div className="absolute bottom-3 right-3 bg-slate-950/80 backdrop-blur-md border border-slate-800 px-2 py-0.5 rounded text-[10px] font-mono text-slate-300 pointer-events-none shadow">
+                            EMP_ID: {selectedEmployeeId.toUpperCase()}
+                          </div>
                         </div>
                       </div>
                       <div className="bg-slate-900 border border-slate-800 p-3 rounded-xl text-center">
@@ -575,17 +635,19 @@ export default function ERPDemo() {
         </div>
 
         {/* Outer ERP Demo Banner */}
-        <div className="mt-8 bg-brand-lightgreen/10 border border-brand-lightgreen/20 p-4 sm:p-5 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs sm:text-sm text-brand-green/85 text-center sm:text-left">
-            <strong>* 위 ERP 대시보드는 실제 베네피플 풀패키지 도입 시 무료로 즉시 활성화됩니다.</strong> 고도화된 안면생체인식 및 고유 IP 2중 보안을 통해 장애가 있더라도 자율적이고 투명하게 근무할 수 있는 환경을 선사합니다.
-          </p>
-          <a
-            href="#ai-diagnosis"
-            className="text-xs font-bold bg-brand-lightgreen text-white hover:bg-brand-green transition px-4 py-2.5 rounded-lg flex items-center gap-1.5 shrink-0"
-          >
-            우리 회사 맞춤 도입 문의하기 <ArrowRight className="w-4 h-4" />
-          </a>
-        </div>
+        {!loggedInCompany && (
+          <div className="mt-8 bg-brand-lightgreen/10 border border-brand-lightgreen/20 p-4 sm:p-5 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-xs sm:text-sm text-brand-green/85 text-center sm:text-left">
+              <strong>* 위 ERP 대시보드는 실제 베네피플 풀패키지 도입 시 무료로 즉시 활성화됩니다.</strong> 고도화된 안면생체인식 및 고유 IP 2중 보안을 통해 장애가 있더라도 자율적이고 투명하게 근무할 수 있는 환경을 선사합니다.
+            </p>
+            <a
+              href="#ai-diagnosis"
+              className="text-xs font-bold bg-brand-lightgreen text-white hover:bg-brand-green transition px-4 py-2.5 rounded-lg flex items-center gap-1.5 shrink-0"
+            >
+              우리 회사 맞춤 도입 문의하기 <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+        )}
       </div>
     </section>
   );

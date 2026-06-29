@@ -248,6 +248,412 @@ export default function AdminDashboard({
     }
   };
 
+  const downloadInquiryPDF = (inq: Inquiry) => {
+    // Determine configuration variables with safe fallbacks
+    const oRate = homepageConfig?.obligationRate !== undefined ? parseFloat(String(homepageConfig.obligationRate)) : 0.031;
+    const fPerMonth = homepageConfig?.finePerMonth !== undefined ? parseInt(String(homepageConfig.finePerMonth), 10) : 2156880;
+    const bCostPerMonth = homepageConfig?.beneCostPerMonth !== undefined ? parseInt(String(homepageConfig.beneCostPerMonth), 10) : 663000;
+
+    const employees = inq.totalEmployees;
+    const current = inq.currentDisabledEmployees;
+
+    const requiredDisabledCount = Math.floor(employees * oRate);
+    const shortage = Math.max(0, requiredDisabledCount - current);
+
+    const pureFineMonthly = shortage * fPerMonth;
+    const pureFineYearly = pureFineMonthly * 12;
+
+    const benePeopleCostMonthly = shortage * bCostPerMonth;
+    const benePeopleCostYearly = benePeopleCostMonthly * 12;
+
+    const savingsYearly = pureFineYearly - benePeopleCostYearly;
+    const savingsPercent = pureFineYearly > 0 ? Math.round((savingsYearly / pureFineYearly) * 100) : 0;
+
+    // Create a hidden iframe for print-to-PDF
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow?.document;
+    if (!doc) return;
+
+    const formattedDate = new Date().toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    const formattedInqDate = new Date(inq.date).toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>${inq.companyName} 상담 내역 및 고용 진단 보고서</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+          
+          body {
+            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, "Malgun Gothic", "맑은 고딕", sans-serif;
+            margin: 0;
+            padding: 40px;
+            color: #1A2E2A;
+            background-color: #ffffff;
+            line-height: 1.5;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          
+          .header {
+            border-bottom: 3px solid #073B31;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+          }
+          
+          .title-area h1 {
+            font-size: 22px;
+            font-weight: 900;
+            color: #073B31;
+            margin: 0 0 5px 0;
+            letter-spacing: -0.5px;
+          }
+          
+          .title-area p {
+            font-size: 11px;
+            color: #6b7280;
+            margin: 0;
+          }
+          
+          .logo-area {
+            text-align: right;
+          }
+          
+          .logo-text {
+            font-size: 16px;
+            font-weight: 800;
+            color: #073B31;
+            letter-spacing: -0.5px;
+            margin: 0;
+          }
+          
+          .logo-sub {
+            font-size: 8px;
+            color: #EBB63F;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-top: 2px;
+          }
+          
+          .section-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #073B31;
+            border-left: 4px solid #EBB63F;
+            padding-left: 10px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+          }
+          
+          .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+          }
+          
+          .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+          }
+          
+          .info-table th {
+            background-color: #f9fafb;
+            color: #4b5563;
+            font-weight: 600;
+            text-align: left;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            width: 35%;
+          }
+          
+          .info-table td {
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            color: #1f2937;
+          }
+          
+          .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+          }
+          
+          .stat-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            background-color: #ffffff;
+          }
+          
+          .stat-card.accent {
+            background-color: #073B31;
+            border-color: #073B31;
+            color: #ffffff;
+          }
+          
+          .stat-card.accent .stat-val {
+            color: #EBB63F;
+          }
+          
+          .stat-label {
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+          }
+          
+          .stat-card.accent .stat-label {
+            color: #a7f3d0;
+          }
+          
+          .stat-val {
+            font-size: 16px;
+            font-weight: 800;
+            color: #1A2E2A;
+          }
+          
+          .stat-card.red .stat-val {
+            color: #ef4444;
+          }
+          
+          .stat-card.green .stat-val {
+            color: #10b981;
+          }
+          
+          .consultation-box {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 13px;
+            color: #374151;
+            margin-bottom: 30px;
+          }
+          
+          .consultation-box p {
+            margin: 0 0 10px 0;
+            line-height: 1.6;
+          }
+          
+          .consultation-box ul {
+            margin: 0;
+            padding-left: 20px;
+          }
+          
+          .consultation-box li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+          }
+          
+          .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+          }
+          
+          .status-pending {
+            background-color: #fef3c7;
+            color: #d97706;
+            border: 1px solid #fde68a;
+          }
+          
+          .status-completed {
+            background-color: #d1fae5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+          }
+          
+          .status-onhold {
+            background-color: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid #e5e7eb;
+          }
+          
+          .signature-area {
+            display: flex;
+            justify-content: flex-end;
+            gap: 40px;
+            margin-top: 50px;
+            page-break-inside: avoid;
+          }
+          
+          .signature-box {
+            border: 1px solid #d1d5db;
+            width: 120px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: #4b5563;
+            padding: 8px;
+            background-color: #ffffff;
+          }
+          
+          .signature-line {
+            width: 100%;
+            border-top: 1px dashed #d1d5db;
+            margin-top: auto;
+            padding-top: 4px;
+            text-align: center;
+          }
+          
+          @media print {
+            body {
+              padding: 20px;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="title-area">
+            <h1>고용 현황 분석 및 컨설팅 상담 보고서</h1>
+            <p>인쇄일: ${formattedDate} | 상담 접수일: ${formattedInqDate} | 관리 ID: ${inq.id}</p>
+          </div>
+          <div class="logo-area">
+            <h2 class="logo-text">(주)베네피플</h2>
+            <div class="logo-sub">BENEPEOPLE ESG SOLUTION</div>
+          </div>
+        </div>
+        
+        <div class="section-title">1. 고객사 및 담당자 기본 정보</div>
+        <div class="grid-2">
+          <table class="info-table">
+            <tr>
+              <th>회사명 (귀사명)</th>
+              <td><strong>${inq.companyName}</strong></td>
+            </tr>
+            <tr>
+              <th>상시 근로자 수</th>
+              <td>${employees}명</td>
+            </tr>
+            <tr>
+              <th>현재 장애인 고용</th>
+              <td>${current}명</td>
+            </tr>
+          </table>
+          
+          <table class="info-table">
+            <tr>
+              <th>인사 담당자</th>
+              <td>${inq.managerName}</td>
+            </tr>
+            <tr>
+              <th>담당자 연락처</th>
+              <td>${inq.managerContact}</td>
+            </tr>
+            <tr>
+              <th>담당자 이메일</th>
+              <td>${inq.managerEmail}</td>
+            </tr>
+          </table>
+        </div>
+        
+        <div class="section-title">2. 법정 의무고용 및 벌금(부담금) 분석 결과</div>
+        <div class="stats-grid">
+          <div class="stat-card accent">
+            <span class="stat-label">법정 의무고용 (3.1%)</span>
+            <span class="stat-val">${requiredDisabledCount}명</span>
+          </div>
+          <div class="stat-card red">
+            <span class="stat-label">현재 부족 인원</span>
+            <span class="stat-val">${shortage}명</span>
+          </div>
+          <div class="stat-card red">
+            <span class="stat-label">연간 예상 부담금</span>
+            <span class="stat-val">₩${pureFineYearly.toLocaleString()}</span>
+          </div>
+          <div class="stat-card green">
+            <span class="stat-label">연간 베네피플 세이브액</span>
+            <span class="stat-val">₩${savingsYearly.toLocaleString()}</span>
+          </div>
+        </div>
+        
+        <div class="section-title">3. 베네피플 상담 분류 및 조치 내용</div>
+        <div class="consultation-box">
+          <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+            <strong>상담 진행 상황:</strong>
+            <span class="status-badge ${
+              inq.status === '접수대기' ? 'status-pending' : inq.status === '상담완료' ? 'status-completed' : 'status-onhold'
+            }">${inq.status}</span>
+          </div>
+          <p>
+            귀사(<strong>${inq.companyName}</strong>)는 상시 근로자 <strong>${employees}명</strong> 규모로 법정 의무고용 인원 <strong>${requiredDisabledCount}명</strong> 중 <strong>${current}명</strong>을 고용한 상태입니다. 기준 미달로 인해 연간 약 <strong>₩${pureFineYearly.toLocaleString()}</strong>의 장애인 고용 부담금 벌금 부과 리스크에 상시 노출되어 있습니다.
+          </p>
+          <p><strong>[베네피플 맞춤형 ESG 장애인 고용 추천 컨설팅 로드맵]</strong></p>
+          <ul>
+            <li><strong>1단계 (직무 발굴)</strong>: 귀사 소속 부서 중 원격 근무 또는 재택근무가 용이한 헬스키퍼, 온라인 리서치, ESG 탄소 중립 데이터 수집 및 분류, 문화예술 직무 등을 선제적으로 분석 및 설계합니다.</li>
+            <li><strong>2단계 (인재 매칭 및 계약)</strong>: 베네피플의 장애인 구직자 풀에서 귀사 직무에 가장 알맞은 특화 인재 <strong>${shortage}명</strong>을 즉각 면접 및 채용할 수 있도록 주선합니다.</li>
+            <li><strong>3단계 (근태 시스템 무상 제공)</strong>: 자사 특허 스마트 ERP 시스템을 연동하여, 자택 근태 및 보고 일지를 안면인식 및 IP로 완벽하게 대조 검증하여 공공감사에 대비합니다.</li>
+            <li><strong>4단계 (부담금 전액 절감 및 ESG 완성)</strong>: 베네피플 위탁비(연 약 ₩${benePeopleCostYearly.toLocaleString()}) 제도를 도입하여, 연간 최대 <strong>₩${savingsYearly.toLocaleString()} (${savingsPercent}% 수준)</strong>의 지출 부담금을 드라마틱하게 세이브하고 대외 ESG 평가 평점을 최고 단계로 혁신합니다.</li>
+          </ul>
+        </div>
+        
+        <div class="signature-area">
+          <div class="signature-box">
+            <span>담당 컨설턴트</span>
+            <div class="signature-line">(서명/인)</div>
+          </div>
+          <div class="signature-box">
+            <span>수석 공인노무사</span>
+            <div class="signature-line">(서명/인)</div>
+          </div>
+        </div>
+        
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+            }, 300);
+          }
+        </script>
+      </body>
+      </html>
+    `;
+
+    doc.open();
+    doc.write(htmlContent);
+    doc.close();
+
+    setTimeout(() => {
+      if (document.body.contains(iframe)) {
+        document.body.removeChild(iframe);
+      }
+    }, 10000);
+  };
+
   const handleSaveHomepageConfig = () => {
     onUpdateHomepageConfig(editingConfig);
     setSaveSuccess(true);
@@ -1367,6 +1773,13 @@ export default function AdminDashboard({
                                 <Clock className="w-4 h-4" />
                               </button>
                             )}
+                            <button
+                              onClick={() => downloadInquiryPDF(inq)}
+                              className="bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold p-1.5 rounded-lg border border-blue-200 transition cursor-pointer"
+                              title="분석 및 상담 보고서 PDF 다운로드"
+                            >
+                              <FileText className="w-4 h-4" />
+                            </button>
                             <button
                               onClick={() => handleDeleteInquiry(inq.id)}
                               className="bg-red-50 hover:bg-red-100 text-red-600 font-bold p-1.5 rounded-lg border border-red-200 transition"

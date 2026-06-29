@@ -714,21 +714,21 @@ export default function Background3D() {
   }, [dimensions]);
 
   const bgColors = {
-    dark: "#02120f",      // Rich Imperial Dark Teal
+    dark: "#031a15",      // Rich Imperial Dark Teal (Slightly brighter than #02120f)
     light: "#F8FAF9",     // Bright Business
     cosmic: "#070514",    // Cosmic Purple
     luxury: "#170D0B",    // Sunset Luxury
   };
 
   const radialOverlays = {
-    dark: "radial-gradient(circle at 50% 35%, rgba(13, 92, 78, 0.45) 0%, rgba(235, 182, 63, 0.1) 32%, rgba(2, 18, 15, 0.94) 75%, rgba(1, 10, 8, 0.99) 100%)",
+    dark: "radial-gradient(circle at 50% 35%, rgba(18, 120, 102, 0.55) 0%, rgba(235, 182, 63, 0.16) 32%, rgba(3, 24, 20, 0.88) 75%, rgba(1, 14, 12, 0.94) 100%)",
     light: "radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.88) 0%, rgba(242, 246, 244, 0.94) 100%)",
     cosmic: "radial-gradient(circle at 50% 50%, rgba(13, 11, 30, 0.4) 0%, rgba(7, 5, 20, 0.98) 85%)",
     luxury: "radial-gradient(circle at 50% 50%, rgba(35, 21, 18, 0.45) 0%, rgba(23, 13, 11, 0.98) 85%)",
   };
 
   const canvasOpacities = {
-    dark: "opacity-[0.46]",
+    dark: "opacity-[0.52]",
     light: "opacity-[0.62]",
     cosmic: "opacity-[0.48]",
     luxury: "opacity-[0.35]",
