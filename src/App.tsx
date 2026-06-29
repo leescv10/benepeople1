@@ -13,6 +13,7 @@ import ESGImpactSection from "./components/ESGImpactSection";
 import AIDiagnosisSection from "./components/AIDiagnosisSection";
 import Footer from "./components/Footer";
 import LoginPage from "./components/LoginPage";
+import TermsModal from "./components/TermsModal";
 import AdminDashboard from "./components/AdminDashboard";
 import { HomepageConfig } from "./types";
 import Background3D from "./components/Background3D";
@@ -131,6 +132,13 @@ const DEFAULT_HOMEPAGE_CONFIG: HomepageConfig = {
 export default function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [loggedInCompany, setLoggedInCompany] = useState<string | null>(null);
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [activeTermsTab, setActiveTermsTab] = useState<"terms" | "privacy">("terms");
+
+  const handleOpenTerms = (tab: "terms" | "privacy") => {
+    setActiveTermsTab(tab);
+    setIsTermsOpen(true);
+  };
 
   const [homepageConfig, setHomepageConfig] = useState<HomepageConfig>(() => {
     const saved = localStorage.getItem("bene_people_homepage_config");
@@ -385,7 +393,7 @@ export default function App() {
           <AIDiagnosisSection config={homepageConfig} />
 
           {/* Brand Footer */}
-          <Footer config={homepageConfig} />
+          <Footer config={homepageConfig} onOpenTerms={handleOpenTerms} />
         </div>
       )}
 
@@ -400,6 +408,17 @@ export default function App() {
               setShowLogin(false);
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Terms and Privacy Policy Fullscreen Modal */}
+      <AnimatePresence>
+        {isTermsOpen && (
+          <TermsModal
+            isOpen={isTermsOpen}
+            initialTab={activeTermsTab}
+            onClose={() => setIsTermsOpen(false)}
           />
         )}
       </AnimatePresence>

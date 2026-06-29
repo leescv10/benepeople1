@@ -7,15 +7,20 @@ import TermsModal from "./TermsModal";
 
 interface FooterProps {
   config?: HomepageConfig;
+  onOpenTerms?: (tab: "terms" | "privacy") => void;
 }
 
-export default function Footer({ config }: FooterProps) {
+export default function Footer({ config, onOpenTerms }: FooterProps) {
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"terms" | "privacy">("terms");
 
   const openTermsModal = (tab: "terms" | "privacy") => {
-    setActiveTab(tab);
-    setIsTermsOpen(true);
+    if (onOpenTerms) {
+      onOpenTerms(tab);
+    } else {
+      setActiveTab(tab);
+      setIsTermsOpen(true);
+    }
   };
 
   const logoSource = config?.logoUrl || logoImg;
