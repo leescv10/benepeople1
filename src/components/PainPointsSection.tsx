@@ -9,8 +9,8 @@ interface PainPointsSectionProps {
 export default function PainPointsSection({ config }: PainPointsSectionProps) {
   const painBadge = config?.painBadge || "PAIN POINTS";
   const painTitle = config?.painTitle || "기업의 현실적인 고민";
-  const painDesc = config?.painDesc || "장애인 고용에는 생각보다 복잡한 허들들이 다양하게 존재합니다.";
-  const painCaution = config?.painCaution || "고민하고 망설이는 동안에도, 부담금은 매년 세금처럼 매달 일정하게 증가하고 있습니다.";
+  const painDesc = config?.painDesc || "장애인 고용에는 생각보다 다양하고, 복잡한 문제가 존재합니다.";
+  const painCaution = config?.painCaution || "고민하고 망설이는 동안에도, 부담금은 매년 세금처럼 증가하고 있습니다.";
 
   const qas = [
     {
@@ -21,7 +21,7 @@ export default function PainPointsSection({ config }: PainPointsSectionProps) {
     {
       id: "qa-2",
       q: "장애인의 일일 업무 진행과 근태 관리는 누가 담당하나요?",
-      a: "베네피플이 무상 제공하는 스마트 근태 시스템(ERP)과 당사 전담 수석 코디네이터가 1:1 관리를 대행합니다."
+      a: "베네피플이 무상 제공하는 스마트 근태 관리 시스템과 당사 전담 수석 코디네이터가 1:1 관리를 대행합니다."
     },
     {
       id: "qa-3",

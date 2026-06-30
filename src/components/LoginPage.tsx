@@ -94,7 +94,7 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
               회원사 전용 로그인
             </h2>
             <p className="text-xs text-gray-400 mt-2 leading-relaxed">
-              (주)베네피플의 차세대 ERP 통합 근태 및 행정 위탁 시스템에 오신 것을 정중히 환영합니다.
+              (주)베네피플의 차세대 통합 근태 및 행정 위탁 시스템에 오신 것을 정중히 환영합니다.
             </p>
           </div>
 

@@ -18,7 +18,7 @@ export default function WorkflowSection({ config }: WorkflowSectionProps) {
   const step2Desc = config?.workflowStep2Desc || "근로기준 지침을 준수하는 합법적 계약 체결 및 유관기관 고용부담 승인 처리";
 
   const step3Title = config?.workflowStep3Title || "통합 운영 관리";
-  const step3Desc = config?.workflowStep3Desc || "베네피플 ERP를 통해 직원현황, 근태관리, 성과관리 등 모든 업무를 지원합니다.";
+  const step3Desc = config?.workflowStep3Desc || "베네피플 통합 근태시스템을 통해 직원현황, 근태관리, 성과관리 등 모든 업무를 지원합니다.";
 
   const step4Title = config?.workflowStep4Title || "행정 지원";
   const step4Desc = config?.workflowStep4Desc || "매월 4대보험 급여 신고, 퇴직 정산 등 모든 복잡한 노무 해결";

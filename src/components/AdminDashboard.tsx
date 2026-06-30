@@ -711,7 +711,7 @@ export default function AdminDashboard({
           <ul>
             <li><strong>1단계 (직무 발굴)</strong>: 귀사 소속 부서 중 원격 근무 또는 재택근무가 용이한 헬스키퍼, 온라인 리서치, ESG 탄소 중립 데이터 수집 및 분류, 문화예술 직무 등을 선제적으로 분석 및 설계합니다.</li>
             <li><strong>2단계 (인재 매칭 및 계약)</strong>: 베네피플의 장애인 구직자 풀에서 귀사 직무에 가장 알맞은 특화 인재 <strong>${shortage}명</strong>을 즉각 면접 및 채용할 수 있도록 주선합니다.</li>
-            <li><strong>3단계 (근태 시스템 무상 제공)</strong>: 자사 특허 스마트 ERP 시스템을 연동하여, 자택 근태 및 보고 일지를 안면인식 및 IP로 완벽하게 대조 검증하여 공공감사에 대비합니다.</li>
+            <li><strong>3단계 (근태 시스템 무상 제공)</strong>: 자사 특허 스마트 근태관리 시스템을 연동하여, 자택 근태 및 보고 일지를 안면인식 및 IP로 완벽하게 대조 검증하여 공공감사에 대비합니다.</li>
             <li><strong>4단계 (부담금 전액 절감 및 ESG 완성)</strong>: 베네피플 위탁비(연 약 ₩${benePeopleCostYearly.toLocaleString()}) 제도를 도입하여, 연간 최대 <strong>₩${savingsYearly.toLocaleString()} (${savingsPercent}% 수준)</strong>의 지출 부담금을 드라마틱하게 세이브하고 대외 ESG 평가 평점을 최고 단계로 혁신합니다.</li>
           </ul>
         </div>
@@ -1074,7 +1074,7 @@ export default function AdminDashboard({
               </div>
 
               <div className="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm relative overflow-hidden">
-                <span className="text-[10px] font-bold text-gray-400 uppercase block">체크인 ERP 활성 채널</span>
+                <span className="text-[10px] font-bold text-gray-400 uppercase block">체크인 활성 채널</span>
                 <div className="flex items-baseline gap-2 mt-2">
                   <span className="text-2xl font-black text-brand-lightgreen">128개 사</span>
                   <span className="text-xs text-blue-600 font-bold font-mono">실시간 구동</span>
@@ -1575,7 +1575,7 @@ export default function AdminDashboard({
                           type="text"
                           value={editingConfig.whyRiskTitle || ""}
                           onChange={(e) => setEditingConfig({ ...editingConfig, whyRiskTitle: e.target.value })}
-                          placeholder="장애인 고용 부재의 숨겨진 리스크"
+                          placeholder="장애인 고용 리스크"
                           className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition"
                         />
                       </div>
@@ -1643,7 +1643,7 @@ export default function AdminDashboard({
                         rows={3}
                         value={editingConfig.painCaution || ""}
                         onChange={(e) => setEditingConfig({ ...editingConfig, painCaution: e.target.value })}
-                        placeholder="고민하고 망설이는 동안에도, 부담금은 매년 세금처럼 매달 일정하게 증가하고 있습니다."
+                        placeholder="고민하고 망설이는 동안에도, 부담금은 매년 세금처럼 증가하고 있습니다."
                         className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition font-sans leading-relaxed"
                       />
                     </div>

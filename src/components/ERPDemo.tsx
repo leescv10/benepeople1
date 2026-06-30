@@ -216,11 +216,11 @@ export default function ERPDemo({ loggedInCompany = null }: ERPDemoProps) {
             Enterprise App Preview
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mt-4 text-white">
-            베네피플 ERP
+            베네피플 통합 근태시스템
           </h2>
           {!loggedInCompany && (
             <p className="text-gray-300 mt-4 text-sm sm:text-base font-sans">
-              기업 담당자에게 무상으로 지원되는 베네피플 ERP 프로그램을 Web과 APP으로 직접 체험해 보세요.
+              기업 담당자에게 무상으로 지원되는 베네피플 통합 근태 프로그램을 Web과 APP으로 직접 체험해 보세요.
             </p>
           )}
         </div>
@@ -708,7 +708,7 @@ export default function ERPDemo({ loggedInCompany = null }: ERPDemoProps) {
         {!loggedInCompany && (
           <div className="mt-8 bg-emerald-950/40 border border-emerald-500/20 p-4 sm:p-5 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 backdrop-blur-sm">
             <p className="text-xs sm:text-sm text-slate-200 text-center sm:text-left leading-relaxed">
-              <strong className="text-brand-accent font-bold">* 위 ERP 대시보드는 실제 베네피플 풀패키지 도입 시 무료로 즉시 활성화됩니다.</strong> 고도화된 안면생체인식 및 고유 IP 2중 보안을 통해 장애가 있더라도 자율적이고 투명하게 근무할 수 있는 환경을 선사합니다.
+              <strong className="text-brand-accent font-bold">* 위 근태 대시보드는 실제 베네피플 풀패키지 도입 시 무료로 즉시 활성화됩니다.</strong> 고도화된 안면생체인식 및 고유 IP 2중 보안을 통해 장애가 있더라도 자율적이고 투명하게 근무할 수 있는 환경을 선사합니다.
             </p>
             <a
               href="#ai-diagnosis"

@@ -161,7 +161,7 @@ export default function GoogleDriveTab({ employees, attendanceFeed }: GoogleDriv
       // Read small text files or fallback to base64
       const reader = new FileReader();
       reader.onload = async (event) => {
-        const textContent = (event.target?.result as string) || `ERP Uploaded Document: ${file.name}`;
+        const textContent = (event.target?.result as string) || `Uploaded Document: ${file.name}`;
         try {
           await uploadFileToDrive(token, file.name, textContent, file.type || "text/plain");
           setSuccessMsg(`파일 '${file.name}'이 구글 드라이브에 성공적으로 업로드되었습니다.`);
@@ -209,9 +209,9 @@ export default function GoogleDriveTab({ employees, attendanceFeed }: GoogleDriv
     setUploading(true);
     try {
       const todayStr = new Date().toISOString().split("T")[0];
-      const fileName = `베네피플_ERP_장애인재택근무자명부_${todayStr}.md`;
+      const fileName = `베네피플_근태시스템_장애인재택근무자명부_${todayStr}.md`;
 
-      const title = `## 베네피플 ESG 특화 ERP - 장애인 재택 근로자 명부\n`;
+      const title = `## 베네피플 ESG 특화 근태시스템 - 장애인 재택 근로자 명부\n`;
       const dateText = `출력 시간: ${new Date().toLocaleString()}\n\n`;
       const headers = `| 사원코드 | 성명 | 배정 직무 | 장애 유형 | 현재상태 |\n|---|---|---|---|---|\n`;
       const rows = employees
@@ -221,7 +221,7 @@ export default function GoogleDriveTab({ employees, attendanceFeed }: GoogleDriv
         )
         .join("\n");
 
-      const fileContent = title + dateText + headers + rows + "\n\n* 본 문서는 베네피플 ERP 구글 드라이브 연동 모듈을 통해 무결성 보장 하에 자동 생성 및 업로드되었습니다.";
+      const fileContent = title + dateText + headers + rows + "\n\n* 본 문서는 베네피플 근태관리 구글 드라이브 연동 모듈을 통해 무결성 보장 하에 자동 생성 및 업로드되었습니다.";
 
       await uploadFileToDrive(token, fileName, fileContent, "text/markdown");
       setSuccessMsg(`장애인 재택근무자 명부('${fileName}')를 구글 드라이브에 완벽히 내보냈습니다!`);
@@ -238,9 +238,9 @@ export default function GoogleDriveTab({ employees, attendanceFeed }: GoogleDriv
     setUploading(true);
     try {
       const todayStr = new Date().toISOString().split("T")[0];
-      const fileName = `베네피플_ERP_실시간출퇴근기록_${todayStr}.md`;
+      const fileName = `베네피플_근태관리_실시간출퇴근기록_${todayStr}.md`;
 
-      const title = `## 베네피플 ESG 특화 ERP - 실시간 출퇴근 기록 대조표\n`;
+      const title = `## 베네피플 ESG 특화 근태관리시스템 - 실시간 출퇴근 기록 대조표\n`;
       const dateText = `출력 시간: ${new Date().toLocaleString()}\n\n`;
       const headers = `| 시간 | 사원 | 보안 인증 방식 | 현재 당일 수행 업무 |\n|---|---|---|---|\n`;
       const rows = attendanceFeed
@@ -305,7 +305,7 @@ export default function GoogleDriveTab({ employees, attendanceFeed }: GoogleDriv
           <div className="space-y-2">
             <h4 className="text-base font-bold text-white">클라우드 원격 동기화 기능 비활성화</h4>
             <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-              본 ERP는 회원사의 업무 편의를 위해 Google Drive API 연동을 지원합니다. <br />
+              본 근태시스템은 회원사의 업무 편의를 위해 Google Drive API 연동을 지원합니다. <br />
               구글 드라이브 계정을 안전하게 연동하여 증빙 문서 보관 및 자동 데이터 내보내기를 체험해 보세요.
             </p>
           </div>
@@ -350,7 +350,7 @@ export default function GoogleDriveTab({ employees, attendanceFeed }: GoogleDriv
             </button>
           </div>
           <div className="text-[10px] text-slate-500 font-mono">
-            * 베네피플 ERP는 구글 보안 OAuth API 가이드라인을 철저히 준수합니다.
+            * 베네피플 근태관리시스템은 구글 보안 OAuth API 가이드라인을 철저히 준수합니다.
           </div>
         </div>
       ) : (
@@ -389,10 +389,10 @@ export default function GoogleDriveTab({ employees, attendanceFeed }: GoogleDriv
               </div>
             </div>
 
-            {/* Quick ERP Data Exporters */}
+            {/* Quick Data Exporters */}
             <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-5 space-y-4">
               <h4 className="text-xs font-bold text-white uppercase tracking-wider text-slate-400">
-                ERP 실시간 통계 원클릭 드라이브 업로드
+                실시간 통계 원클릭 드라이브 업로드
               </h4>
 
               <div className="space-y-2.5">

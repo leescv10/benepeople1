@@ -126,9 +126,14 @@ export default function BudgetCalculator({ config }: BudgetCalculatorProps) {
   const rewardYearly = employees >= 50 && excessCount > 0 ? excessCount * 500000 * 12 : 0;
 
   // Helper incrementer/decrementer with safety bounds
-  const changeEmployeeValue = (val: number) => {
-    const updated = Math.max(10, Math.min(10000, val));
-    setEmployees(updated);
+  const changeEmployeeValue = (val: number, isSlider = false) => {
+    if (isSlider) {
+      const updated = Math.max(100, Math.min(10000, val));
+      setEmployees(updated);
+    } else {
+      const updated = Math.min(10000, val);
+      setEmployees(updated);
+    }
   };
 
   const handleInputBlur = (val: number, setter: (v: number) => void, min = 0, max = 10000) => {
@@ -210,11 +215,11 @@ export default function BudgetCalculator({ config }: BudgetCalculatorProps) {
                   <div className="flex items-center gap-1.5">
                     <input
                       type="number"
-                      min="10"
+                      min="100"
                       max="10000"
                       value={employees === 0 ? "" : employees}
                       onChange={(e) => changeEmployeeValue(parseInt(e.target.value) || 0)}
-                      onBlur={(e) => handleInputBlur(parseInt(e.target.value), setEmployees, 10, 10000)}
+                      onBlur={(e) => handleInputBlur(parseInt(e.target.value), setEmployees, 100, 10000)}
                       className="w-20 px-2 py-1 text-right text-sm font-mono font-bold text-brand-green bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-green focus:bg-white"
                     />
                     <span className="text-sm font-bold text-gray-700">명</span>
@@ -230,19 +235,20 @@ export default function BudgetCalculator({ config }: BudgetCalculatorProps) {
                 {/* Symmetrical Slider with custom markers */}
                 <input
                   type="range"
-                  min="30"
-                  max="2000"
-                  step="5"
-                  value={employees}
-                  onChange={(e) => changeEmployeeValue(parseInt(e.target.value))}
+                  min="100"
+                  max="10000"
+                  step="10"
+                  value={Math.max(100, employees)}
+                  onChange={(e) => changeEmployeeValue(parseInt(e.target.value), true)}
                   className="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-brand-green focus:outline-none"
                 />
                 <div className="flex justify-between text-[10px] text-gray-400 font-mono">
-                  <span>30명</span>
-                  <span>100명 (부담금 징수)</span>
-                  <span>300명 (평균)</span>
-                  <span>1,000명</span>
-                  <span>2,000명+</span>
+                  <span>100명</span>
+                  <span>2,000명</span>
+                  <span>4,000명</span>
+                  <span>6,000명</span>
+                  <span>8,000명</span>
+                  <span>10,000명</span>
                 </div>
               </div>
 
@@ -571,7 +577,7 @@ export default function BudgetCalculator({ config }: BudgetCalculatorProps) {
             href="#ai-diagnosis"
             className="text-brand-accent font-bold hover:underline flex items-center gap-1.5 ml-0.5 group font-sans"
           >
-            지금 무료 1:1 정밀 레포트 진단받기 
+            지금 무료 1:1 정밀 리포트 진단받기 
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition duration-200" />
           </a>
         </div>

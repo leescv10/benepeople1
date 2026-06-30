@@ -18,7 +18,7 @@ export default function ESGImpactSection({ config }: ESGImpactSectionProps) {
   const card2Desc = config?.esgCard2Desc || "경증 및 중증 장애인 모두에게 동등한 사회적 직업 활동의 소중한 기회를 확대합니다. 장애인의 경제적 자립 기반을 주체적으로 마련하며 사회적 보이지 않는 장벽을 극적으로 줄이고 배려와 포용 문화를 전격적으로 확산합니다.";
 
   const card3Title = config?.esgCard3Title || "법적 의무 이행";
-  const card3Desc = config?.esgCard3Desc || "공정하고 합법적인 절차를 통해 장애인 고용부담금(벌금) 발생 리스크를 완전히 예방합니다. 국가적 장애인 의무고용 법률적 기준을 완전 충족하여 기업의 지배구조 신뢰도와 대외 이미지를 확고하게 격상시킵니다.";
+  const card3Desc = config?.esgCard3Desc || "공정하고 합법적인 절차를 통해 장애인 고용부담금 발생 리스크를 완전히 예방합니다. 국가적 장애인 의무고용 법률적 기준을 완전 충족하여 기업의 지배구조 신뢰도와 대외 이미지를 확고하게 격상시킵니다.";
 
   const pillars = [
     {

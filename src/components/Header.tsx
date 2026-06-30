@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Menu, X, ShieldAlert, LogIn, LogOut, LayoutDashboard } from "lucide-react";
 import logoImg from "../assets/images/benepeople_logo_1782496128774.jpg";
 import { HomepageConfig } from "../types";
@@ -32,9 +32,20 @@ export default function Header({ onLoginClick, loggedInCompany, onLogout, config
     { label: "솔루션 TOP 3", href: "#three-pillars" },
     { label: "부담금 계산기", href: "#calculator" },
     { label: "원스톱 행정", href: "#workflow" },
-    { label: "근태관리 ERP", href: "#erp-demo" },
     { label: "ESG 효과", href: "#esg" },
   ];
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const targetId = href.replace("#", "");
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  };
 
   const logoSource = config?.logoUrl || logoImg;
   const companyNameText = config?.companyName || "BenePeople";
@@ -63,7 +74,7 @@ export default function Header({ onLoginClick, loggedInCompany, onLogout, config
                 {companyNameText}
               </span>
               <span className="text-[9px] text-brand-accent font-semibold block tracking-wide">
-                {companyLogoSubtext} {loggedInCompany ? "ERP" : ""}
+                {companyLogoSubtext} {loggedInCompany ? "PORTAL" : ""}
               </span>
             </div>
           </a>
@@ -75,6 +86,7 @@ export default function Header({ onLoginClick, loggedInCompany, onLogout, config
                 <a
                   key={item.label}
                   href={item.href}
+                  onClick={(e) => handleNavClick(e, item.href)}
                   className="text-gray-300 hover:text-brand-accent transition text-xs xl:text-sm font-semibold px-2 py-1.5 rounded-lg hover:bg-white/5"
                 >
                   {item.label}
@@ -84,27 +96,19 @@ export default function Header({ onLoginClick, loggedInCompany, onLogout, config
           ) : (
             <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-xs font-semibold text-emerald-400">
               <LayoutDashboard className="w-3.5 h-3.5 animate-pulse" />
-              <span>[ {loggedInCompany} ] 회원사 전용 원격 ERP 채널</span>
+              <span>[ {loggedInCompany} ] 회원사 전용 원격 관리 채널</span>
             </div>
           )}
 
           {/* Header Action Button */}
           <div className="hidden lg:block">
-            {loggedInCompany ? (
+            {loggedInCompany && (
               <button
                 onClick={onLogout}
                 className="bg-red-500 hover:bg-red-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:scale-[1.02] transition duration-300 flex items-center gap-1.5 cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
                 로그아웃
-              </button>
-            ) : (
-              <button
-                onClick={onLoginClick}
-                className="bg-[#EBB63F] text-brand-green font-bold text-xs px-4 py-2.5 rounded-xl shadow-md hover:bg-amber-400 hover:shadow-lg hover:scale-[1.02] transition duration-300 flex items-center gap-1.5 cursor-pointer"
-              >
-                <LogIn className="w-4 h-4" />
-                회원사 로그인
               </button>
             )}
           </div>
@@ -131,30 +135,21 @@ export default function Header({ onLoginClick, loggedInCompany, onLogout, config
                 <a
                   key={item.label}
                   href={item.href}
-                  onClick={() => setIsOpen(false)}
+                  onClick={(e) => {
+                    setIsOpen(false);
+                    handleNavClick(e, item.href);
+                  }}
                   className="block text-gray-300 hover:text-brand-accent transition text-sm font-semibold py-2 px-3.5 rounded-lg hover:bg-white/5"
                 >
                   {item.label}
                 </a>
               ))}
-              <div className="pt-2">
-                <button
-                  onClick={() => {
-                    setIsOpen(false);
-                    onLoginClick();
-                  }}
-                  className="w-full bg-[#EBB63F] text-brand-green font-bold text-xs py-3 rounded-xl shadow-md hover:bg-amber-400 hover:shadow-lg transition flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <LogIn className="w-4 h-4" />
-                  회원사 로그인
-                </button>
-              </div>
             </>
           ) : (
             <div className="space-y-3 pt-2">
               <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs font-semibold text-emerald-400 justify-center">
                 <LayoutDashboard className="w-3.5 h-3.5 animate-pulse" />
-                <span>{loggedInCompany} ERP 활성화</span>
+                <span>{loggedInCompany} 포탈 활성화</span>
               </div>
               <button
                 onClick={() => {
