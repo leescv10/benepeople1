@@ -1,5 +1,5 @@
 {
-  "name": "베네피플 (Bene People) - 장애인 고용 솔루션",
+  "name": "베네피플 (BenePeople) - 장애인 고용 솔루션",
   "description": "채용, 행정지원, 사후관리부터 전용 ERP 솔루션 무상 제공까지 한 번에 완벽히 해결해 드리는 (주)베네피플 장애인 고용 솔루션 공식 홈페이지 및 맞춤형 AI 진단 플랫폼입니다.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

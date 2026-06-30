@@ -8,7 +8,7 @@ interface ThreePillarsSectionProps {
 
 export default function ThreePillarsSection({ config }: ThreePillarsSectionProps) {
   const badge = config?.pillarsBadge || "OUR THREE PILLARS";
-  const title = config?.pillarsTitle || "기업을 위한 Bene People 3대 솔루션";
+  const title = config?.pillarsTitle || "기업을 위한 BenePeople 3대 솔루션";
   const desc = config?.pillarsDesc || "비용, 법적 Risk, 사후 관리에 대해 기업별 맞춤형 솔루션을 완벽 제공합니다.";
 
   const p1Title = config?.pillar1Title || "극적인 비용 절감 효과";
@@ -37,11 +37,11 @@ export default function ThreePillarsSection({ config }: ThreePillarsSectionProps
             {badge}
           </span>
           <h2 className="text-3xl sm:text-4xl font-black tracking-tight mt-4 text-white font-sans">
-            {title.includes("Bene People 3대 솔루션") ? (
+            {title.includes("BenePeople 3대 솔루션") ? (
               <>
-                {title.split("Bene People 3대 솔루션")[0]}
-                <span className="text-brand-accent underline decoration-4 decoration-brand-accent">Bene People 3대 솔루션</span>
-                {title.split("Bene People 3대 솔루션")[1]}
+                {title.split("BenePeople 3대 솔루션")[0]}
+                <span className="text-brand-accent underline decoration-4 decoration-brand-accent">BenePeople 3대 솔루션</span>
+                {title.split("BenePeople 3대 솔루션")[1]}
               </>
             ) : (
               title

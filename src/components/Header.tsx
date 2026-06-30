@@ -37,7 +37,7 @@ export default function Header({ onLoginClick, loggedInCompany, onLogout, config
   ];
 
   const logoSource = config?.logoUrl || logoImg;
-  const companyNameText = config?.companyName || "Bene People";
+  const companyNameText = config?.companyName || "BenePeople";
   const companyLogoSubtext = config?.companyLogoText || "(주)베네피플";
 
   return (
@@ -54,7 +54,7 @@ export default function Header({ onLoginClick, loggedInCompany, onLogout, config
           <a href="#" className="flex items-center gap-2.5 group">
             <img
               src={logoSource}
-              alt="Bene People Logo"
+              alt="BenePeople Logo"
               className="w-10 h-10 rounded-xl object-cover shadow-md group-hover:scale-105 transition duration-300"
               referrerPolicy="no-referrer"
             />

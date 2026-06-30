@@ -316,7 +316,7 @@ export default function IntroSection({ config }: IntroSectionProps) {
 
         {/* Bottom Banner slogan line */}
         <div className="mt-16 bg-[#EBB63F] text-brand-green p-4 sm:p-5 rounded-2xl shadow-xl font-bold text-center text-xs sm:text-sm tracking-tight">
-          기업의 장애인 고용을 신속하고, 합법적으로, 효율적인 시스템을 통해 <span className="underline decoration-2 font-black">'Bene People'</span>이 모든 최상의 솔루션을 제공해 드립니다.
+          기업의 장애인 고용을 신속하고, 합법적으로, 효율적인 시스템을 통해 <span className="underline decoration-2 font-black">'BenePeople'</span>이 모든 최상의 솔루션을 제공해 드립니다.
         </div>
       </div>
     </section>

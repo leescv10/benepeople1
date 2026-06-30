@@ -62,7 +62,7 @@ const DEFAULT_HOMEPAGE_CONFIG: HomepageConfig = {
 
   // General & Identity Defaults
   logoUrl: "", // Defaults to standard build assets if empty
-  companyName: "Bene People",
+  companyName: "BenePeople",
   companyLogoText: "(주)베네피플",
 
   // Budget Calculator defaults
@@ -76,7 +76,7 @@ const DEFAULT_HOMEPAGE_CONFIG: HomepageConfig = {
 
   // Three Pillars Section defaults
   pillarsBadge: "OUR THREE PILLARS",
-  pillarsTitle: "기업을 위한 Bene People 3대 솔루션",
+  pillarsTitle: "기업을 위한 BenePeople 3대 솔루션",
   pillarsDesc: "비용, 법적 Risk, 사후 관리에 대해 기업별 맞춤형 솔루션을 완벽 제공합니다.",
   pillar1Title: "극적인 비용 절감 효과",
   pillar1Sub: "300명 기업 기준 연간 부담금 약 2.33억원 대비",
@@ -126,7 +126,7 @@ const DEFAULT_HOMEPAGE_CONFIG: HomepageConfig = {
   companyFax: "02-1234-5679",
   companyEmail: "info@benepeople.com",
   companyAddress: "경기도 고양시 행신동 948-1 엘지프라자 7층 (본사 · 전국 25개 거점 운영)",
-  footerCopyright: "© 2026 Bene People Inc. All rights reserved. 대한민국 No.1 장애인 고용 통합 위탁 솔루션."
+  footerCopyright: "© 2026 BenePeople Inc. All rights reserved. 대한민국 No.1 장애인 고용 통합 위탁 솔루션."
 };
 
 export default function App() {

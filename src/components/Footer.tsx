@@ -24,7 +24,7 @@ export default function Footer({ config, onOpenTerms }: FooterProps) {
   };
 
   const logoSource = config?.logoUrl || logoImg;
-  const companyNameText = config?.companyName || "Bene People";
+  const companyNameText = config?.companyName || "BenePeople";
   const companyLogoSubtext = config?.companyLogoText || "(주)베네피플";
   const slogan = config?.footerSlogan || "장애인 인재 채용부터 고용부담금 처리, 전용 ERP 시스템 무상 제공까지 — 베네피플이 채용 · 운영의 전 과정을 완벽히 책임지고 동행합니다.";
   const owner = config?.companyOwner || "박성진";
@@ -32,7 +32,7 @@ export default function Footer({ config, onOpenTerms }: FooterProps) {
   const fax = config?.companyFax || "02-1234-5679";
   const email = config?.companyEmail || "info@benepeople.com";
   const address = config?.companyAddress || "경기도 고양시 행신동 948-1 엘지프라자 7층 (본사 · 전국 25개 거점 운영)";
-  const copyright = config?.footerCopyright || "© 2026 (주)베네피플 (Bene People Inc.) All rights reserved.";
+  const copyright = config?.footerCopyright || "© 2026 (주)베네피플 (BenePeople Inc.) All rights reserved.";
 
   return (
     <footer className="bg-black/15 backdrop-blur-[2px] text-gray-300 border-t border-white/5 pt-16 pb-8 font-sans relative overflow-hidden">
@@ -43,7 +43,7 @@ export default function Footer({ config, onOpenTerms }: FooterProps) {
             <div className="flex items-center gap-2.5">
               <img
                 src={logoSource}
-                alt="Bene People Logo"
+                alt="BenePeople Logo"
                 className="w-10 h-10 rounded-xl object-cover shadow-md"
                 referrerPolicy="no-referrer"
               />
