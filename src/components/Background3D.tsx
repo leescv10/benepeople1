@@ -187,6 +187,18 @@ export default function Background3D() {
       z: -200 + Math.random() * 600,
     }));
 
+    // 2.5. Floating bokeh particles (rising dust / glowing bubbles for premium atmosphere)
+    const bokehCount = 28;
+    const bokehParticles = Array.from({ length: bokehCount }).map((_, i) => ({
+      x: Math.random() * dimensions.width,
+      y: Math.random() * dimensions.height,
+      size: 1.5 + Math.random() * 4.5,
+      speedY: 0.15 + Math.random() * 0.35,
+      speedX: -0.1 + Math.random() * 0.2,
+      phase: Math.random() * Math.PI * 2,
+      color: i % 3 === 0 ? "rgba(235, 182, 63, " : i % 3 === 1 ? "rgba(16, 185, 129, " : "rgba(56, 189, 248, ",
+    }));
+
     // 3. Generate Floating 3D Crystals (Tech Compliance Nodes)
     const createCrystalPoints = (): Point3D[] => [
       { x: 0, y: -1.2, z: 0 },  // Top vertex
@@ -357,6 +369,73 @@ export default function Background3D() {
           }
         }
       });
+
+      // 1.5. Draw Rising Luminous Dust / Bokeh Particles (Dynamic)
+      bokehParticles.forEach((p, idx) => {
+        p.y -= p.speedY * currentSpeed;
+        p.x += p.speedX * currentSpeed + Math.sin(starTimeAcc.current * 0.05 + p.phase) * 0.15;
+        
+        // Wrap around smoothly
+        if (p.y < -15) {
+          p.y = dimensions.height + 15;
+          p.x = Math.random() * dimensions.width;
+        }
+        if (p.x < -15) p.x = dimensions.width + 15;
+        if (p.x > dimensions.width + 15) p.x = -15;
+
+        const opacity = Math.sin((p.y / dimensions.height) * Math.PI) * 0.35;
+        ctx.fillStyle = `${p.color}${opacity})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, 2 * Math.PI);
+        ctx.fill();
+      });
+
+      // 1.8. Draw Elegant Fluid Aurora Waves (Sophisticated & Bright)
+      const drawAuroraWave = (
+        baseY: number,
+        amplitude: number,
+        frequency: number,
+        phaseOffset: number,
+        color1: string,
+        color2: string,
+        thickness: number
+      ) => {
+        ctx.save();
+        const gradient = ctx.createLinearGradient(0, 0, dimensions.width, 0);
+        gradient.addColorStop(0, "rgba(0,0,0,0)");
+        gradient.addColorStop(0.2, color1);
+        gradient.addColorStop(0.5, color2);
+        gradient.addColorStop(0.8, color1);
+        gradient.addColorStop(1, "rgba(0,0,0,0)");
+        
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = thickness;
+        ctx.beginPath();
+        
+        for (let x = 0; x <= dimensions.width; x += 15) {
+          const wave1 = Math.sin(x * frequency + starTimeAcc.current * 0.12 + phaseOffset);
+          const wave2 = Math.cos(x * (frequency * 0.65) - starTimeAcc.current * 0.08 + phaseOffset * 1.3);
+          const y = baseY + (wave1 * amplitude + wave2 * (amplitude * 0.35));
+          
+          if (x === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        }
+        ctx.stroke();
+        ctx.restore();
+      };
+
+      if (currentTheme === "dark") {
+        drawAuroraWave(centerY - 120, 50, 0.0016, 0, "rgba(235, 182, 63, 0.08)", "rgba(16, 185, 129, 0.10)", 3.0);
+        drawAuroraWave(centerY + 60, 65, 0.0011, Math.PI / 3, "rgba(16, 185, 129, 0.07)", "rgba(56, 189, 248, 0.10)", 3.5);
+      } else if (currentTheme === "cosmic") {
+        drawAuroraWave(centerY - 100, 50, 0.0018, 0, "rgba(6, 182, 212, 0.09)", "rgba(236, 72, 153, 0.10)", 3.0);
+        drawAuroraWave(centerY + 120, 60, 0.0012, Math.PI / 2, "rgba(139, 92, 246, 0.08)", "rgba(6, 182, 212, 0.09)", 3.5);
+      } else if (currentTheme === "luxury") {
+        drawAuroraWave(centerY - 50, 45, 0.0015, 0, "rgba(245, 158, 11, 0.08)", "rgba(239, 68, 68, 0.08)", 3.0);
+      }
 
       // 2. Draw Interactive 3D Sphere (Nationwide Network Hologram)
       // Slow constant spin, plus mouse dragging, plus scroll roll
@@ -714,21 +793,21 @@ export default function Background3D() {
   }, [dimensions]);
 
   const bgColors = {
-    dark: "#031a15",      // Rich Imperial Dark Teal (Slightly brighter than #02120f)
+    dark: "#04251e",      // Rich Imperial Dark Teal (Slightly brighter than #031a15)
     light: "#F8FAF9",     // Bright Business
     cosmic: "#070514",    // Cosmic Purple
     luxury: "#170D0B",    // Sunset Luxury
   };
 
   const radialOverlays = {
-    dark: "radial-gradient(circle at 50% 35%, rgba(18, 120, 102, 0.55) 0%, rgba(235, 182, 63, 0.16) 32%, rgba(3, 24, 20, 0.88) 75%, rgba(1, 14, 12, 0.94) 100%)",
+    dark: "radial-gradient(circle at 50% 35%, rgba(20, 150, 125, 0.50) 0%, rgba(235, 182, 63, 0.18) 32%, rgba(4, 30, 24, 0.85) 75%, rgba(2, 18, 14, 0.92) 100%)",
     light: "radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.88) 0%, rgba(242, 246, 244, 0.94) 100%)",
     cosmic: "radial-gradient(circle at 50% 50%, rgba(13, 11, 30, 0.4) 0%, rgba(7, 5, 20, 0.98) 85%)",
     luxury: "radial-gradient(circle at 50% 50%, rgba(35, 21, 18, 0.45) 0%, rgba(23, 13, 11, 0.98) 85%)",
   };
 
   const canvasOpacities = {
-    dark: "opacity-[0.52]",
+    dark: "opacity-[0.68]", // Increased opacity for a brighter and pop-out effect
     light: "opacity-[0.62]",
     cosmic: "opacity-[0.48]",
     luxury: "opacity-[0.35]",
