@@ -60,8 +60,8 @@ const safeLocalStorage = {
 
 interface AdminDashboardProps {
   homepageConfig: HomepageConfig;
-  onUpdateHomepageConfig: (newConfig: HomepageConfig) => void;
-  onResetHomepageConfig: () => void;
+  onUpdateHomepageConfig: (newConfig: HomepageConfig) => Promise<void>;
+  onResetHomepageConfig: () => Promise<void>;
 }
 
 export default function AdminDashboard({
@@ -73,6 +73,7 @@ export default function AdminDashboard({
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [editingConfig, setEditingConfig] = useState<HomepageConfig>({ ...homepageConfig });
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [contentSubTab, setContentSubTab] = useState<"identity" | "hero" | "intro" | "why" | "pain">("identity");
   const [dragOverLogo, setDragOverLogo] = useState(false);
 
@@ -810,19 +811,29 @@ export default function AdminDashboard({
     }
   };
 
-  const handleSaveHomepageConfig = () => {
-    playCheerfulChime();
-    onUpdateHomepageConfig(editingConfig);
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 3000);
-  };
-
-  const handleRestoreDefaults = () => {
-    if (confirm("홈페이지 텍스트를 초기 기획 사양으로 복구하시겠습니까?")) {
+  const handleSaveHomepageConfig = async () => {
+    setSaveError(null);
+    try {
+      await onUpdateHomepageConfig(editingConfig);
       playCheerfulChime();
-      onResetHomepageConfig();
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "홈페이지 저장에 실패했습니다.");
+    }
+  };
+
+  const handleRestoreDefaults = async () => {
+    if (confirm("홈페이지 텍스트를 초기 기획 사양으로 복구하시겠습니까?")) {
+      setSaveError(null);
+      try {
+        await onResetHomepageConfig();
+        playCheerfulChime();
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3000);
+      } catch (err) {
+        setSaveError(err instanceof Error ? err.message : "홈페이지 초기화에 실패했습니다.");
+      }
     }
   };
 
@@ -1260,6 +1271,13 @@ export default function AdminDashboard({
                 <CheckCircle className="w-4 h-4 text-emerald-500" />
                 <span>성공적으로 저장되었습니다! 홈페이지 및 랜딩 화면에 변경사항이 영구 반영되었습니다.</span>
               </motion.div>
+            )}
+
+            {saveError && (
+              <div className="bg-red-50 border border-red-100 p-4 rounded-xl text-red-700 text-xs flex items-center gap-2">
+                <XCircle className="w-4 h-4 text-red-500" />
+                <span>{saveError}</span>
+              </div>
             )}
 
             {/* Sub-Tabs for different sections */}
