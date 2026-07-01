@@ -25,12 +25,13 @@ import {
   Plus,
   Upload,
   X,
-  Search
+  Search,
+  Cloud
 } from "lucide-react";
 import { HomepageConfig, Inquiry } from "../types";
 import logoImg from "../assets/images/bene_brand_logo_1782911879088.jpg";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from "recharts";
-import { db } from "../lib/googleAuth";
+import { db, googleSignIn, listDriveFiles, downloadDriveFileAsBase64, initAuth } from "../lib/googleAuth";
 import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
 
 const safeLocalStorage = {
@@ -93,6 +94,82 @@ export default function AdminDashboard({
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [contentSubTab, setContentSubTab] = useState<"identity" | "hero" | "intro" | "why" | "pain">("identity");
   const [dragOverLogo, setDragOverLogo] = useState(false);
+
+  // Google Drive Logo Import states
+  const [isDriveLogoModalOpen, setIsDriveLogoModalOpen] = useState(false);
+  const [driveFiles, setDriveFiles] = useState<any[]>([]);
+  const [driveLoading, setDriveLoading] = useState(false);
+  const [driveError, setDriveError] = useState<string | null>(null);
+  const [driveSearch, setDriveSearch] = useState("");
+  const [driveDownloading, setDriveDownloading] = useState(false);
+  const [driveUser, setDriveUser] = useState<any>(null);
+  const [driveAccessToken, setDriveAccessToken] = useState<string | null>(null);
+
+  // Initialize Auth state for Drive logo loader
+  useEffect(() => {
+    const unsubscribe = initAuth(
+      (currentUser, accessToken) => {
+        setDriveUser(currentUser);
+        setDriveAccessToken(accessToken);
+      },
+      () => {
+        setDriveUser(null);
+        setDriveAccessToken(null);
+      }
+    );
+    return () => unsubscribe();
+  }, []);
+
+  const handleDriveLogin = async () => {
+    setDriveLoading(true);
+    setDriveError(null);
+    try {
+      const result = await googleSignIn();
+      if (result) {
+        setDriveUser(result.user);
+        setDriveAccessToken(result.accessToken);
+        loadDriveLogoFiles(result.accessToken);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setDriveError("구글 연동에 실패했습니다. 권한을 확인해주세요.");
+    } finally {
+      setDriveLoading(false);
+    }
+  };
+
+  const loadDriveLogoFiles = async (token: string, search?: string) => {
+    setDriveLoading(true);
+    setDriveError(null);
+    try {
+      const allFiles = await listDriveFiles(token, search);
+      const imageFiles = allFiles.filter(f => f.mimeType.startsWith("image/") || f.name.match(/\.(png|jpg|jpeg|gif|svg|webp)$/i));
+      setDriveFiles(imageFiles);
+    } catch (err: any) {
+      console.error(err);
+      setDriveError("구글 드라이브 이미지 목록을 불러오는데 실패했습니다.");
+    } finally {
+      setDriveLoading(false);
+    }
+  };
+
+  const handleSelectDriveLogo = async (file: any) => {
+    const token = driveAccessToken;
+    if (!token) return;
+
+    setDriveDownloading(true);
+    setDriveError(null);
+    try {
+      const base64Data = await downloadDriveFileAsBase64(token, file.id);
+      setEditingConfig(prev => ({ ...prev, logoUrl: base64Data }));
+      setIsDriveLogoModalOpen(false);
+    } catch (err: any) {
+      console.error(err);
+      setDriveError("구글 드라이브 파일 다운로드 및 변환에 실패했습니다.");
+    } finally {
+      setDriveDownloading(false);
+    }
+  };
 
   // Member companies list
   const [companies, setCompanies] = useState<any[]>(() => {
@@ -1410,6 +1487,23 @@ export default function AdminDashboard({
                         </p>
                       </div>
 
+                      {/* Google Drive Logo Loader Button */}
+                      <div className="mt-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsDriveLogoModalOpen(true);
+                            if (driveAccessToken) {
+                              loadDriveLogoFiles(driveAccessToken);
+                            }
+                          }}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-sky-50 border border-sky-100 hover:bg-sky-100 hover:border-sky-200 text-sky-700 rounded-xl text-xs font-bold transition cursor-pointer"
+                        >
+                          <Cloud className="w-4 h-4 text-sky-500" />
+                          구글 드라이브에서 로고 불러오기
+                        </button>
+                      </div>
+
                       {/* Current Logo / Uploaded Logo Display */}
                       {editingConfig.logoUrl && (
                         <div className="mt-4 p-4 bg-gray-50 rounded-xl flex items-center justify-between border border-gray-100">
@@ -2604,6 +2698,212 @@ export default function AdminDashboard({
                         </button>
                       </div>
                     </form>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>
+
+            {/* Google Drive Logo Picker Modal */}
+            <AnimatePresence>
+              {isDriveLogoModalOpen && (
+                <div className="fixed inset-0 z-[110] overflow-y-auto bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="bg-white text-slate-900 w-full max-w-lg rounded-2xl border border-gray-100 shadow-2xl p-6 space-y-5"
+                  >
+                    {/* Header */}
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                      <div className="flex items-center gap-2 text-sky-600">
+                        <Cloud className="w-5 h-5" />
+                        <h4 className="text-sm sm:text-base font-extrabold text-gray-900">
+                          구글 드라이브 로고 가져오기
+                        </h4>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setIsDriveLogoModalOpen(false)}
+                        className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {!driveUser ? (
+                      /* Not Connected Panel */
+                      <div className="py-6 text-center space-y-4">
+                        <div className="w-14 h-14 bg-sky-50 text-sky-500 rounded-2xl flex items-center justify-center mx-auto">
+                          <Cloud className="w-7 h-7" />
+                        </div>
+                        <div className="space-y-1.5">
+                          <h5 className="text-sm font-bold text-gray-800">구글 드라이브 연동 필요</h5>
+                          <p className="text-xs text-gray-500 max-w-sm mx-auto leading-relaxed">
+                            구글 드라이브에 저장된 로고 파일을 직접 동기화하여 불러옵니다. <br />
+                            권한을 안전하게 수락하고 진행해 주세요.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleDriveLogin}
+                          disabled={driveLoading}
+                          className="mx-auto flex items-center gap-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition cursor-pointer disabled:opacity-50"
+                        >
+                          <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                          </svg>
+                          <span>Google 계정 연동 및 로그인</span>
+                        </button>
+                      </div>
+                    ) : (
+                      /* Connected - List & Search */
+                      <div className="space-y-4">
+                        {/* Profile Info Row */}
+                        <div className="flex items-center gap-2.5 bg-gray-50 p-2.5 rounded-xl border border-gray-100">
+                          {driveUser.photoURL ? (
+                            <img
+                              src={driveUser.photoURL}
+                              alt={driveUser.displayName || "User"}
+                              className="w-8 h-8 rounded-full border border-gray-200"
+                              referrerPolicy="no-referrer"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-sky-500 text-white font-bold flex items-center justify-center text-xs">
+                              {driveUser.displayName?.substring(0, 1) || "G"}
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-bold text-gray-800">{driveUser.displayName || "구글 사용자"}</p>
+                            <p className="text-[10px] text-gray-400 truncate">{driveUser.email}</p>
+                          </div>
+                          <span className="text-[10px] bg-emerald-50 text-emerald-600 font-extrabold px-2 py-0.5 rounded-full border border-emerald-100">
+                            연동 활성화
+                          </span>
+                        </div>
+
+                        {/* Search Bar */}
+                        <div className="flex gap-2">
+                          <div className="relative flex-1">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                              <Search className="w-3.5 h-3.5" />
+                            </div>
+                            <input
+                              type="text"
+                              value={driveSearch}
+                              onChange={(e) => setDriveSearch(e.target.value)}
+                              placeholder="이미지 파일명 검색..."
+                              className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-8.5 pr-4 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-sky-500 transition"
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  loadDriveLogoFiles(driveAccessToken!, driveSearch);
+                                }
+                              }}
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => loadDriveLogoFiles(driveAccessToken!, driveSearch)}
+                            className="bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs px-3.5 rounded-xl transition cursor-pointer"
+                          >
+                            검색
+                          </button>
+                        </div>
+
+                        {/* Error Notification */}
+                        {driveError && (
+                          <div className="bg-red-50 text-red-600 p-2.5 rounded-xl text-xs border border-red-100 flex items-center gap-1.5 font-medium">
+                            <span>⚠️ {driveError}</span>
+                          </div>
+                        )}
+
+                        {/* Drive Files List */}
+                        <div className="bg-gray-50 border border-gray-100 rounded-xl overflow-hidden min-h-[220px] max-h-[300px] overflow-y-auto flex flex-col">
+                          {driveLoading && driveFiles.length === 0 ? (
+                            <div className="flex-1 flex flex-col items-center justify-center py-10 space-y-2">
+                              <svg className="animate-spin h-5 w-5 text-sky-500" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              <span className="text-[11px] text-gray-500 font-medium">이미지 목록을 가져오는 중...</span>
+                            </div>
+                          ) : driveFiles.length === 0 ? (
+                            <div className="flex-1 flex flex-col items-center justify-center py-10 text-center space-y-2">
+                              <Cloud className="w-8 h-8 text-gray-300" />
+                              <p className="text-[11px] text-gray-400 font-bold">드라이브에 저장된 이미지 파일이 없습니다.</p>
+                              <p className="text-[9px] text-gray-400 max-w-xs mx-auto">
+                                구글 드라이브에 로고 파일(.png, .jpg, .svg 등)을 업로드한 후 검색해 보세요.
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="divide-y divide-gray-100">
+                              {driveFiles.map((file) => (
+                                <div
+                                  key={file.id}
+                                  className="p-3 flex items-center justify-between hover:bg-gray-100/50 transition"
+                                >
+                                  <div className="flex items-center gap-2.5 min-w-0">
+                                    {file.thumbnailLink ? (
+                                      <img
+                                        src={file.thumbnailLink}
+                                        alt={file.name}
+                                        className="w-8 h-8 rounded border border-gray-200 object-cover bg-white"
+                                        referrerPolicy="no-referrer"
+                                      />
+                                    ) : (
+                                      <div className="w-8 h-8 rounded bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-500">
+                                        <Cloud className="w-4 h-4" />
+                                      </div>
+                                    )}
+                                    <div className="min-w-0">
+                                      <p className="text-xs font-bold text-gray-700 truncate max-w-[240px] sm:max-w-[280px]" title={file.name}>
+                                        {file.name}
+                                      </p>
+                                      <span className="text-[9px] text-gray-400 font-mono">
+                                        {file.size ? `${(parseInt(file.size) / 1024).toFixed(1)} KB` : "크기 알 수 없음"}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleSelectDriveLogo(file)}
+                                    disabled={driveDownloading}
+                                    className="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 disabled:bg-sky-400 text-white font-extrabold text-[10px] rounded-lg transition shadow cursor-pointer flex items-center gap-1 shrink-0"
+                                  >
+                                    {driveDownloading ? (
+                                      <>
+                                        <svg className="animate-spin h-3 w-3 text-white" fill="none" viewBox="0 0 24 24">
+                                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <span>다운로드...</span>
+                                      </>
+                                    ) : (
+                                      <span>선택</span>
+                                    )}
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Footer buttons */}
+                    <div className="flex justify-end pt-3 border-t border-gray-100">
+                      <button
+                        type="button"
+                        onClick={() => setIsDriveLogoModalOpen(false)}
+                        className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-xs rounded-xl transition"
+                      >
+                        닫기
+                      </button>
+                    </div>
                   </motion.div>
                 </div>
               )}

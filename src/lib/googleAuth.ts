@@ -172,3 +172,31 @@ export const deleteDriveFile = async (token: string, fileId: string): Promise<vo
     throw new Error(`Google Drive API error deleting file: ${errText}`);
   }
 };
+
+// 4. Download file from Google Drive as Base64 (for loading images like logos)
+export const downloadDriveFileAsBase64 = async (token: string, fileId: string): Promise<string> => {
+  const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Google Drive API error downloading file: ${errText}`);
+  }
+
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      resolve(reader.result as string);
+    };
+    reader.onerror = () => {
+      reject(new Error("Failed to read downloaded file as base64."));
+    };
+    reader.readAsDataURL(blob);
+  });
+};
