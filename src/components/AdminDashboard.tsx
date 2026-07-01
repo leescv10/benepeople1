@@ -28,9 +28,35 @@ import {
   Search
 } from "lucide-react";
 import { HomepageConfig, Inquiry } from "../types";
+import logoImg from "../assets/images/benepeople_logo_1782496128774.jpg";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from "recharts";
 import { db } from "../lib/googleAuth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+
+const safeLocalStorage = {
+  getItem(key: string): string | null {
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      console.warn("localStorage.getItem is restricted or unavailable:", e);
+      return null;
+    }
+  },
+  setItem(key: string, value: string): void {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      console.warn("localStorage.setItem is restricted or unavailable:", e);
+    }
+  },
+  removeItem(key: string): void {
+    try {
+      localStorage.removeItem(key);
+    } catch (e) {
+      console.warn("localStorage.removeItem is restricted or unavailable:", e);
+    }
+  }
+};
 
 interface AdminDashboardProps {
   homepageConfig: HomepageConfig;
@@ -47,11 +73,12 @@ export default function AdminDashboard({
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [editingConfig, setEditingConfig] = useState<HomepageConfig>({ ...homepageConfig });
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [contentSubTab, setContentSubTab] = useState<"hero" | "intro" | "why" | "pain">("hero");
+  const [contentSubTab, setContentSubTab] = useState<"identity" | "hero" | "intro" | "why" | "pain">("identity");
+  const [dragOverLogo, setDragOverLogo] = useState(false);
 
   // Member companies list
   const [companies, setCompanies] = useState<any[]>(() => {
-    const saved = localStorage.getItem("bene_people_member_companies");
+    const saved = safeLocalStorage.getItem("bene_people_member_companies");
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -79,7 +106,7 @@ export default function AdminDashboard({
 
   // Disabled employees list
   const [disabledEmployees, setDisabledEmployees] = useState<any[]>(() => {
-    const saved = localStorage.getItem("bene_people_company_employees");
+    const saved = safeLocalStorage.getItem("bene_people_company_employees");
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -167,10 +194,10 @@ export default function AdminDashboard({
         if (compSnap.exists()) {
           activeComps = compSnap.data().list || [];
           setCompanies(activeComps);
-          localStorage.setItem("bene_people_member_companies", JSON.stringify(activeComps));
+          safeLocalStorage.setItem("bene_people_member_companies", JSON.stringify(activeComps));
         } else {
           // Fallback to local
-          const savedComp = localStorage.getItem("bene_people_member_companies");
+          const savedComp = safeLocalStorage.getItem("bene_people_member_companies");
           if (savedComp) {
             try {
               activeComps = JSON.parse(savedComp);
@@ -186,10 +213,10 @@ export default function AdminDashboard({
         if (empSnap.exists()) {
           activeEmps = empSnap.data().list || [];
           setDisabledEmployees(activeEmps);
-          localStorage.setItem("bene_people_company_employees", JSON.stringify(activeEmps));
+          safeLocalStorage.setItem("bene_people_company_employees", JSON.stringify(activeEmps));
         } else {
           // Fallback to local
-          const savedEmp = localStorage.getItem("bene_people_company_employees");
+          const savedEmp = safeLocalStorage.getItem("bene_people_company_employees");
           if (savedEmp) {
             try {
               activeEmps = JSON.parse(savedEmp);
@@ -205,10 +232,10 @@ export default function AdminDashboard({
         if (inqSnap.exists()) {
           activeInqs = inqSnap.data().list || [];
           setInquiries(activeInqs);
-          localStorage.setItem("bene_people_inquiries", JSON.stringify(activeInqs));
+          safeLocalStorage.setItem("bene_people_inquiries", JSON.stringify(activeInqs));
         } else {
           // Fallback to local
-          const savedInq = localStorage.getItem("bene_people_inquiries");
+          const savedInq = safeLocalStorage.getItem("bene_people_inquiries");
           if (savedInq) {
             try {
               activeInqs = JSON.parse(savedInq);
@@ -232,7 +259,7 @@ export default function AdminDashboard({
   // Save changes to Firestore and localStorage
   useEffect(() => {
     if (!dataLoaded) return;
-    localStorage.setItem("bene_people_member_companies", JSON.stringify(companies));
+    safeLocalStorage.setItem("bene_people_member_companies", JSON.stringify(companies));
     const saveCompanies = async () => {
       try {
         await setDoc(doc(db, "configs", "companies"), { list: companies });
@@ -245,7 +272,7 @@ export default function AdminDashboard({
 
   useEffect(() => {
     if (!dataLoaded) return;
-    localStorage.setItem("bene_people_company_employees", JSON.stringify(disabledEmployees));
+    safeLocalStorage.setItem("bene_people_company_employees", JSON.stringify(disabledEmployees));
     const saveEmployees = async () => {
       try {
         await setDoc(doc(db, "configs", "employees"), { list: disabledEmployees });
@@ -258,7 +285,7 @@ export default function AdminDashboard({
 
   useEffect(() => {
     if (!dataLoaded) return;
-    localStorage.setItem("bene_people_inquiries", JSON.stringify(inquiries));
+    safeLocalStorage.setItem("bene_people_inquiries", JSON.stringify(inquiries));
     const saveInquiries = async () => {
       try {
         await setDoc(doc(db, "configs", "inquiries"), { list: inquiries });
@@ -326,20 +353,20 @@ export default function AdminDashboard({
       },
     ];
     setInquiries(mockInquiries);
-    localStorage.setItem("bene_people_inquiries", JSON.stringify(mockInquiries));
+    safeLocalStorage.setItem("bene_people_inquiries", JSON.stringify(mockInquiries));
   };
 
   const handleUpdateStatus = (id: string, newStatus: "접수대기" | "상담완료" | "보류") => {
     const updated = inquiries.map((inq) => (inq.id === id ? { ...inq, status: newStatus } : inq));
     setInquiries(updated);
-    localStorage.setItem("bene_people_inquiries", JSON.stringify(updated));
+    safeLocalStorage.setItem("bene_people_inquiries", JSON.stringify(updated));
   };
 
   const handleDeleteInquiry = (id: string) => {
     if (confirm("정말로 이 상담 문의 내역을 삭제하시겠습니까?")) {
       const updated = inquiries.filter((inq) => inq.id !== id);
       setInquiries(updated);
-      localStorage.setItem("bene_people_inquiries", JSON.stringify(updated));
+      safeLocalStorage.setItem("bene_people_inquiries", JSON.stringify(updated));
     }
   };
 
@@ -749,7 +776,42 @@ export default function AdminDashboard({
     }, 10000);
   };
 
+  const playCheerfulChime = () => {
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const ctx = new AudioContextClass();
+      
+      const playTone = (freq: number, start: number, duration: number) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, start);
+        
+        gain.gain.setValueAtTime(0, start);
+        gain.gain.linearRampToValueAtTime(0.12, start + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start(start);
+        osc.stop(start + duration);
+      };
+
+      const now = ctx.currentTime;
+      // Beautiful cheerful chime arpeggio: G5 -> C6 -> E6
+      playTone(783.99, now, 0.18);
+      playTone(1046.50, now + 0.07, 0.25);
+      playTone(1318.51, now + 0.14, 0.45);
+    } catch (error) {
+      console.warn("Audio chime play failed:", error);
+    }
+  };
+
   const handleSaveHomepageConfig = () => {
+    playCheerfulChime();
     onUpdateHomepageConfig(editingConfig);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
@@ -757,10 +819,19 @@ export default function AdminDashboard({
 
   const handleRestoreDefaults = () => {
     if (confirm("홈페이지 텍스트를 초기 기획 사양으로 복구하시겠습니까?")) {
+      playCheerfulChime();
       onResetHomepageConfig();
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
     }
+  };
+
+  const handleLogoUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setEditingConfig(prev => ({ ...prev, logoUrl: reader.result as string }));
+    };
+    reader.readAsDataURL(file);
   };
 
   // Helper to read file as base64
@@ -1194,6 +1265,16 @@ export default function AdminDashboard({
             {/* Sub-Tabs for different sections */}
             <div className="flex border-b border-gray-100 overflow-x-auto pb-px gap-2">
               <button
+                onClick={() => setContentSubTab("identity")}
+                className={`pb-3 text-xs font-bold whitespace-nowrap px-3 transition border-b-2 ${
+                  contentSubTab === "identity"
+                    ? "border-[#073B31] text-[#073B31]"
+                    : "border-transparent text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                기업 브랜드 & 로고 (Identity)
+              </button>
+              <button
                 onClick={() => setContentSubTab("hero")}
                 className={`pb-3 text-xs font-bold whitespace-nowrap px-3 transition border-b-2 ${
                   contentSubTab === "hero"
@@ -1238,6 +1319,103 @@ export default function AdminDashboard({
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               {/* Left Column: Form Fields (Takes 7 cols) */}
               <div className="lg:col-span-7 space-y-6">
+                {contentSubTab === "identity" && (
+                  <div className="space-y-5 animate-fade-in">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                        회사명 / 상호 (Company Name)
+                      </label>
+                      <input
+                        type="text"
+                        value={editingConfig.companyName || ""}
+                        placeholder="예: BenePeople"
+                        onChange={(e) => setEditingConfig({ ...editingConfig, companyName: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                        상호 서브 텍스트 (e.g. 법인명)
+                      </label>
+                      <input
+                        type="text"
+                        value={editingConfig.companyLogoText || ""}
+                        placeholder="예: (주)베네피플"
+                        onChange={(e) => setEditingConfig({ ...editingConfig, companyLogoText: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen outline-none text-xs sm:text-sm font-medium transition"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                        회사 로고 이미지 업로드
+                      </label>
+                      
+                      {/* Logo Drag & Drop Zone */}
+                      <div
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          setDragOverLogo(true);
+                        }}
+                        onDragLeave={() => setDragOverLogo(false)}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          setDragOverLogo(false);
+                          const file = e.dataTransfer.files?.[0];
+                          if (file) handleLogoUpload(file);
+                        }}
+                        className={`border-2 border-dashed rounded-xl p-6 text-center transition flex flex-col items-center justify-center gap-2 cursor-pointer ${
+                          dragOverLogo
+                            ? "border-[#073B31] bg-[#073B31]/5"
+                            : "border-gray-200 hover:border-[#073B31] hover:bg-gray-50"
+                        }`}
+                        onClick={() => document.getElementById("logo-upload-input")?.click()}
+                      >
+                        <input
+                          id="logo-upload-input"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleLogoUpload(file);
+                          }}
+                        />
+                        <Upload className="w-8 h-8 text-gray-400" />
+                        <div className="text-xs text-gray-600 font-semibold">
+                          클릭하거나 이미지를 여기로 드래그하여 업로드하세요
+                        </div>
+                        <p className="text-[10px] text-gray-400">
+                          PNG, JPG, SVG 형식 (권장 비율: 가로형 또는 정사각형)
+                        </p>
+                      </div>
+
+                      {/* Current Logo / Uploaded Logo Display */}
+                      {editingConfig.logoUrl && (
+                        <div className="mt-4 p-4 bg-gray-50 rounded-xl flex items-center justify-between border border-gray-100">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-lg bg-white border border-gray-200 p-1 flex items-center justify-center overflow-hidden">
+                              <img src={editingConfig.logoUrl} alt="Logo preview" className="max-w-full max-h-full object-contain" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold text-gray-700">현재 업로드된 로고 이미지</p>
+                              <p className="text-[10px] text-gray-400 font-sans">Base64 포맷으로 동기화되어 저장됩니다.</p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setEditingConfig({ ...editingConfig, logoUrl: "" })}
+                            className="text-xs text-red-500 font-bold hover:underline"
+                          >
+                            로고 초기화
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {contentSubTab === "hero" && (
                   <div className="space-y-5">
                     <div>
@@ -1659,6 +1837,48 @@ export default function AdminDashboard({
                       🖥️ 실시간 웹 랜더링 미리보기
                     </span>
                     
+                    {contentSubTab === "identity" && (
+                      <div className="bg-brand-green text-white p-5 rounded-xl shadow-lg space-y-4 animate-fade-in">
+                        <span className="text-[10px] font-bold bg-white/10 px-2 py-0.5 rounded-full text-brand-accent inline-block">
+                          HEADER PREVIEW
+                        </span>
+                        
+                        {/* Header preview row */}
+                        <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-white p-1 flex items-center justify-center overflow-hidden">
+                              <img
+                                src={editingConfig.logoUrl || logoImg}
+                                alt="Logo"
+                                className="max-w-full max-h-full object-contain"
+                              />
+                            </div>
+                            <div>
+                              <span className="font-extrabold text-sm block leading-none text-white tracking-tight">
+                                {editingConfig.companyName || "BenePeople"}
+                              </span>
+                              <span className="text-[8px] font-bold text-gray-300 block tracking-tight mt-0.5">
+                                {editingConfig.companyLogoText || "(주)베네피플"}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          {/* Mock Nav links */}
+                          <div className="flex gap-2 text-[8px] font-bold text-gray-300">
+                            <span>소개</span>
+                            <span>비용비교</span>
+                            <span>ERP</span>
+                            <span>ESG</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5 pt-2 text-[10px] text-gray-300">
+                          <p className="font-bold text-white">상단 로고 & 회사 브랜드 실시간 연동</p>
+                          <p>좌측의 업로드 및 텍스트 수정 즉시 메인 화면 상단 헤더, 하단 푸터, 회사 소개 전 영역에 걸쳐 브랜드명이 전수 자동 변경 반영됩니다.</p>
+                        </div>
+                      </div>
+                    )}
+
                     {contentSubTab === "hero" && (
                       <div className="bg-brand-green text-white p-5 rounded-xl shadow-lg space-y-4">
                         <span className="text-[9px] font-bold bg-white/10 px-2 py-0.5 rounded-full text-brand-accent inline-block">{editingConfig.heroBadge}</span>

@@ -142,56 +142,61 @@ export default function App() {
   };
 
   const [homepageConfig, setHomepageConfig] = useState<HomepageConfig>(() => {
-    const saved = localStorage.getItem("bene_people_homepage_config");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved) as HomepageConfig;
-        if (parsed.heroSubtitle && parsed.heroSubtitle.includes("원스톱으로 무결점 안전 처리합니다")) {
-          parsed.heroSubtitle = parsed.heroSubtitle.replace("원스톱으로 무결점 안전 처리합니다", "원스톱으로 진행합니다");
+    try {
+      const saved = localStorage.getItem("bene_people_homepage_config");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved) as HomepageConfig;
+          const merged = { ...DEFAULT_HOMEPAGE_CONFIG, ...parsed };
+          if (merged.heroSubtitle && merged.heroSubtitle.includes("원스톱으로 무결점 안전 처리합니다")) {
+            merged.heroSubtitle = merged.heroSubtitle.replace("원스톱으로 무결점 안전 처리합니다", "원스톱으로 진행합니다");
+          }
+          if (merged.heroSubtitle && merged.heroSubtitle.includes("근태관리, 노무 행정까지")) {
+            merged.heroSubtitle = merged.heroSubtitle.replace("근태관리, 노무 행정까지", "근태관리,\n노무 행정까지");
+          }
+          if (merged.heroTitle && merged.heroTitle.includes("장애인 고용부담금 절감")) {
+            merged.heroTitle = merged.heroTitle.replace("장애인 고용부담금 절감", "장애인 고용부담금");
+          }
+          if (merged.heroBadge === "대한민국 1등 장애인 고용 솔루션 파트너" || merged.heroBadge === "장애인 고용 솔류션 파트너" || !merged.heroBadge) {
+            merged.heroBadge = "장애인 고용 솔루션 파트너";
+          }
+          if (merged.introPillar3Desc && merged.introPillar3Desc.includes("완벽 일임하여 완벽히 행정 부담을 덜어드립니다")) {
+            merged.introPillar3Desc = merged.introPillar3Desc.replace("완벽 일임하여 완벽히 행정 부담을 덜어드립니다", "일임하여 행정 부담을 덜어 드립니다");
+          }
+          if (merged.whyRiskTitle && (merged.whyRiskTitle.includes("장애인 고용 부재의 숨겨진 리스크") || merged.whyRiskTitle === "장애인 고용 부재의 숨겨진 리스크")) {
+            merged.whyRiskTitle = "장애인 고용 리스크";
+          }
+          if (merged.whyRiskDesc && (merged.whyRiskDesc.includes("많은 기업이 막대한 부담금을 매년 납부하면서도, 정작 실질적인 맞춤형 직무와 체계적인 재택근무 관리 방법을 찾지 못해 매월 깊은 고충을 격하게 겪고 있는") || merged.whyRiskDesc.includes("오늘날 대한민국 기업들의 냉정한 현실입니다"))) {
+            merged.whyRiskDesc = "많은 기업이 막대한 부담금을 매년 납부하면서 장애인 고용과 체계적인 관리 방법을 찾지 못해서 깊은 고충을 겪고 있습니다.";
+          }
+          if (merged.painDesc && (merged.painDesc.includes("장애인 고용에는 생각보다 복잡한 허들들이 다양하게 존재합니다") || merged.painDesc === "장애인 고용에는 생각보다 복잡한 허들들이 다양하게 존재합니다.")) {
+            merged.painDesc = "장애인 고용에는 생각보다 다양하고, 복잡한 문제가 존재합니다.";
+          }
+          if (merged.painCaution && merged.painCaution.includes("부담금은 매년 세금처럼 매달 일정하게 증가하고 있습니다")) {
+            merged.painCaution = merged.painCaution.replace("부담금은 매년 세금처럼 매달 일정하게 증가하고 있습니다", "부담금은 매년 세금처럼 증가하고 있습니다");
+          }
+          if (merged.pillarsDesc && merged.pillarsDesc.includes("기업별 맞춤형 솔루션을 완벽 제공합니다")) {
+            merged.pillarsDesc = merged.pillarsDesc.replace("기업별 맞춤형 솔루션을 완벽 제공합니다", "기업별 맞춤형 솔루션을 제공합니다");
+          }
+          if (merged.pillar1Title && merged.pillar1Title.includes("극적인 비용 절감 효과")) {
+            merged.pillar1Title = "비용 절감 효과";
+          }
+          if (merged.pillar2Title && merged.pillar2Title.includes("법무/노무 리스크 완전 배제")) {
+            merged.pillar2Title = "법무/노무 리스크 해소";
+          }
+          if (merged.pillar3Title && (merged.pillar3Title.includes("원스톱 스마트 운영 시스템") || merged.pillar3Title === "원스톱 스마트 운영 시스템")) {
+            merged.pillar3Title = "베네피플 Performance Dashbord";
+          }
+          if (merged.pillar3Sub && (merged.pillar3Sub.includes("기업 커스텀 고도화 웹&앱 모니터링 시스템 무상 지원") || merged.pillar3Sub.includes("웹&앱 모니터링 시스템") || merged.pillar3Sub === "기업 커스텀 고도화 웹&앱 모니터링 시스템 무상 지원")) {
+            merged.pillar3Sub = "매월 고객사에 운영 현황을 제공되는 리포트 시스템.";
+          }
+          return merged;
+        } catch (e) {
+          return DEFAULT_HOMEPAGE_CONFIG;
         }
-        if (parsed.heroSubtitle && parsed.heroSubtitle.includes("근태관리, 노무 행정까지")) {
-          parsed.heroSubtitle = parsed.heroSubtitle.replace("근태관리, 노무 행정까지", "근태관리,\n노무 행정까지");
-        }
-        if (parsed.heroTitle && parsed.heroTitle.includes("장애인 고용부담금 절감")) {
-          parsed.heroTitle = parsed.heroTitle.replace("장애인 고용부담금 절감", "장애인 고용부담금");
-        }
-        if (parsed.heroBadge === "대한민국 1등 장애인 고용 솔루션 파트너" || parsed.heroBadge === "장애인 고용 솔류션 파트너" || !parsed.heroBadge) {
-          parsed.heroBadge = "장애인 고용 솔루션 파트너";
-        }
-        if (parsed.introPillar3Desc && parsed.introPillar3Desc.includes("완벽 일임하여 완벽히 행정 부담을 덜어드립니다")) {
-          parsed.introPillar3Desc = parsed.introPillar3Desc.replace("완벽 일임하여 완벽히 행정 부담을 덜어드립니다", "일임하여 행정 부담을 덜어 드립니다");
-        }
-        if (parsed.whyRiskTitle && (parsed.whyRiskTitle.includes("장애인 고용 부재의 숨겨진 리스크") || parsed.whyRiskTitle === "장애인 고용 부재의 숨겨진 리스크")) {
-          parsed.whyRiskTitle = "장애인 고용 리스크";
-        }
-        if (parsed.whyRiskDesc && (parsed.whyRiskDesc.includes("많은 기업이 막대한 부담금을 매년 납부하면서도, 정작 실질적인 맞춤형 직무와 체계적인 재택근무 관리 방법을 찾지 못해 매월 깊은 고충을 격하게 겪고 있는") || parsed.whyRiskDesc.includes("오늘날 대한민국 기업들의 냉정한 현실입니다"))) {
-          parsed.whyRiskDesc = "많은 기업이 막대한 부담금을 매년 납부하면서 장애인 고용과 체계적인 관리 방법을 찾지 못해서 깊은 고충을 겪고 있습니다.";
-        }
-        if (parsed.painDesc && (parsed.painDesc.includes("장애인 고용에는 생각보다 복잡한 허들들이 다양하게 존재합니다") || parsed.painDesc === "장애인 고용에는 생각보다 복잡한 허들들이 다양하게 존재합니다.")) {
-          parsed.painDesc = "장애인 고용에는 생각보다 다양하고, 복잡한 문제가 존재합니다.";
-        }
-        if (parsed.painCaution && parsed.painCaution.includes("부담금은 매년 세금처럼 매달 일정하게 증가하고 있습니다")) {
-          parsed.painCaution = parsed.painCaution.replace("부담금은 매년 세금처럼 매달 일정하게 증가하고 있습니다", "부담금은 매년 세금처럼 증가하고 있습니다");
-        }
-        if (parsed.pillarsDesc && parsed.pillarsDesc.includes("기업별 맞춤형 솔루션을 완벽 제공합니다")) {
-          parsed.pillarsDesc = parsed.pillarsDesc.replace("기업별 맞춤형 솔루션을 완벽 제공합니다", "기업별 맞춤형 솔루션을 제공합니다");
-        }
-        if (parsed.pillar1Title && parsed.pillar1Title.includes("극적인 비용 절감 효과")) {
-          parsed.pillar1Title = "비용 절감 효과";
-        }
-        if (parsed.pillar2Title && parsed.pillar2Title.includes("법무/노무 리스크 완전 배제")) {
-          parsed.pillar2Title = "법무/노무 리스크 해소";
-        }
-        if (parsed.pillar3Title && (parsed.pillar3Title.includes("원스톱 스마트 운영 시스템") || parsed.pillar3Title === "원스톱 스마트 운영 시스템")) {
-          parsed.pillar3Title = "베네피플 Performance Dashbord";
-        }
-        if (parsed.pillar3Sub && (parsed.pillar3Sub.includes("기업 커스텀 고도화 웹&앱 모니터링 시스템 무상 지원") || parsed.pillar3Sub.includes("웹&앱 모니터링 시스템") || parsed.pillar3Sub === "기업 커스텀 고도화 웹&앱 모니터링 시스템 무상 지원")) {
-          parsed.pillar3Sub = "매월 고객사에 운영 현황을 제공되는 리포트 시스템.";
-        }
-        return parsed;
-      } catch (e) {
-        return DEFAULT_HOMEPAGE_CONFIG;
       }
+    } catch (err) {
+      console.warn("Could not read from localStorage on initialization:", err);
     }
     return DEFAULT_HOMEPAGE_CONFIG;
   });
@@ -203,7 +208,7 @@ export default function App() {
         const docRef = doc(db, "configs", "homepage");
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          const cloudConfig = docSnap.data() as HomepageConfig;
+          const cloudConfig = { ...DEFAULT_HOMEPAGE_CONFIG, ...docSnap.data() } as HomepageConfig;
           let changed = false;
           if (cloudConfig.heroSubtitle && cloudConfig.heroSubtitle.includes("원스톱으로 무결점 안전 처리합니다")) {
             cloudConfig.heroSubtitle = cloudConfig.heroSubtitle.replace("원스톱으로 무결점 안전 처리합니다", "원스톱으로 진행합니다");
@@ -266,7 +271,11 @@ export default function App() {
             await setDoc(docRef, cloudConfig);
           }
           setHomepageConfig(cloudConfig);
-          localStorage.setItem("bene_people_homepage_config", JSON.stringify(cloudConfig));
+          try {
+            localStorage.setItem("bene_people_homepage_config", JSON.stringify(cloudConfig));
+          } catch (e) {
+            console.warn("Could not save to localStorage on loadConfig:", e);
+          }
         }
       } catch (err) {
         console.warn("Could not load homepage config from Firestore, using local cache:", err);
@@ -277,7 +286,11 @@ export default function App() {
 
   const handleUpdateHomepageConfig = async (newConfig: HomepageConfig) => {
     setHomepageConfig(newConfig);
-    localStorage.setItem("bene_people_homepage_config", JSON.stringify(newConfig));
+    try {
+      localStorage.setItem("bene_people_homepage_config", JSON.stringify(newConfig));
+    } catch (e) {
+      console.warn("Could not save to localStorage on handleUpdateHomepageConfig:", e);
+    }
     try {
       const docRef = doc(db, "configs", "homepage");
       await setDoc(docRef, newConfig);
@@ -288,7 +301,11 @@ export default function App() {
 
   const handleResetHomepageConfig = async () => {
     setHomepageConfig(DEFAULT_HOMEPAGE_CONFIG);
-    localStorage.setItem("bene_people_homepage_config", JSON.stringify(DEFAULT_HOMEPAGE_CONFIG));
+    try {
+      localStorage.setItem("bene_people_homepage_config", JSON.stringify(DEFAULT_HOMEPAGE_CONFIG));
+    } catch (e) {
+      console.warn("Could not save to localStorage on handleResetHomepageConfig:", e);
+    }
     try {
       const docRef = doc(db, "configs", "homepage");
       await setDoc(docRef, DEFAULT_HOMEPAGE_CONFIG);
