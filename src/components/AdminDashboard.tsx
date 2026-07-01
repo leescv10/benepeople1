@@ -204,8 +204,8 @@ export default function AdminDashboard({
   // Load collections from Firestore or localStorage fallback on mount
   useEffect(() => {
     const loadAllData = async () => {
+      // 1. Load Companies
       try {
-        // 1. Load Companies
         const compRef = doc(db, "configs", "companies");
         const compSnap = await getDoc(compRef);
         let activeComps = [];
@@ -223,8 +223,18 @@ export default function AdminDashboard({
             } catch (e) {}
           }
         }
+      } catch (err) {
+        console.warn("Could not load companies from Firestore, using local cache:", err);
+        const savedComp = safeLocalStorage.getItem("bene_people_member_companies");
+        if (savedComp) {
+          try {
+            setCompanies(JSON.parse(savedComp));
+          } catch (e) {}
+        }
+      }
 
-        // 2. Load Employees
+      // 2. Load Employees
+      try {
         const empRef = doc(db, "configs", "employees");
         const empSnap = await getDoc(empRef);
         let activeEmps = [];
@@ -242,8 +252,18 @@ export default function AdminDashboard({
             } catch (e) {}
           }
         }
+      } catch (err) {
+        console.warn("Could not load employees from Firestore, using local cache:", err);
+        const savedEmp = safeLocalStorage.getItem("bene_people_company_employees");
+        if (savedEmp) {
+          try {
+            setDisabledEmployees(JSON.parse(savedEmp));
+          } catch (e) {}
+        }
+      }
 
-        // 3. Load Inquiries
+      // 3. Load Inquiries
+      try {
         const inqRef = doc(db, "configs", "inquiries");
         const inqSnap = await getDoc(inqRef);
         let activeInqs = [];
@@ -266,10 +286,20 @@ export default function AdminDashboard({
           }
         }
       } catch (err) {
-        console.warn("Could not load from Firestore, using local cache:", err);
-      } finally {
-        setDataLoaded(true);
+        console.warn("Could not load inquiries from Firestore, using local cache:", err);
+        const savedInq = safeLocalStorage.getItem("bene_people_inquiries");
+        if (savedInq) {
+          try {
+            setInquiries(JSON.parse(savedInq));
+          } catch (e) {
+            generateMockInquiries();
+          }
+        } else {
+          generateMockInquiries();
+        }
       }
+
+      setDataLoaded(true);
     };
     loadAllData();
   }, []);
