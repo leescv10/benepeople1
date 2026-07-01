@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Menu, X, ShieldAlert, LogIn, LogOut, LayoutDashboard } from "lucide-react";
-import logoImg from "../assets/images/benepeople_logo_1782496128774.jpg";
+import logoImg from "../assets/images/benepeople_new_logo_1782821338695.jpg";
 import { HomepageConfig } from "../types";
 
 interface HeaderProps {

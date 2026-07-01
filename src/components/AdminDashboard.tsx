@@ -28,7 +28,7 @@ import {
   Search
 } from "lucide-react";
 import { HomepageConfig, Inquiry } from "../types";
-import logoImg from "../assets/images/benepeople_logo_1782496128774.jpg";
+import logoImg from "../assets/images/benepeople_new_logo_1782821338695.jpg";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from "recharts";
 import { db } from "../lib/googleAuth";
 import { doc, getDoc, setDoc } from "firebase/firestore";

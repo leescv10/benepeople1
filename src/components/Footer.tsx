@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Shield, Sparkles } from "lucide-react";
-import logoImg from "../assets/images/benepeople_logo_1782496128774.jpg";
+import logoImg from "../assets/images/benepeople_new_logo_1782821338695.jpg";
 import { HomepageConfig } from "../types";
 import { AnimatePresence } from "motion/react";
 import TermsModal from "./TermsModal";
