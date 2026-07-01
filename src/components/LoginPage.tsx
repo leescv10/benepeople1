@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { LogIn, ShieldCheck, Mail, Lock, ArrowLeft, Building2, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { LogIn, ShieldCheck, Mail, Lock, ArrowLeft, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { db } from "../lib/googleAuth";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 
@@ -18,7 +18,6 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
   const [rememberMe, setRememberMe] = useState(false);
   
   const [companies, setCompanies] = useState<any[]>([]);
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string>("comp-1"); // Default to comp-1 or admin
 
   // Fetch registered companies on mount with real-time updates
   useEffect(() => {
@@ -28,14 +27,6 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
         if (snap.exists()) {
           const list = snap.data().list || [];
           setCompanies(list);
-          if (list.length > 0) {
-            const hasComp1 = list.some((c: any) => c.id === "comp-1");
-            if (hasComp1) {
-              setSelectedCompanyId("comp-1");
-            } else {
-              setSelectedCompanyId(list[0].id);
-            }
-          }
         } else {
           // Fallback to local
           const savedComp = localStorage.getItem("bene_people_member_companies");
@@ -43,9 +34,6 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
             try {
               const list = JSON.parse(savedComp);
               setCompanies(list);
-              if (list.length > 0) {
-                setSelectedCompanyId(list[0].id);
-              }
             } catch (e) {}
           }
         }
@@ -74,34 +62,52 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
     setTimeout(() => {
       setLoading(false);
       
+      const cleanedEmail = email.toLowerCase().trim();
+
       // Explicit Admin Check
-      if (selectedCompanyId === "admin-mode" || email === "admins") {
-        if (email === "admins" && password === "chon1092!!") {
+      if (cleanedEmail === "admins") {
+        if (password === "chon1092!!") {
           onLoginSuccess("최고관리자 (ADMIN)");
         } else {
           setError("최고관리자 로그인 정보가 올바르지 않습니다. (ID: admins / PW: chon1092!!)");
         }
-      } else {
-        // Find company name by selectedCompanyId
-        const matchedComp = companies.find((c: any) => c.id === selectedCompanyId);
-        if (matchedComp) {
-          if (password.length >= 6) {
-            onLoginSuccess(matchedComp.name);
-          } else {
-            setError("비밀번호는 최소 6자리 이상이어야 합니다.");
-          }
+        return;
+      }
+
+      // Try to find a matching company from the loaded companies list
+      let matchedComp = companies.find((c: any) => {
+        const nameCleaned = c.name.toLowerCase().replace(/[^a-zA-Z0-9가-힣]/g, "");
+        const codeCleaned = c.code.toLowerCase().replace(/[^a-zA-Z0-9]/g, "");
+        
+        if (cleanedEmail.includes("benepeople") && (c.id === "comp-1" || c.name.includes("베네피플"))) return true;
+        if (cleanedEmail.includes("esgcorp") && (c.id === "comp-2" || c.name.includes("ESG"))) return true;
+        if (codeCleaned && cleanedEmail.includes(codeCleaned)) return true;
+        if (nameCleaned && cleanedEmail.includes(nameCleaned)) return true;
+        return false;
+      });
+
+      // Special check for hardcoded defaults
+      if (!matchedComp) {
+        if (cleanedEmail === "admin@benepeople.com") {
+          matchedComp = { id: "comp-1", name: "(주)베네피플 일렉트릭" };
+        } else if (cleanedEmail === "partner@esgcorp.kr") {
+          matchedComp = { id: "comp-2", name: "ESG 환경코퍼레이션" };
+        }
+      }
+
+      if (matchedComp) {
+        if (password.length >= 6) {
+          onLoginSuccess(matchedComp.name);
         } else {
-          // Fallback mapping if companies aren't fully loaded or fallback behaves differently
-          if (
-            (email === "admin@benepeople.com" && password === "benepeople1234") ||
-            (email === "partner@esgcorp.kr" && password === "esgpartner77") ||
-            (email !== "admins" && password.length >= 6)
-          ) {
-            const company = email.includes("esgcorp") ? "ESG 환경코퍼레이션" : "(주)베네피플 일렉트릭";
-            onLoginSuccess(company);
-          } else {
-            setError("일치하는 계정 정보가 없습니다. 아이디와 비밀번호를 다시 확인해 주세요.");
-          }
+          setError("비밀번호는 최소 6자리 이상이어야 합니다.");
+        }
+      } else {
+        // Fallback matching if email contains certain keywords
+        if (password.length >= 6) {
+          const isEsg = cleanedEmail.includes("esg");
+          onLoginSuccess(isEsg ? "ESG 환경코퍼레이션" : "(주)베네피플 일렉트릭");
+        } else {
+          setError("일치하는 계정 정보가 없습니다. 아이디와 비밀번호를 다시 확인해 주세요.");
         }
       }
     }, 1200);
@@ -141,7 +147,7 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
               B
             </div>
             <h2 className="text-xl sm:text-2xl font-extrabold text-brand-green">
-              회원사 전용 로그인
+              관리자 전용 로그인
             </h2>
             <p className="text-xs text-gray-400 mt-2 leading-relaxed">
               (주)베네피플의 차세대 통합 근태 및 행정 위탁 시스템에 오신 것을 정중히 환영합니다.
@@ -149,45 +155,6 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Company Selector Dropdown */}
-            <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
-                회원사 및 로그인 유형 선택
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                  <Building2 className="w-4 h-4 text-brand-lightgreen" />
-                </div>
-                <select
-                  value={selectedCompanyId}
-                  onChange={(e) => {
-                    setSelectedCompanyId(e.target.value);
-                    setError(null);
-                  }}
-                  className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-brand-lightgreen focus:border-transparent outline-none text-xs sm:text-sm font-medium transition appearance-none cursor-pointer"
-                  disabled={loading}
-                >
-                  <option value="admin-mode">최고관리자 (ADMIN)</option>
-                  {companies.map((c: any) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name} ({c.code})
-                    </option>
-                  ))}
-                  {companies.length === 0 && (
-                    <>
-                      <option value="comp-1">(주)베네피플 일렉트릭 (BPE-01)</option>
-                      <option value="comp-2">ESG 환경코퍼레이션 (ESG-02)</option>
-                    </>
-                  )}
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-gray-400">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
             {/* Email / ID Field */}
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
@@ -205,7 +172,7 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
                     setEmail(e.target.value);
                     setError(null);
                   }}
-                  placeholder="name@company.com 또는 admins"
+                  placeholder=""
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen focus:border-transparent outline-none text-xs sm:text-sm font-medium transition"
                   disabled={loading}
                 />
@@ -282,12 +249,12 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  <span>회원사 계정 보안 인증 중...</span>
+                  <span>관리자 계정 보안 인증 중...</span>
                 </>
               ) : (
                 <>
                   <LogIn className="w-4 h-4" />
-                  <span>회원사 로그인 완료</span>
+                  <span>로그인 완료</span>
                 </>
               )}
             </button>
