@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import { LogIn, ShieldCheck, Mail, Lock, ArrowLeft, Building2, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { AuthError, login } from "@netlify/identity";
 
 interface LoginPageProps {
   onClose: () => void;
@@ -15,18 +16,17 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleDemoFill = (type: "demo1" | "demo2") => {
-    if (type === "demo1") {
-      setEmail("admin@benepeople.com");
-      setPassword("benepeople1234");
-    } else {
-      setEmail("partner@esgcorp.kr");
-      setPassword("esgpartner77");
-    }
-    setError(null);
+  const isAdminUser = (user: any) => {
+    const roles = [
+      ...(user?.appMetadata?.roles || []),
+      ...(user?.app_metadata?.roles || []),
+      ...(user?.userMetadata?.roles || []),
+      ...(user?.user_metadata?.roles || []),
+    ];
+    return roles.includes("admin") || roles.includes("super_admin");
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -37,24 +37,24 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
 
     setLoading(true);
 
-    // Simulate authenticating server call
-    setTimeout(() => {
-      setLoading(false);
-      
-      // Explicit Admin Check
-      if (email === "admins" && password === "chon1092!!") {
+    try {
+      const user = await login(email, password);
+      if (isAdminUser(user)) {
         onLoginSuccess("최고관리자 (ADMIN)");
-      } else if (
-        (email === "admin@benepeople.com" && password === "benepeople1234") ||
-        (email === "partner@esgcorp.kr" && password === "esgpartner77") ||
-        (email !== "admins" && password.length >= 6)
-      ) {
-        const company = email.includes("esgcorp") ? "ESG 환경코퍼레이션" : "(주)베네피플 일렉트릭";
-        onLoginSuccess(company);
-      } else {
-        setError("일치하는 계정 정보가 없습니다. 아이디와 비밀번호를 다시 확인해 주세요. (관리자 아이디: admins / 패스워드: chon1092!!)");
+        return;
       }
-    }, 1200);
+
+      const company = (user as any)?.userMetadata?.companyName || user?.email || "회원사";
+      onLoginSuccess(company);
+    } catch (err) {
+      if (err instanceof AuthError) {
+        setError(err.status === 401 ? "아이디 또는 비밀번호가 올바르지 않습니다." : err.message);
+      } else {
+        setError("로그인 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -116,7 +116,7 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
                     setEmail(e.target.value);
                     setError(null);
                   }}
-                  placeholder="name@company.com 또는 admins"
+                  placeholder="name@company.com"
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-lightgreen focus:border-transparent outline-none text-xs sm:text-sm font-medium transition"
                   disabled={loading}
                 />
@@ -204,32 +204,14 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
             </button>
           </form>
 
-          {/* Quick Demo Accounts Helper */}
           <div className="mt-8 border-t border-gray-100 pt-6">
             <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-400 mb-3">
               <Building2 className="w-3.5 h-3.5 text-brand-lightgreen" />
-              <span>간편 데모 체험용 로그인 계정</span>
+              <span>관리자 계정 안내</span>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleDemoFill("demo1")}
-                className="text-left bg-gray-50 hover:bg-brand-lightgreen/5 border border-gray-200 hover:border-brand-lightgreen/30 p-2.5 rounded-lg text-[10px] text-gray-600 transition"
-              >
-                <strong className="block text-brand-green font-bold">1번 데모 회원사</strong>
-                admin@benepeople.com
-                <span className="block text-[9px] text-gray-400 mt-0.5">PW: benepeople1234</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleDemoFill("demo2")}
-                className="text-left bg-gray-50 hover:bg-brand-lightgreen/5 border border-gray-200 hover:border-brand-lightgreen/30 p-2.5 rounded-lg text-[10px] text-gray-600 transition"
-              >
-                <strong className="block text-brand-green font-bold">2번 데모 회원사</strong>
-                partner@esgcorp.kr
-                <span className="block text-[9px] text-gray-400 mt-0.5">PW: esgpartner77</span>
-              </button>
-            </div>
+            <p className="bg-gray-50 border border-gray-200 p-3 rounded-lg text-[11px] text-gray-500 leading-relaxed">
+              Netlify Identity에서 <strong className="text-brand-green">admin</strong> 또는 <strong className="text-brand-green">super_admin</strong> 역할이 부여된 계정만 홈페이지 수정 화면에 접근할 수 있습니다.
+            </p>
           </div>
 
           <p className="text-center text-[11px] text-gray-400 mt-6 leading-relaxed">

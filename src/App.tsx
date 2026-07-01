@@ -17,8 +17,8 @@ import TermsModal from "./components/TermsModal";
 import AdminDashboard from "./components/AdminDashboard";
 import { HomepageConfig } from "./types";
 import Background3D from "./components/Background3D";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "./lib/googleAuth";
+import { getUser, handleAuthCallback, logout } from "@netlify/identity";
+import { fetchHomepageConfig, saveHomepageConfig } from "./lib/homepageApi";
 
 const DEFAULT_HOMEPAGE_CONFIG: HomepageConfig = {
   heroBadge: "장애인 고용 솔루션 파트너",
@@ -205,10 +205,9 @@ export default function App() {
   useEffect(() => {
     const loadConfig = async () => {
       try {
-        const docRef = doc(db, "configs", "homepage");
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const cloudConfig = { ...DEFAULT_HOMEPAGE_CONFIG, ...docSnap.data() } as HomepageConfig;
+        const savedConfig = await fetchHomepageConfig();
+        if (savedConfig) {
+          const cloudConfig = { ...DEFAULT_HOMEPAGE_CONFIG, ...savedConfig } as HomepageConfig;
           let changed = false;
           if (cloudConfig.heroSubtitle && cloudConfig.heroSubtitle.includes("원스톱으로 무결점 안전 처리합니다")) {
             cloudConfig.heroSubtitle = cloudConfig.heroSubtitle.replace("원스톱으로 무결점 안전 처리합니다", "원스톱으로 진행합니다");
@@ -266,10 +265,6 @@ export default function App() {
             cloudConfig.pillar3Sub = "매월 고객사에 운영 현황을 제공되는 리포트 시스템.";
             changed = true;
           }
-          if (changed) {
-            // Sync the updated config back to Firestore
-            await setDoc(docRef, cloudConfig);
-          }
           setHomepageConfig(cloudConfig);
           try {
             localStorage.setItem("bene_people_homepage_config", JSON.stringify(cloudConfig));
@@ -278,10 +273,31 @@ export default function App() {
           }
         }
       } catch (err) {
-        console.warn("Could not load homepage config from Firestore, using local cache:", err);
+        console.warn("Could not load homepage config from Netlify Database, using local cache:", err);
       }
     };
     loadConfig();
+  }, []);
+
+  useEffect(() => {
+    const syncIdentitySession = async () => {
+      try {
+        await handleAuthCallback();
+        const user = await getUser();
+        const roles = [
+          ...((user as any)?.appMetadata?.roles || []),
+          ...((user as any)?.app_metadata?.roles || []),
+          ...((user as any)?.userMetadata?.roles || []),
+          ...((user as any)?.user_metadata?.roles || []),
+        ];
+        if (user && (roles.includes("admin") || roles.includes("super_admin"))) {
+          setLoggedInCompany("최고관리자 (ADMIN)");
+        }
+      } catch (err) {
+        console.warn("Could not restore Netlify Identity session:", err);
+      }
+    };
+    syncIdentitySession();
   }, []);
 
   const handleUpdateHomepageConfig = async (newConfig: HomepageConfig) => {
@@ -292,10 +308,10 @@ export default function App() {
       console.warn("Could not save to localStorage on handleUpdateHomepageConfig:", e);
     }
     try {
-      const docRef = doc(db, "configs", "homepage");
-      await setDoc(docRef, newConfig);
+      await saveHomepageConfig(newConfig);
     } catch (err) {
-      console.error("Could not save homepage config to Firestore:", err);
+      console.error("Could not save homepage config to Netlify Database:", err);
+      throw err;
     }
   };
 
@@ -307,14 +323,19 @@ export default function App() {
       console.warn("Could not save to localStorage on handleResetHomepageConfig:", e);
     }
     try {
-      const docRef = doc(db, "configs", "homepage");
-      await setDoc(docRef, DEFAULT_HOMEPAGE_CONFIG);
+      await saveHomepageConfig(DEFAULT_HOMEPAGE_CONFIG);
     } catch (err) {
-      console.error("Could not reset homepage config in Firestore:", err);
+      console.error("Could not reset homepage config in Netlify Database:", err);
+      throw err;
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (err) {
+      console.warn("Could not clear Netlify Identity session:", err);
+    }
     setLoggedInCompany(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
