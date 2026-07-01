@@ -60,8 +60,8 @@ const safeLocalStorage = {
 
 interface AdminDashboardProps {
   homepageConfig: HomepageConfig;
-  onUpdateHomepageConfig: (newConfig: HomepageConfig) => void;
-  onResetHomepageConfig: () => void;
+  onUpdateHomepageConfig: (newConfig: HomepageConfig) => Promise<void>;
+  onResetHomepageConfig: () => Promise<void>;
 }
 
 export default function AdminDashboard({
@@ -73,6 +73,8 @@ export default function AdminDashboard({
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [editingConfig, setEditingConfig] = useState<HomepageConfig>({ ...homepageConfig });
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [isSavingHomepage, setIsSavingHomepage] = useState(false);
   const [contentSubTab, setContentSubTab] = useState<"identity" | "hero" | "intro" | "why" | "pain">("identity");
   const [dragOverLogo, setDragOverLogo] = useState(false);
 
@@ -810,19 +812,41 @@ export default function AdminDashboard({
     }
   };
 
-  const handleSaveHomepageConfig = () => {
-    playCheerfulChime();
-    onUpdateHomepageConfig(editingConfig);
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 3000);
-  };
+  const handleSaveHomepageConfig = async () => {
+    setIsSavingHomepage(true);
+    setSaveError("");
+    setSaveSuccess(false);
 
-  const handleRestoreDefaults = () => {
-    if (confirm("홈페이지 텍스트를 초기 기획 사양으로 복구하시겠습니까?")) {
+    try {
+      await onUpdateHomepageConfig(editingConfig);
       playCheerfulChime();
-      onResetHomepageConfig();
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error) {
+      console.error("Homepage config save failed:", error);
+      setSaveError("저장에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+    } finally {
+      setIsSavingHomepage(false);
+    }
+  };
+
+  const handleRestoreDefaults = async () => {
+    if (confirm("홈페이지 텍스트를 초기 기획 사양으로 복구하시겠습니까?")) {
+      setIsSavingHomepage(true);
+      setSaveError("");
+      setSaveSuccess(false);
+
+      try {
+        await onResetHomepageConfig();
+        playCheerfulChime();
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3000);
+      } catch (error) {
+        console.error("Homepage config reset failed:", error);
+        setSaveError("기본 사양 복원 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+      } finally {
+        setIsSavingHomepage(false);
+      }
     }
   };
 
@@ -1259,6 +1283,17 @@ export default function AdminDashboard({
               >
                 <CheckCircle className="w-4 h-4 text-emerald-500" />
                 <span>성공적으로 저장되었습니다! 홈페이지 및 랜딩 화면에 변경사항이 영구 반영되었습니다.</span>
+              </motion.div>
+            )}
+
+            {saveError && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-red-50 border border-red-100 p-4 rounded-xl text-red-700 text-xs flex items-center gap-2"
+              >
+                <XCircle className="w-4 h-4 text-red-500" />
+                <span>{saveError}</span>
               </motion.div>
             )}
 
@@ -1960,6 +1995,7 @@ export default function AdminDashboard({
             <div className="flex justify-between items-center pt-6 border-t border-gray-100">
               <button
                 onClick={handleRestoreDefaults}
+                disabled={isSavingHomepage}
                 className="px-4 py-2.5 border border-red-200 hover:bg-red-50 text-red-600 font-bold text-xs rounded-xl flex items-center gap-1.5 transition"
               >
                 <RotateCcw className="w-4 h-4" />
@@ -1968,10 +2004,11 @@ export default function AdminDashboard({
               
               <button
                 onClick={handleSaveHomepageConfig}
-                className="bg-[#073B31] hover:bg-emerald-800 text-white font-bold text-xs px-5 py-3 rounded-xl flex items-center gap-2 transition shadow-md"
+                disabled={isSavingHomepage}
+                className="bg-[#073B31] hover:bg-emerald-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold text-xs px-5 py-3 rounded-xl flex items-center gap-2 transition shadow-md"
               >
                 <Save className="w-4 h-4" />
-                수정 문구 저장 및 즉시 반영
+                {isSavingHomepage ? "저장 중..." : "수정 문구 저장 및 즉시 반영"}
               </button>
             </div>
           </motion.div>
