@@ -17,8 +17,6 @@ import TermsModal from "./components/TermsModal";
 import AdminDashboard from "./components/AdminDashboard";
 import { HomepageConfig } from "./types";
 import Background3D from "./components/Background3D";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "./lib/googleAuth";
 
 const DEFAULT_HOMEPAGE_CONFIG: HomepageConfig = {
   heroBadge: "장애인 고용 솔루션 파트너",
@@ -201,14 +199,18 @@ export default function App() {
     return DEFAULT_HOMEPAGE_CONFIG;
   });
 
-  // Load config from Firestore on mount
+  // Load config from the shared Netlify Database-backed API on mount.
   useEffect(() => {
     const loadConfig = async () => {
       try {
-        const docRef = doc(db, "configs", "homepage");
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const cloudConfig = { ...DEFAULT_HOMEPAGE_CONFIG, ...docSnap.data() } as HomepageConfig;
+        const response = await fetch("/api/homepage-config", { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`Homepage config API responded with ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.config) {
+          const cloudConfig = { ...DEFAULT_HOMEPAGE_CONFIG, ...data.config } as HomepageConfig;
           let changed = false;
           if (cloudConfig.heroSubtitle && cloudConfig.heroSubtitle.includes("원스톱으로 무결점 안전 처리합니다")) {
             cloudConfig.heroSubtitle = cloudConfig.heroSubtitle.replace("원스톱으로 무결점 안전 처리합니다", "원스톱으로 진행합니다");
@@ -267,8 +269,11 @@ export default function App() {
             changed = true;
           }
           if (changed) {
-            // Sync the updated config back to Firestore
-            await setDoc(docRef, cloudConfig);
+            await fetch("/api/homepage-config", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ config: cloudConfig }),
+            });
           }
           setHomepageConfig(cloudConfig);
           try {
@@ -278,40 +283,35 @@ export default function App() {
           }
         }
       } catch (err) {
-        console.warn("Could not load homepage config from Firestore, using local cache:", err);
+        console.warn("Could not load homepage config from the server, using local cache:", err);
       }
     };
     loadConfig();
   }, []);
 
   const handleUpdateHomepageConfig = async (newConfig: HomepageConfig) => {
-    setHomepageConfig(newConfig);
+    const response = await fetch("/api/homepage-config", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ config: newConfig }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Homepage config save failed with ${response.status}`);
+    }
+
+    const data = await response.json();
+    const savedConfig = { ...DEFAULT_HOMEPAGE_CONFIG, ...(data.config || newConfig) } as HomepageConfig;
+    setHomepageConfig(savedConfig);
     try {
-      localStorage.setItem("bene_people_homepage_config", JSON.stringify(newConfig));
+      localStorage.setItem("bene_people_homepage_config", JSON.stringify(savedConfig));
     } catch (e) {
       console.warn("Could not save to localStorage on handleUpdateHomepageConfig:", e);
-    }
-    try {
-      const docRef = doc(db, "configs", "homepage");
-      await setDoc(docRef, newConfig);
-    } catch (err) {
-      console.error("Could not save homepage config to Firestore:", err);
     }
   };
 
   const handleResetHomepageConfig = async () => {
-    setHomepageConfig(DEFAULT_HOMEPAGE_CONFIG);
-    try {
-      localStorage.setItem("bene_people_homepage_config", JSON.stringify(DEFAULT_HOMEPAGE_CONFIG));
-    } catch (e) {
-      console.warn("Could not save to localStorage on handleResetHomepageConfig:", e);
-    }
-    try {
-      const docRef = doc(db, "configs", "homepage");
-      await setDoc(docRef, DEFAULT_HOMEPAGE_CONFIG);
-    } catch (err) {
-      console.error("Could not reset homepage config in Firestore:", err);
-    }
+    await handleUpdateHomepageConfig(DEFAULT_HOMEPAGE_CONFIG);
   };
 
   const handleLogout = () => {
