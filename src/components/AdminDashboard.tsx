@@ -1867,7 +1867,7 @@ export default function AdminDashboard({
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-lg bg-white p-1 flex items-center justify-center overflow-hidden">
                               <img
-                                src={editingConfig.logoUrl || logoImg}
+                                src={(editingConfig.logoUrl && !editingConfig.logoUrl.includes("benepeople_logo")) ? editingConfig.logoUrl : logoImg}
                                 alt="Logo"
                                 className="max-w-full max-h-full object-contain"
                               />

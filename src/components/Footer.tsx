@@ -23,7 +23,7 @@ export default function Footer({ config, onOpenTerms }: FooterProps) {
     }
   };
 
-  const logoSource = config?.logoUrl || logoImg;
+  const logoSource = (config?.logoUrl && !config.logoUrl.includes("benepeople_logo")) ? config.logoUrl : logoImg;
   const companyNameText = config?.companyName || "BenePeople";
   const companyLogoSubtext = config?.companyLogoText || "(주)베네피플";
   const slogan = config?.footerSlogan || "장애인 인재 채용부터 고용부담금 처리, 전용 근태시스템 무상 제공까지 — 베네피플이 채용 · 운영의 전 과정을 완벽히 책임지고 동행합니다.";

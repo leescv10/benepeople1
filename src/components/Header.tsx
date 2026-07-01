@@ -47,7 +47,7 @@ export default function Header({ onLoginClick, loggedInCompany, onLogout, config
     }
   };
 
-  const logoSource = config?.logoUrl || logoImg;
+  const logoSource = (config?.logoUrl && !config.logoUrl.includes("benepeople_logo")) ? config.logoUrl : logoImg;
   const companyNameText = config?.companyName || "BenePeople";
   const companyLogoSubtext = config?.companyLogoText || "(주)베네피플";
 
