@@ -394,7 +394,7 @@ export default function App() {
                   onClick={() => {
                     setBadgeClicks(prev => {
                       const next = prev + 1;
-                      if (next >= 5) {
+                      if (next >= 10) {
                         setShowLogin(true);
                         return 0;
                       }
