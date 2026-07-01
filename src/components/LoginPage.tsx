@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { LogIn, ShieldCheck, Mail, Lock, ArrowLeft, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { db } from "../lib/googleAuth";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import logoImg from "../assets/images/benepeople_new_logo_1782821338695.jpg";
 
 interface LoginPageProps {
   onClose: () => void;
@@ -143,8 +144,13 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
         {/* Content Body */}
         <div className="p-6 sm:p-8">
           <div className="text-center mb-8">
-            <div className="w-12 h-12 bg-brand-green text-white rounded-xl flex items-center justify-center text-xl font-black mx-auto shadow-md mb-4">
-              B
+            <div className="flex justify-center mb-4">
+              <img
+                src={logoImg}
+                alt="Logo"
+                className="h-16 w-auto object-contain rounded-xl"
+                referrerPolicy="no-referrer"
+              />
             </div>
             <h2 className="text-xl sm:text-2xl font-extrabold text-brand-green">
               관리자 전용 로그인
