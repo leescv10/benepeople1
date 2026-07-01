@@ -17,7 +17,7 @@ import TermsModal from "./components/TermsModal";
 import AdminDashboard from "./components/AdminDashboard";
 import { HomepageConfig } from "./types";
 import Background3D from "./components/Background3D";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
 import { db } from "./lib/googleAuth";
 
 const DEFAULT_HOMEPAGE_CONFIG: HomepageConfig = {
@@ -219,12 +219,11 @@ export default function App() {
     return cleanBenePeopleObj(DEFAULT_HOMEPAGE_CONFIG);
   });
 
-  // Load config from Firestore on mount
+  // Load config from Firestore on mount with real-time updates
   useEffect(() => {
-    const loadConfig = async () => {
+    const docRef = doc(db, "configs", "homepage");
+    const unsubscribe = onSnapshot(docRef, async (docSnap) => {
       try {
-        const docRef = doc(db, "configs", "homepage");
-        const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const cloudConfig = { ...DEFAULT_HOMEPAGE_CONFIG, ...docSnap.data() } as HomepageConfig;
           let changed = false;
@@ -286,7 +285,6 @@ export default function App() {
           }
           const cleanedCloudConfig = cleanBenePeopleObj(cloudConfig);
           if (changed) {
-            // Sync the updated config back to Firestore
             await setDoc(docRef, cleanedCloudConfig);
           }
           setHomepageConfig(cleanedCloudConfig);
@@ -297,10 +295,13 @@ export default function App() {
           }
         }
       } catch (err) {
-        console.warn("Could not load homepage config from Firestore, using local cache:", err);
+        console.warn("Could not process real-time homepage config snapshot:", err);
       }
-    };
-    loadConfig();
+    }, (error) => {
+      console.error("onSnapshot failed for homepage config:", error);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const handleUpdateHomepageConfig = async (newConfig: HomepageConfig) => {

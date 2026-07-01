@@ -31,7 +31,7 @@ import { HomepageConfig, Inquiry } from "../types";
 import logoImg from "../assets/images/benepeople_new_logo_1782821338695.jpg";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from "recharts";
 import { db } from "../lib/googleAuth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
 
 const safeLocalStorage = {
   getItem(key: string): string | null {
@@ -201,30 +201,17 @@ export default function AdminDashboard({
   // Handle saving states
   const [dataLoaded, setDataLoaded] = useState(false);
 
-  // Load collections from Firestore or localStorage fallback on mount
+  // Load collections from Firestore in real-time
   useEffect(() => {
-    const loadAllData = async () => {
-      // 1. Load Companies
-      try {
-        const compRef = doc(db, "configs", "companies");
-        const compSnap = await getDoc(compRef);
-        let activeComps = [];
-        if (compSnap.exists()) {
-          activeComps = compSnap.data().list || [];
-          setCompanies(activeComps);
-          safeLocalStorage.setItem("bene_people_member_companies", JSON.stringify(activeComps));
-        } else {
-          // Fallback to local
-          const savedComp = safeLocalStorage.getItem("bene_people_member_companies");
-          if (savedComp) {
-            try {
-              activeComps = JSON.parse(savedComp);
-              setCompanies(activeComps);
-            } catch (e) {}
-          }
-        }
-      } catch (err) {
-        console.warn("Could not load companies from Firestore, using local cache:", err);
+    // 1. Listen to Companies
+    const compRef = doc(db, "configs", "companies");
+    const unsubCompanies = onSnapshot(compRef, (snap) => {
+      if (snap.exists()) {
+        const list = snap.data().list || [];
+        setCompanies(list);
+        safeLocalStorage.setItem("bene_people_member_companies", JSON.stringify(list));
+      } else {
+        // Fallback to local
         const savedComp = safeLocalStorage.getItem("bene_people_member_companies");
         if (savedComp) {
           try {
@@ -232,28 +219,19 @@ export default function AdminDashboard({
           } catch (e) {}
         }
       }
+      setDataLoaded(true);
+    }, (err) => {
+      console.warn("onSnapshot failed for companies:", err);
+    });
 
-      // 2. Load Employees
-      try {
-        const empRef = doc(db, "configs", "employees");
-        const empSnap = await getDoc(empRef);
-        let activeEmps = [];
-        if (empSnap.exists()) {
-          activeEmps = empSnap.data().list || [];
-          setDisabledEmployees(activeEmps);
-          safeLocalStorage.setItem("bene_people_company_employees", JSON.stringify(activeEmps));
-        } else {
-          // Fallback to local
-          const savedEmp = safeLocalStorage.getItem("bene_people_company_employees");
-          if (savedEmp) {
-            try {
-              activeEmps = JSON.parse(savedEmp);
-              setDisabledEmployees(activeEmps);
-            } catch (e) {}
-          }
-        }
-      } catch (err) {
-        console.warn("Could not load employees from Firestore, using local cache:", err);
+    // 2. Listen to Employees
+    const empRef = doc(db, "configs", "employees");
+    const unsubEmployees = onSnapshot(empRef, (snap) => {
+      if (snap.exists()) {
+        const list = snap.data().list || [];
+        setDisabledEmployees(list);
+        safeLocalStorage.setItem("bene_people_company_employees", JSON.stringify(list));
+      } else {
         const savedEmp = safeLocalStorage.getItem("bene_people_company_employees");
         if (savedEmp) {
           try {
@@ -261,32 +239,18 @@ export default function AdminDashboard({
           } catch (e) {}
         }
       }
+    }, (err) => {
+      console.warn("onSnapshot failed for employees:", err);
+    });
 
-      // 3. Load Inquiries
-      try {
-        const inqRef = doc(db, "configs", "inquiries");
-        const inqSnap = await getDoc(inqRef);
-        let activeInqs = [];
-        if (inqSnap.exists()) {
-          activeInqs = inqSnap.data().list || [];
-          setInquiries(activeInqs);
-          safeLocalStorage.setItem("bene_people_inquiries", JSON.stringify(activeInqs));
-        } else {
-          // Fallback to local
-          const savedInq = safeLocalStorage.getItem("bene_people_inquiries");
-          if (savedInq) {
-            try {
-              activeInqs = JSON.parse(savedInq);
-              setInquiries(activeInqs);
-            } catch (e) {
-              generateMockInquiries();
-            }
-          } else {
-            generateMockInquiries();
-          }
-        }
-      } catch (err) {
-        console.warn("Could not load inquiries from Firestore, using local cache:", err);
+    // 3. Listen to Inquiries
+    const inqRef = doc(db, "configs", "inquiries");
+    const unsubInquiries = onSnapshot(inqRef, (snap) => {
+      if (snap.exists()) {
+        const list = snap.data().list || [];
+        setInquiries(list);
+        safeLocalStorage.setItem("bene_people_inquiries", JSON.stringify(list));
+      } else {
         const savedInq = safeLocalStorage.getItem("bene_people_inquiries");
         if (savedInq) {
           try {
@@ -298,10 +262,15 @@ export default function AdminDashboard({
           generateMockInquiries();
         }
       }
+    }, (err) => {
+      console.warn("onSnapshot failed for inquiries:", err);
+    });
 
-      setDataLoaded(true);
+    return () => {
+      unsubCompanies();
+      unsubEmployees();
+      unsubInquiries();
     };
-    loadAllData();
   }, []);
 
   // Save changes to Firestore and localStorage

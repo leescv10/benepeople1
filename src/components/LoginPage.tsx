@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { LogIn, ShieldCheck, Mail, Lock, ArrowLeft, Building2, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { db } from "../lib/googleAuth";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 
 interface LoginPageProps {
   onClose: () => void;
@@ -14,12 +16,60 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
+  
+  const [companies, setCompanies] = useState<any[]>([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>("comp-1"); // Default to comp-1 or admin
 
-  const handleDemoFill = (type: "demo1" | "demo2") => {
-    if (type === "demo1") {
+  // Fetch registered companies on mount with real-time updates
+  useEffect(() => {
+    const compRef = doc(db, "configs", "companies");
+    const unsubscribe = onSnapshot(compRef, (snap) => {
+      try {
+        if (snap.exists()) {
+          const list = snap.data().list || [];
+          setCompanies(list);
+          if (list.length > 0) {
+            const hasComp1 = list.some((c: any) => c.id === "comp-1");
+            if (hasComp1) {
+              setSelectedCompanyId("comp-1");
+            } else {
+              setSelectedCompanyId(list[0].id);
+            }
+          }
+        } else {
+          // Fallback to local
+          const savedComp = localStorage.getItem("bene_people_member_companies");
+          if (savedComp) {
+            try {
+              const list = JSON.parse(savedComp);
+              setCompanies(list);
+              if (list.length > 0) {
+                setSelectedCompanyId(list[0].id);
+              }
+            } catch (e) {}
+          }
+        }
+      } catch (err) {
+        console.warn("Could not process companies snapshot in LoginPage:", err);
+      }
+    }, (error) => {
+      console.error("onSnapshot failed for companies in LoginPage:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleDemoFill = (type: "demo1" | "demo2" | "admin") => {
+    if (type === "admin") {
+      setSelectedCompanyId("admin-mode");
+      setEmail("admins");
+      setPassword("chon1092!!");
+    } else if (type === "demo1") {
+      setSelectedCompanyId("comp-1");
       setEmail("admin@benepeople.com");
       setPassword("benepeople1234");
     } else {
+      setSelectedCompanyId("comp-2");
       setEmail("partner@esgcorp.kr");
       setPassword("esgpartner77");
     }
@@ -42,17 +92,34 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
       setLoading(false);
       
       // Explicit Admin Check
-      if (email === "admins" && password === "chon1092!!") {
-        onLoginSuccess("최고관리자 (ADMIN)");
-      } else if (
-        (email === "admin@benepeople.com" && password === "benepeople1234") ||
-        (email === "partner@esgcorp.kr" && password === "esgpartner77") ||
-        (email !== "admins" && password.length >= 6)
-      ) {
-        const company = email.includes("esgcorp") ? "ESG 환경코퍼레이션" : "(주)베네피플 일렉트릭";
-        onLoginSuccess(company);
+      if (selectedCompanyId === "admin-mode" || email === "admins") {
+        if (email === "admins" && password === "chon1092!!") {
+          onLoginSuccess("최고관리자 (ADMIN)");
+        } else {
+          setError("최고관리자 로그인 정보가 올바르지 않습니다. (ID: admins / PW: chon1092!!)");
+        }
       } else {
-        setError("일치하는 계정 정보가 없습니다. 아이디와 비밀번호를 다시 확인해 주세요. (관리자 아이디: admins / 패스워드: chon1092!!)");
+        // Find company name by selectedCompanyId
+        const matchedComp = companies.find((c: any) => c.id === selectedCompanyId);
+        if (matchedComp) {
+          if (password.length >= 6) {
+            onLoginSuccess(matchedComp.name);
+          } else {
+            setError("비밀번호는 최소 6자리 이상이어야 합니다.");
+          }
+        } else {
+          // Fallback mapping if companies aren't fully loaded or fallback behaves differently
+          if (
+            (email === "admin@benepeople.com" && password === "benepeople1234") ||
+            (email === "partner@esgcorp.kr" && password === "esgpartner77") ||
+            (email !== "admins" && password.length >= 6)
+          ) {
+            const company = email.includes("esgcorp") ? "ESG 환경코퍼레이션" : "(주)베네피플 일렉트릭";
+            onLoginSuccess(company);
+          } else {
+            setError("일치하는 계정 정보가 없습니다. 아이디와 비밀번호를 다시 확인해 주세요.");
+          }
+        }
       }
     }, 1200);
   };
@@ -99,6 +166,64 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Company Selector Dropdown */}
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
+                회원사 및 로그인 유형 선택
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                  <Building2 className="w-4 h-4 text-brand-lightgreen" />
+                </div>
+                <select
+                  value={selectedCompanyId}
+                  onChange={(e) => {
+                    setSelectedCompanyId(e.target.value);
+                    setError(null);
+                    if (e.target.value === "admin-mode") {
+                      setEmail("admins");
+                      setPassword("chon1092!!");
+                    } else if (e.target.value === "comp-1") {
+                      setEmail("admin@benepeople.com");
+                      setPassword("benepeople1234");
+                    } else if (e.target.value === "comp-2") {
+                      setEmail("partner@esgcorp.kr");
+                      setPassword("esgpartner77");
+                    } else {
+                      const matched = companies.find((c: any) => c.id === e.target.value);
+                      if (matched) {
+                        setEmail(`admin@${matched.code.toLowerCase().replace(/[^a-z0-9]/g, "") || "company"}.com`);
+                        setPassword("password1234");
+                      } else {
+                        setEmail("");
+                        setPassword("");
+                      }
+                    }
+                  }}
+                  className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-brand-lightgreen focus:border-transparent outline-none text-xs sm:text-sm font-medium transition appearance-none cursor-pointer"
+                  disabled={loading}
+                >
+                  <option value="admin-mode">최고관리자 (ADMIN)</option>
+                  {companies.map((c: any) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} ({c.code})
+                    </option>
+                  ))}
+                  {companies.length === 0 && (
+                    <>
+                      <option value="comp-1">(주)베네피플 일렉트릭 (BPE-01)</option>
+                      <option value="comp-2">ESG 환경코퍼레이션 (ESG-02)</option>
+                    </>
+                  )}
+                </select>
+                <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-gray-400">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
             {/* Email / ID Field */}
             <div>
               <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">
