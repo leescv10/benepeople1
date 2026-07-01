@@ -208,7 +208,7 @@ export default function App() {
           if (merged.pillar3Sub && (merged.pillar3Sub.includes("기업 커스텀 고도화 웹&앱 모니터링 시스템 무상 지원") || merged.pillar3Sub.includes("웹&앱 모니터링 시스템") || merged.pillar3Sub === "기업 커스텀 고도화 웹&앱 모니터링 시스템 무상 지원")) {
             merged.pillar3Sub = "매월 고객사에 운영 현황을 제공되는 리포트 시스템.";
           }
-          if (merged.logoUrl && merged.logoUrl.includes("benepeople_logo")) {
+          if (merged.logoUrl && (merged.logoUrl.includes("benepeople_logo") || merged.logoUrl.includes("benepeople_new_logo") || merged.logoUrl.includes("bene_brand_logo"))) {
             merged.logoUrl = "";
           }
           return cleanBenePeopleObj(merged);
@@ -230,7 +230,7 @@ export default function App() {
         if (docSnap.exists()) {
           const cloudConfig = { ...DEFAULT_HOMEPAGE_CONFIG, ...docSnap.data() } as HomepageConfig;
           let changed = false;
-          if (cloudConfig.logoUrl && cloudConfig.logoUrl.includes("benepeople_logo")) {
+          if (cloudConfig.logoUrl && (cloudConfig.logoUrl.includes("benepeople_logo") || cloudConfig.logoUrl.includes("benepeople_new_logo") || cloudConfig.logoUrl.includes("bene_brand_logo"))) {
             cloudConfig.logoUrl = "";
             changed = true;
           }

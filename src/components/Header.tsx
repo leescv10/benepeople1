@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Menu, X, ShieldAlert, LogIn, LogOut, LayoutDashboard } from "lucide-react";
-import logoImg from "../assets/images/benepeople_new_logo_1782821338695.jpg";
+import logoImg from "../assets/images/bene_brand_logo_1782911879088.jpg";
 import { HomepageConfig } from "../types";
 
 interface HeaderProps {
@@ -47,7 +47,14 @@ export default function Header({ onLoginClick, loggedInCompany, onLogout, config
     }
   };
 
-  const logoSource = (config?.logoUrl && !config.logoUrl.includes("benepeople_logo")) ? config.logoUrl : logoImg;
+  const isCustomLogo = !!(
+    config?.logoUrl &&
+    !config.logoUrl.includes("benepeople_logo") &&
+    !config.logoUrl.includes("benepeople_new_logo") &&
+    !config.logoUrl.includes("bene_brand_logo") &&
+    config.logoUrl.trim() !== ""
+  );
+  const logoSource = isCustomLogo ? config.logoUrl : logoImg;
   const companyNameText = config?.companyName || "BenePeople";
   const companyLogoSubtext = config?.companyLogoText || "(주)베네피플";
 

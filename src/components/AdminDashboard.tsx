@@ -28,7 +28,7 @@ import {
   Search
 } from "lucide-react";
 import { HomepageConfig, Inquiry } from "../types";
-import logoImg from "../assets/images/benepeople_new_logo_1782821338695.jpg";
+import logoImg from "../assets/images/bene_brand_logo_1782911879088.jpg";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from "recharts";
 import { db } from "../lib/googleAuth";
 import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
@@ -1867,7 +1867,7 @@ export default function AdminDashboard({
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-lg bg-white p-1 flex items-center justify-center overflow-hidden">
                               <img
-                                src={(editingConfig.logoUrl && !editingConfig.logoUrl.includes("benepeople_logo")) ? editingConfig.logoUrl : logoImg}
+                                src={(editingConfig.logoUrl && !editingConfig.logoUrl.includes("benepeople_logo") && !editingConfig.logoUrl.includes("benepeople_new_logo") && !editingConfig.logoUrl.includes("bene_brand_logo")) ? editingConfig.logoUrl : logoImg}
                                 alt="Logo"
                                 className="max-w-full max-h-full object-contain"
                               />

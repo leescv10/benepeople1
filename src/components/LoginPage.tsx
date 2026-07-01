@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import { LogIn, ShieldCheck, Mail, Lock, ArrowLeft, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { db } from "../lib/googleAuth";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
-import logoImg from "../assets/images/benepeople_new_logo_1782821338695.jpg";
+import logoImg from "../assets/images/bene_brand_logo_1782911879088.jpg";
 
 interface LoginPageProps {
   onClose: () => void;
@@ -19,6 +19,58 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
   const [rememberMe, setRememberMe] = useState(false);
   
   const [companies, setCompanies] = useState<any[]>([]);
+  const [logoSource, setLogoSource] = useState(logoImg);
+
+  // Load logoUrl from localStorage on mount as instant fallback
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("bene_people_homepage_config");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.logoUrl) {
+          const isCustom = !parsed.logoUrl.includes("benepeople_logo") && 
+                           !parsed.logoUrl.includes("benepeople_new_logo") && 
+                           !parsed.logoUrl.includes("bene_brand_logo") && 
+                           parsed.logoUrl.trim() !== "";
+          if (isCustom) {
+            setLogoSource(parsed.logoUrl);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Could not read homepage config in LoginPage:", e);
+    }
+  }, []);
+
+  // Fetch real-time updates for homepage logo
+  useEffect(() => {
+    const homepageRef = doc(db, "configs", "homepage");
+    const unsubscribe = onSnapshot(homepageRef, (docSnap) => {
+      try {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data && data.logoUrl) {
+            const isCustom = !data.logoUrl.includes("benepeople_logo") && 
+                             !data.logoUrl.includes("benepeople_new_logo") && 
+                             !data.logoUrl.includes("bene_brand_logo") && 
+                             data.logoUrl.trim() !== "";
+            if (isCustom) {
+              setLogoSource(data.logoUrl);
+            } else {
+              setLogoSource(logoImg);
+            }
+          } else {
+            setLogoSource(logoImg);
+          }
+        }
+      } catch (err) {
+        console.warn("Could not process homepage snapshot in LoginPage:", err);
+      }
+    }, (err) => {
+      console.warn("Homepage onSnapshot error in LoginPage:", err);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Fetch registered companies on mount with real-time updates
   useEffect(() => {
@@ -146,7 +198,7 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
               <img
-                src={logoImg}
+                src={logoSource}
                 alt="Logo"
                 className="h-16 w-auto object-contain rounded-xl"
                 referrerPolicy="no-referrer"
