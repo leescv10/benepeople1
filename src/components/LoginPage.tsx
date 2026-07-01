@@ -59,23 +59,6 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
     return () => unsubscribe();
   }, []);
 
-  const handleDemoFill = (type: "demo1" | "demo2" | "admin") => {
-    if (type === "admin") {
-      setSelectedCompanyId("admin-mode");
-      setEmail("admins");
-      setPassword("chon1092!!");
-    } else if (type === "demo1") {
-      setSelectedCompanyId("comp-1");
-      setEmail("admin@benepeople.com");
-      setPassword("benepeople1234");
-    } else {
-      setSelectedCompanyId("comp-2");
-      setEmail("partner@esgcorp.kr");
-      setPassword("esgpartner77");
-    }
-    setError(null);
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -180,25 +163,6 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
                   onChange={(e) => {
                     setSelectedCompanyId(e.target.value);
                     setError(null);
-                    if (e.target.value === "admin-mode") {
-                      setEmail("admins");
-                      setPassword("chon1092!!");
-                    } else if (e.target.value === "comp-1") {
-                      setEmail("admin@benepeople.com");
-                      setPassword("benepeople1234");
-                    } else if (e.target.value === "comp-2") {
-                      setEmail("partner@esgcorp.kr");
-                      setPassword("esgpartner77");
-                    } else {
-                      const matched = companies.find((c: any) => c.id === e.target.value);
-                      if (matched) {
-                        setEmail(`admin@${matched.code.toLowerCase().replace(/[^a-z0-9]/g, "") || "company"}.com`);
-                        setPassword("password1234");
-                      } else {
-                        setEmail("");
-                        setPassword("");
-                      }
-                    }
                   }}
                   className="w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl bg-white focus:ring-2 focus:ring-brand-lightgreen focus:border-transparent outline-none text-xs sm:text-sm font-medium transition appearance-none cursor-pointer"
                   disabled={loading}
@@ -329,33 +293,7 @@ export default function LoginPage({ onClose, onLoginSuccess }: LoginPageProps) {
             </button>
           </form>
 
-          {/* Quick Demo Accounts Helper */}
-          <div className="mt-8 border-t border-gray-100 pt-6">
-            <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-400 mb-3">
-              <Building2 className="w-3.5 h-3.5 text-brand-lightgreen" />
-              <span>간편 데모 체험용 로그인 계정</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleDemoFill("demo1")}
-                className="text-left bg-gray-50 hover:bg-brand-lightgreen/5 border border-gray-200 hover:border-brand-lightgreen/30 p-2.5 rounded-lg text-[10px] text-gray-600 transition"
-              >
-                <strong className="block text-brand-green font-bold">1번 데모 회원사</strong>
-                admin@benepeople.com
-                <span className="block text-[9px] text-gray-400 mt-0.5">PW: benepeople1234</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleDemoFill("demo2")}
-                className="text-left bg-gray-50 hover:bg-brand-lightgreen/5 border border-gray-200 hover:border-brand-lightgreen/30 p-2.5 rounded-lg text-[10px] text-gray-600 transition"
-              >
-                <strong className="block text-brand-green font-bold">2번 데모 회원사</strong>
-                partner@esgcorp.kr
-                <span className="block text-[9px] text-gray-400 mt-0.5">PW: esgpartner77</span>
-              </button>
-            </div>
-          </div>
+
 
           <p className="text-center text-[11px] text-gray-400 mt-6 leading-relaxed">
             아직 회원사가 아니신가요? <br />
