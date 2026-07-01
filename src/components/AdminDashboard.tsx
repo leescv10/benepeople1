@@ -58,6 +58,24 @@ const safeLocalStorage = {
   }
 };
 
+const cleanBenePeopleText = (str: string): string => {
+  if (typeof str !== "string") return str;
+  return str.replace(/Bene\s+People/gi, "BenePeople");
+};
+
+const cleanBenePeopleObj = <T extends Record<string, any>>(obj: T): T => {
+  if (!obj || typeof obj !== "object") return obj;
+  const newObj = { ...obj };
+  for (const key in newObj) {
+    if (typeof newObj[key] === "string") {
+      newObj[key] = cleanBenePeopleText(newObj[key]) as any;
+    } else if (newObj[key] && typeof newObj[key] === "object") {
+      newObj[key] = cleanBenePeopleObj(newObj[key]);
+    }
+  }
+  return newObj;
+};
+
 interface AdminDashboardProps {
   homepageConfig: HomepageConfig;
   onUpdateHomepageConfig: (newConfig: HomepageConfig) => void;
@@ -71,7 +89,7 @@ export default function AdminDashboard({
 }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<"overview" | "content" | "inquiries" | "accounts">("overview");
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
-  const [editingConfig, setEditingConfig] = useState<HomepageConfig>({ ...homepageConfig });
+  const [editingConfig, setEditingConfig] = useState<HomepageConfig>(() => cleanBenePeopleObj({ ...homepageConfig }));
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [contentSubTab, setContentSubTab] = useState<"identity" | "hero" | "intro" | "why" | "pain">("identity");
   const [dragOverLogo, setDragOverLogo] = useState(false);
@@ -298,7 +316,7 @@ export default function AdminDashboard({
 
   // Sync editing configuration with prop updates
   useEffect(() => {
-    setEditingConfig({ ...homepageConfig });
+    setEditingConfig(cleanBenePeopleObj({ ...homepageConfig }));
   }, [homepageConfig]);
 
   const generateMockInquiries = () => {
@@ -812,7 +830,9 @@ export default function AdminDashboard({
 
   const handleSaveHomepageConfig = () => {
     playCheerfulChime();
-    onUpdateHomepageConfig(editingConfig);
+    const cleaned = cleanBenePeopleObj(editingConfig);
+    setEditingConfig(cleaned);
+    onUpdateHomepageConfig(cleaned);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
   };

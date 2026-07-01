@@ -129,6 +129,24 @@ const DEFAULT_HOMEPAGE_CONFIG: HomepageConfig = {
   footerCopyright: "© 2026 BenePeople Inc. All rights reserved. 대한민국 No.1 장애인 고용 통합 위탁 솔루션."
 };
 
+const cleanBenePeopleText = (str: string): string => {
+  if (typeof str !== "string") return str;
+  return str.replace(/Bene\s+People/gi, "BenePeople");
+};
+
+const cleanBenePeopleObj = <T extends Record<string, any>>(obj: T): T => {
+  if (!obj || typeof obj !== "object") return obj;
+  const newObj = { ...obj };
+  for (const key in newObj) {
+    if (typeof newObj[key] === "string") {
+      newObj[key] = cleanBenePeopleText(newObj[key]) as any;
+    } else if (newObj[key] && typeof newObj[key] === "object") {
+      newObj[key] = cleanBenePeopleObj(newObj[key]);
+    }
+  }
+  return newObj;
+};
+
 export default function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [badgeClicks, setBadgeClicks] = useState(0);
@@ -190,15 +208,15 @@ export default function App() {
           if (merged.pillar3Sub && (merged.pillar3Sub.includes("기업 커스텀 고도화 웹&앱 모니터링 시스템 무상 지원") || merged.pillar3Sub.includes("웹&앱 모니터링 시스템") || merged.pillar3Sub === "기업 커스텀 고도화 웹&앱 모니터링 시스템 무상 지원")) {
             merged.pillar3Sub = "매월 고객사에 운영 현황을 제공되는 리포트 시스템.";
           }
-          return merged;
+          return cleanBenePeopleObj(merged);
         } catch (e) {
-          return DEFAULT_HOMEPAGE_CONFIG;
+          return cleanBenePeopleObj(DEFAULT_HOMEPAGE_CONFIG);
         }
       }
     } catch (err) {
       console.warn("Could not read from localStorage on initialization:", err);
     }
-    return DEFAULT_HOMEPAGE_CONFIG;
+    return cleanBenePeopleObj(DEFAULT_HOMEPAGE_CONFIG);
   });
 
   // Load config from Firestore on mount
@@ -266,13 +284,14 @@ export default function App() {
             cloudConfig.pillar3Sub = "매월 고객사에 운영 현황을 제공되는 리포트 시스템.";
             changed = true;
           }
+          const cleanedCloudConfig = cleanBenePeopleObj(cloudConfig);
           if (changed) {
             // Sync the updated config back to Firestore
-            await setDoc(docRef, cloudConfig);
+            await setDoc(docRef, cleanedCloudConfig);
           }
-          setHomepageConfig(cloudConfig);
+          setHomepageConfig(cleanedCloudConfig);
           try {
-            localStorage.setItem("bene_people_homepage_config", JSON.stringify(cloudConfig));
+            localStorage.setItem("bene_people_homepage_config", JSON.stringify(cleanedCloudConfig));
           } catch (e) {
             console.warn("Could not save to localStorage on loadConfig:", e);
           }
@@ -285,30 +304,32 @@ export default function App() {
   }, []);
 
   const handleUpdateHomepageConfig = async (newConfig: HomepageConfig) => {
-    setHomepageConfig(newConfig);
+    const cleaned = cleanBenePeopleObj(newConfig);
+    setHomepageConfig(cleaned);
     try {
-      localStorage.setItem("bene_people_homepage_config", JSON.stringify(newConfig));
+      localStorage.setItem("bene_people_homepage_config", JSON.stringify(cleaned));
     } catch (e) {
       console.warn("Could not save to localStorage on handleUpdateHomepageConfig:", e);
     }
     try {
       const docRef = doc(db, "configs", "homepage");
-      await setDoc(docRef, newConfig);
+      await setDoc(docRef, cleaned);
     } catch (err) {
       console.error("Could not save homepage config to Firestore:", err);
     }
   };
 
   const handleResetHomepageConfig = async () => {
-    setHomepageConfig(DEFAULT_HOMEPAGE_CONFIG);
+    const cleaned = cleanBenePeopleObj(DEFAULT_HOMEPAGE_CONFIG);
+    setHomepageConfig(cleaned);
     try {
-      localStorage.setItem("bene_people_homepage_config", JSON.stringify(DEFAULT_HOMEPAGE_CONFIG));
+      localStorage.setItem("bene_people_homepage_config", JSON.stringify(cleaned));
     } catch (e) {
       console.warn("Could not save to localStorage on handleResetHomepageConfig:", e);
     }
     try {
       const docRef = doc(db, "configs", "homepage");
-      await setDoc(docRef, DEFAULT_HOMEPAGE_CONFIG);
+      await setDoc(docRef, cleaned);
     } catch (err) {
       console.error("Could not reset homepage config in Firestore:", err);
     }
