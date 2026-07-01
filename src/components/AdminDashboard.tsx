@@ -132,7 +132,11 @@ export default function AdminDashboard({
       }
     } catch (err: any) {
       console.error(err);
-      setDriveError("구글 연동에 실패했습니다. 권한을 확인해주세요.");
+      if (err.code === "auth/unauthorized-domain" || (err.message && err.message.includes("unauthorized-domain"))) {
+        setDriveError(`unauthorized-domain:${window.location.hostname}`);
+      } else {
+        setDriveError("구글 연동에 실패했습니다. 권한을 확인해주세요. (GCP OAuth Client 설정 및 Firebase Authorized Domains 설정을 확인하세요)");
+      }
     } finally {
       setDriveLoading(false);
     }
@@ -169,6 +173,52 @@ export default function AdminDashboard({
     } finally {
       setDriveDownloading(false);
     }
+  };
+
+  const renderDriveError = () => {
+    if (!driveError) return null;
+
+    if (driveError.startsWith("unauthorized-domain:")) {
+      const hostname = driveError.substring("unauthorized-domain:".length);
+      return (
+        <div className="bg-amber-50 text-amber-900 p-4 rounded-xl text-xs border border-amber-200 space-y-3 text-left">
+          <div className="flex items-center gap-1.5 font-extrabold text-amber-800">
+            <span>⚠️ Netlify 배포 도메인 승인 필요</span>
+          </div>
+          <p className="text-[11px] leading-relaxed text-amber-700 font-medium">
+            현재 Netlify 도메인(<strong className="underline">{hostname}</strong>)이 Firebase 인증 및 Google Cloud Console의 승인된 도메인 목록에 등록되어 있지 않아 연동이 차단되었습니다.
+          </p>
+          <div className="bg-white/80 p-3 rounded-lg border border-amber-100 space-y-2.5 text-[10.5px]">
+            <div>
+              <p className="font-bold text-amber-900">1단계. Firebase 콘솔 설정</p>
+              <ol className="list-decimal pl-4 mt-0.5 space-y-0.5 text-amber-800">
+                <li><a href="https://console.firebase.google.com/" target="_blank" rel="noreferrer" className="underline font-bold text-sky-600">Firebase 콘솔</a>에 로그인 후 프로젝트를 선택합니다.</li>
+                <li><strong>Authentication</strong> → <strong>Settings</strong> 탭으로 이동합니다.</li>
+                <li><strong>Authorized domains (승인된 도메인)</strong> 목록에 <strong>{hostname}</strong>을 추가합니다.</li>
+              </ol>
+            </div>
+            <div className="border-t border-amber-100/50 pt-2">
+              <p className="font-bold text-amber-900">2단계. Google Cloud Console 설정</p>
+              <ol className="list-decimal pl-4 mt-0.5 space-y-0.5 text-amber-800">
+                <li><a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noreferrer" className="underline font-bold text-sky-600">Google Cloud 사용자 인증 정보</a>로 이동합니다.</li>
+                <li>사용 중인 <strong>OAuth 2.0 Client ID</strong>를 선택해 수정 페이지로 들어갑니다.</li>
+                <li><strong>승인된 JavaScript 원본</strong>에 <code className="bg-gray-100 px-1 py-0.5 rounded">https://{hostname}</code>을 추가합니다.</li>
+                <li><strong>승인된 리디렉션 URI</strong>에 <code className="bg-gray-100 px-1 py-0.5 rounded">https://{hostname}/__/auth/handler</code>를 추가합니다.</li>
+              </ol>
+            </div>
+          </div>
+          <p className="text-[10px] text-amber-600 italic leading-relaxed">
+            * 만약 AI Studio의 기본 샌드박스 프로젝트를 사용 중이시라면, 샌드박스 프로젝트는 Google 관리자 전용이므로 외부 Netlify 도메인을 승인할 수 없습니다. 이 경우 본인의 Firebase 프로젝트를 생성하여 <code className="bg-amber-100/50 px-1 rounded">firebase-applet-config.json</code> 파일을 업데이트해 주셔야 정상 작동합니다.
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="bg-red-50 text-red-600 p-2.5 rounded-xl text-xs border border-red-100 flex items-center gap-1.5 font-medium text-left">
+        <span>⚠️ {driveError}</span>
+      </div>
+    );
   };
 
   // Member companies list
@@ -2743,6 +2793,9 @@ export default function AdminDashboard({
                             권한을 안전하게 수락하고 진행해 주세요.
                           </p>
                         </div>
+                        
+                        {renderDriveError()}
+
                         <button
                           type="button"
                           onClick={handleDriveLogin}
@@ -2814,11 +2867,7 @@ export default function AdminDashboard({
                         </div>
 
                         {/* Error Notification */}
-                        {driveError && (
-                          <div className="bg-red-50 text-red-600 p-2.5 rounded-xl text-xs border border-red-100 flex items-center gap-1.5 font-medium">
-                            <span>⚠️ {driveError}</span>
-                          </div>
-                        )}
+                        {renderDriveError()}
 
                         {/* Drive Files List */}
                         <div className="bg-gray-50 border border-gray-100 rounded-xl overflow-hidden min-h-[220px] max-h-[300px] overflow-y-auto flex flex-col">
